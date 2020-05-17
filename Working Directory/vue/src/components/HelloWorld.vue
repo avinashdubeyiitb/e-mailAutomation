@@ -21,7 +21,7 @@
                         <input type="text" class="form-control" v-model="department">
                         <strong>College Name:</strong>
                         <input type="text" class="form-control" v-model="college">
-                        <strong>Conant No.:</strong>
+                        <strong>Contact No.:</strong>
                         <input type="number" class="form-control" v-model="contact">
                           <button @click="formSubmit" class="btn btn-success">Accept</button><br><br>
                           <button class="btn btn-success">Reject</button><br><br>

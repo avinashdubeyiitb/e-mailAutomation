@@ -50,6 +50,7 @@ def get(info):
     except (NameError,ObjectDoesNotExist) as e :
         print(e.args[0])
         data = collegeData(mail_id = d['mail_id'],name = d['name'],designation = d['designation'],department = d['department'],college = d['college'],contact = d['contact'] )
+        data.save('self')
         with open('templates/new.html', 'r') as email_content:
             msgHtml = email_content.read()
         msgPlain = "Hi\nPlain Email"
