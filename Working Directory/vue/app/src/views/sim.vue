@@ -1,6 +1,9 @@
 <template>
   <div>
     <h1>Send Information Mail</h1>
+    <b-container class="bv-example-row">
+      <b-row><b-col cols="8">
+
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-8">
@@ -23,12 +26,7 @@
                         <strong>Contact No.:</strong>
                         <input type="tel" class="form-control" v-model="cno"><br>
                         <button class="btn btn-success" v-b-modal.modal-1>Submit</button>
-                        <b-modal id="modal-1" title="Response">
-                           <p class="my-4">Key: {{output.key}}</p>
-                           <p class="my-4">Recipient ID:{{output.recipientId}}</p>
-                           <p class="my-4">Subject: {{output.subject}}</p>
-                           <p class="my-4">Body: {{output.body}}</p>
-                         </b-modal>
+
                         </form>
                         <!-- <strong>Response:</strong> -->
                         <!-- <pre>
@@ -36,55 +34,73 @@
                         <p id="rmsg">{{output}}</p>
                         <!-- <div  v-if="{{output.key}} === 'success'"> -->
                         <p>{{key}}</p>
-                        <form >
-                        <b-button class="btn btn-success" id="popover-reactive-1" ref="button1">Approve</b-button>
-                        </form>
-                        <b-popover
-                              target="popover-reactive-1"
-                              triggers="click"
-                              :show.sync="popoverShow1"
-                              placement="auto"
-                              container="my-container"
-                              ref="popover"
-                              @hidden="onHidden"
-                            >
-                              <template v-slot:title>
-                                Are you sure you want to continue?
-                              </template>
-                              <div>
-                                <b-button @click="onClose" size="sm" variant="danger">Cancel</b-button>
-                                <b-button @click="approve" size="sm" variant="primary">Sure</b-button>
-                              </div>
-                            </b-popover>
-                        <form @submit="edit">
-                        <button class="btn btn-success" >Edit</button>
-                        </form>
-                        <b-button id="popover-reactive-2" ref="button2" class="btn btn-success" >Reject</b-button>
-                        <b-popover
-                              target="popover-reactive-2"
-                              triggers="click"
-                              :show.sync="popoverShow2"
-                              placement="auto"
-                              container="my-container"
-                              ref="popover"
-                              @hidden="onHidden"
-                            >
-                              <template v-slot:title>
-                                Are you want to save it in gmail draft or discard it ?
-                              </template>
-                              <div>
-                                <b-button @click="gsave" size="sm" variant="primary">Save to draft</b-button>
-                                <b-button @click="reject" size="sm" variant="danger">Discard</b-button>
-                              </div>
-                            </b-popover>
-                        <!-- </div> -->
-                        <!-- Output from the popover interaction -->
-
+                        <p>-----------------------or------------------------</p>
+                        <p>Upload csv file</p>
+                        <label>File:
+                        <input type="file" accept=".csv" id="file" ref="file" v-on:change="handleFileUpload()"/>
+                      </label>
+                        <button v-on:click="submitFile()" class="btn btn-success">Submit</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+  </b-col>
+  <b-col cols="2" v-show="!isNight">"show right now"
+  <b-container title="Response" v-show="!isNight">
+     <p class="my-4">Key: {{output.key}}</p>
+     <p class="my-4">Recipient ID:{{output.recipientId}}</p>
+     <p class="my-4">Subject: {{output.subject}}</p>
+     <p class="my-4">Body: {{output.body}}</p>
+   </b-container></b-col>
+  <b-col cols="2" v-show="isNight">" nothing to show right now"<img alt="no-thumbnail" src="../assets/no-thumbnail.jpg"> </b-col>
+  <div v-show="!isNight">
+    <form >
+    <b-button class="btn btn-success" id="popover-reactive-1" ref="button1">Approve</b-button>
+    </form>
+    <b-popover
+          target="popover-reactive-1"
+          triggers="click"
+          :show.sync="popoverShow1"
+          placement="auto"
+          container="my-container"
+          ref="popover"
+          @hidden="onHidden"
+        >
+          <template v-slot:title>
+            Are you sure you want to continue?
+          </template>
+          <div>
+            <b-button @click="onClose" size="sm" variant="danger">Cancel</b-button>
+            <b-button @click="approve" size="sm" variant="primary">Sure</b-button>
+          </div>
+        </b-popover>
+    <form @submit="edit">
+    <button class="btn btn-success" >Edit</button>
+    </form>
+    <b-button id="popover-reactive-2" ref="button2" class="btn btn-success" >Reject</b-button>
+    <b-popover
+          target="popover-reactive-2"
+          triggers="click"
+          :show.sync="popoverShow2"
+          placement="auto"
+          container="my-container"
+          ref="popover"
+          @hidden="onHidden"
+        >
+          <template v-slot:title>
+            Are you want to save it in gmail draft or discard it ?
+          </template>
+          <div>
+            <b-button @click="gsave" size="sm" variant="primary">Save to draft</b-button>
+            <b-button @click="reject" size="sm" variant="danger">Discard</b-button>
+          </div>
+        </b-popover>
+    <!-- </div> -->
+    <!-- Output from the popover interaction -->
+  </div>
+</b-row>
+</b-container>
   </div>
 
 </template>
@@ -102,6 +118,7 @@ export default {
   },
   data () {
     return {
+      isNight: true,
       popoverShow1: false,
       popoverShow2: false,
       captureid: '',
@@ -112,12 +129,35 @@ export default {
       department: '',
       cname: '',
       cno: '',
-      output: ''
+      output: '',
+      file: ''
     }
   },
   watch: {
   },
   methods: {
+    handleFileUpload () {
+      this.file = this.$refs.file.files[0]
+    },
+    submitFile () {
+      const formData = new FormData()
+      // const currentObj = this
+      formData.append('file', this.file)
+      this.axios.post('http://localhost:8081/api/teg',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      )
+        .then(function () {
+          console.log('SUCCESS!!')
+        })
+        .catch(function () {
+          console.log('FAILURE!!')
+        })
+    },
     onClose () {
       this.popoverShow1 = false
       this.popoverShow2 = false
@@ -141,6 +181,7 @@ export default {
     formSubmit (e) {
       e.preventDefault()
       const currentObj = this
+      this.isNight = false
       this.axios.post('http://localhost:8081/api/teg', {
         captureid: 'sim',
         remail: this.remail,
@@ -156,6 +197,7 @@ export default {
           // this.$store.commit('change', response.data)
           if (currentObj.output.key === 'success') {
             console.log(currentObj.output.key)
+
             // isVisible: False
           //   visibleHandler(isVisible) {
           //   if (isVisible) {
@@ -264,5 +306,9 @@ a {
 }
 .form-control{
   margin:10px
+}
+img{
+  height:200px;
+  width:200px;
 }
 </style>
