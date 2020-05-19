@@ -35,8 +35,8 @@
                         <p>{{key}}</p>
                         <p>-----------------------or------------------------</p>
                         <p>Upload csv file</p>
-                        <label>File:
-                        <input type="file" accept=".csv" id="file" ref="file" v-on:change="handleFileUpload()"/>
+                        <label>File:accept=".csv"
+                        <input type="file"  id="file" ref="file" v-on:change="handleFileUpload()"/>
                       </label>
                         <button v-on:click="submitFile()" class="btn btn-success">Submit</button>
                     </div>
@@ -180,7 +180,7 @@ export default {
       const formData = new FormData()
       // const currentObj = this
       formData.append('file', this.file)
-      this.axios.post('http://localhost:8081/api/teg',
+      this.axios.post('http://localhost:8081/api/main/savefile',
         formData,
         {
           headers: {

@@ -28,6 +28,11 @@ SCOPES = [
 ]
 
 @api_view(['POST'])
+def savefile(request):
+    file = request.FILES['file']
+    file_name = default_storage.save(file.name, file)
+    return JsonResponse({'key':'done'})
+
 def base(info):
         try:
             get(info)
@@ -90,7 +95,7 @@ def get_credentials():
         with open('pickle.token', 'wb') as token:
             pickle.dump(creds, token)
     return creds
-    
+
 def CreateMessageHtml(sender, to, subject, msgHtml, msgPlain):
     msg = MIMEMultipart('alternative')
     msg['Subject'] = subject
