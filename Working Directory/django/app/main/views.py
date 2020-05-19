@@ -32,7 +32,16 @@ SCOPES = [
 ]
 
 @api_view(['POST'])
+<<<<<<< HEAD
 def submit(request):
+=======
+def savefile(request):
+    file = request.FILES['file']
+    file_name = default_storage.save(file.name, file)
+    return JsonResponse({'key':'done'})
+
+def base(info):
+>>>>>>> refs/remotes/origin/master
         try:
             var = JSONParser().parse(request)
             clg = var.get('cname')
@@ -144,6 +153,7 @@ def get_credentials():
         with open('pickle.token', 'wb') as token:
             pickle.dump(creds, token)
     return creds
+<<<<<<< HEAD
  '''   
 def CreateMessageHtml(sender, to, subject, msg):
     message = MIMEText(msg)
@@ -152,6 +162,16 @@ def CreateMessageHtml(sender, to, subject, msg):
     message['To'] = to
     #msg.attach(MIMEText(msgPlain, 'plain'))
     #msg.attach(MIMEText(msgHtml, 'html'))
+=======
+
+def CreateMessageHtml(sender, to, subject, msgHtml, msgPlain):
+    msg = MIMEMultipart('alternative')
+    msg['Subject'] = subject
+    msg['From'] = sender
+    msg['To'] = to
+    msg.attach(MIMEText(msgPlain, 'plain'))
+    msg.attach(MIMEText(msgHtml, 'html'))
+>>>>>>> refs/remotes/origin/master
     return {'raw': base64.urlsafe_b64encode(msg.as_string().encode()).decode()}
 
 def SendMessageInternal(service, user_id, message):

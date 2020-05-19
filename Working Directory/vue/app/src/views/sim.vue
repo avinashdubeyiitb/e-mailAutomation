@@ -180,7 +180,11 @@ export default {
       const formData = new FormData()
       // const currentObj = this
       formData.append('file', this.file)
+<<<<<<< HEAD
       this.axios.post('http://localhost:8081/api/main/csvsubmit',
+=======
+      this.axios.post('http://localhost:8081/api/main/savefile',
+>>>>>>> refs/remotes/origin/master
         formData,
         {
           headers: {
