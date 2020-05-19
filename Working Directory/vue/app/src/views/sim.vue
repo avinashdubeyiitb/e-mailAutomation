@@ -1,11 +1,11 @@
 <template>
   <div>
     <h1>Send Information Mail</h1>
-    <b-container class="bv-example-row">
+    <b-container >
       <b-row><b-col cols="8">
 
-    <div class="container">
-        <div class="row justify-content-center">
+    <div >
+        <div>
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header">Please input fields</div>
@@ -26,7 +26,6 @@
                         <strong>Contact No.:</strong>
                         <input type="tel" class="form-control" v-model="cno"><br>
                         <button class="btn btn-success" v-b-modal.modal-1>Submit</button>
-
                         </form>
                         <!-- <strong>Response:</strong> -->
                         <!-- <pre>
@@ -46,12 +45,43 @@
         </div>
     </div>
   </b-col>
+
   <b-col cols="2" v-show="!isNight">"show right now"
   <b-container title="Response" v-show="!isNight">
-     <p class="my-4">Key: {{output.key}}</p>
-     <p class="my-4">Recipient ID:{{output.recipientId}}</p>
-     <p class="my-4">Subject: {{output.subject}}</p>
-     <p class="my-4">Body: {{output.body}}</p>
+     <!-- <p class="my-4">Key: {{output.key}}</p> -->
+     <form>
+     <p>Key:</p>
+     <input v-if = "key1" v-model = "output.key"
+     @blur= "key1 = false; $emit('update')"
+     @keyup.enter = "key1=false; $emit('update')">
+           <div v-else>
+       <label @click = "key1 = true;">{{output.key}} </label>
+     </div>
+     <!-- <p class="my-4">Recipient ID:{{output.recipientId}}</p> -->
+     <p>recipientId:</p>
+     <input v-if = "key2" v-model = "output.recipientId"
+     @blur= "key2 = false; $emit('update')"
+     @keyup.enter = "key2=false; $emit('update')">
+           <div v-else>
+       <label @click = "key2 = true;"> {{output.recipientId}} </label>
+     </div>
+     <!-- <p class="my-4">Subject: {{output.subject}}</p> -->
+     <!-- <p class="my-4">Body: {{output.body}}</p> -->
+     <p>subject:</p>
+     <input v-if = "key3" v-model = "output.subject"
+     @blur= "key3 = false; $emit('update')"
+     @keyup.enter = "key3=false; $emit('update')">
+           <div v-else>
+       <label @click = "key3 = true;"> {{output.subject}} </label>
+     </div>
+     <p>body:</p>
+     <input v-if = "key4" v-model = "output.body"
+     @blur= "key4 = false; $emit('update')"
+     @keyup.enter = "output.body=false; $emit('update')">
+           <div v-else>
+       <label @click = "key4 = true;"> {{output.body}} </label>
+     </div>
+   </form>
    </b-container></b-col>
   <b-col cols="2" v-show="isNight">" nothing to show right now"<img alt="no-thumbnail" src="../assets/no-thumbnail.jpg"> </b-col>
   <div v-show="!isNight">
@@ -102,7 +132,6 @@
 </b-row>
 </b-container>
   </div>
-
 </template>
 
 <script>
@@ -130,12 +159,20 @@ export default {
       cname: '',
       cno: '',
       output: '',
-      file: ''
+      file: '',
+      key1: '',
+      key2: '',
+      key3: '',
+      key4: '',
+      editedTodo: null
     }
   },
   watch: {
   },
   methods: {
+    editTodo: function (output) {
+      this.editedTodo = output
+    },
     handleFileUpload () {
       this.file = this.$refs.file.files[0]
     },
@@ -168,15 +205,6 @@ export default {
       this.focusRef(this.$refs.button)
     },
     focusRef (ref) {
-      // Some references may be a component, functional component, or plain element
-      // This handles that check before focusing, assuming a `focus()` method exists
-      // We do this in a double `$nextTick()` to ensure components have
-      // updated & popover positioned first
-      // this.$nextTick(() => {
-      //   this.$nextTick(() => {
-      //     ;(ref.$el || ref).focus()
-      //   })
-      // })
     },
     formSubmit (e) {
       e.preventDefault()
@@ -192,35 +220,12 @@ export default {
         cname: this.cname,
         cno: this.cno
       })
-        .then(function (response) {
-          currentObj.output = response.data
-          // this.$store.commit('change', response.data)
-          if (currentObj.output.key === 'success') {
-            console.log(currentObj.output.key)
-
-            // isVisible: False
-          //   visibleHandler(isVisible) {
-          //   if (isVisible) {
-          //     // Do something
-          //
-          //   } else {
-          //     // Do something else
-          //     this.isVisible: False
-          //   }
-          // }
-          }
+        .then(output => {
+          this.output = output.data
         })
         .catch(function (error) {
           currentObj.output = error
         })
-      // this.$store.dispatch('createEvent', this.output)
-      this.$store.commit({
-        type: 'change',
-        key: currentObj.output.key,
-        recipientId: currentObj.output.recipientId,
-        subject: currentObj.output.subject,
-        body: currentObj.output.body
-      })
     },
     approve (e) {
       e.preventDefault()

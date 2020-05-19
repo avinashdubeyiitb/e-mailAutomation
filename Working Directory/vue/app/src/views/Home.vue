@@ -2,7 +2,7 @@
   <!-- <div class="home"> -->
     <!-- <img alt="Vue logo" src="../assets/logo.png"> -->
     <!-- <HelloWorld msg="This is my first Vue.js App"/> -->
-    <b-jumbotron>
+    <!-- <b-jumbotron> -->
     <div>
     <b-container class="bv-example-row">
       <b-row>
@@ -35,7 +35,7 @@
     </b-row>
     </b-container>
   </div>
-  </b-jumbotron>
+  <!-- </b-jumbotron> -->
 </template>
 
 <script>
