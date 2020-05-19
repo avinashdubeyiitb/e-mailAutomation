@@ -105,9 +105,6 @@
             <b-button @click="approve" size="sm" variant="primary">Sure</b-button>
           </div>
         </b-popover>
-    <form @submit="edit">
-    <button class="btn btn-success" >Edit</button>
-    </form>
     <b-button id="popover-reactive-2" ref="button2" class="btn btn-success" >Reject</b-button>
     <b-popover
           target="popover-reactive-2"
@@ -210,7 +207,7 @@ export default {
       e.preventDefault()
       const currentObj = this
       this.isNight = false
-      this.axios.post('http://localhost:8081/api/teg', {
+      this.axios.post('http://localhost:8081/api', {
         captureid: 'sim',
         remail: this.remail,
         ccbcc: this.ccbcc,
