@@ -22,6 +22,7 @@ import os.path
 import httplib2
 import base64
 import mimetypes
+from django.core.files.storage import default_storage
 
 from .models import clgData
 from .serializers import ClgDataSerializer
@@ -29,9 +30,12 @@ from app.settings import EMAIL_HOST_USER
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = [
     'https://www.googleapis.com/auth/gmail.readonly',
-    'https://www.googleapis.com/auth/gmail.send'
+    'https://www.googleapis.com/auth/gmail.send',
+    'https://www.googleapis.com/auth/gmail.compose',
+    'https://www.googleapis.com/auth/gmail.modify',
 ]
 
+@api_view(['POST'])
 def savefile(request):
     file = request.FILES['file']
     file_name = default_storage.save(file.name, file)
@@ -46,38 +50,43 @@ def submit(request):
             if obj.count() >= 1:
                 subject = "Send Information Mail"
                 body = "You are already registered."
+                var['subject']=subject
+                var['body']=body
             else:
                 clgSrz = ClgDataSerializer(data = {'cname' : clg})
                 if clgSrz.is_valid():
                     clgSrz.save()
                 subject = "Send Information Mail"
                 body = "Welcome to our eyrc program."
-            return JsonResponse(var.update({'subject':subject,'body':body}))
+                var['subject']=subject
+                var['body']=body
+            return JsonResponse(var)
         except ValueError as e:
             return JsonResponse({'status':'failed','info':e.args[0]})
 
 @api_view(['POST'])
 def approve(request):
-        try:        
+        try:
             var = JSONParser().parse(request)
             to = var.get('remail')
             subject = var.get('subject')
             body = var.get('body')
             sent  = SendMessage(EMAIL_HOST_USER,to,subject,body)
-            if sent :      
+            if sent :
                 return JsonResponse({'status':'success','info':'mail sent successfully'})
             else :
-                return JsonResponse({'status':'failure','info':'mail was not sent'})          
+                return JsonResponse({'status':'failure','info':'mail was not sent'})
         except ValueError as e:
             return Response(e.args[0],status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def gsave(request):
     var = JSONParser().parse(request)
-    to = var.get('remail')
-    subject = var.get('subject')
-    body = var.get('body')
+    to = 'aakashkhandelwal56@gmail.com'
+    subject = 'subject'
+    body = "hiii"
     credentials = get_credentials()
+    attachmentFile=None
     # http = credentials.authorize(httplib2.Http())
     # service = discovery.build('gmail', 'v1', http=http)
     service = build('gmail', 'v1', credentials=credentials)
@@ -85,7 +94,7 @@ def gsave(request):
         pass
         #message = createMessageWithAttachment(sender, to, subject, msgHtml, msgPlain, attachmentFile)
     else:
-        message = CreateMessageHtml(EMAIL_HOST_USER, to, subject, body)    
+        message = CreateMessageHtml(EMAIL_HOST_USER, to, subject, body)
     result = CreateDraft(service,"me",message)
     return result
 
@@ -106,9 +115,9 @@ def CreateDraft(service, user_id, message_body):
     draft = service.users().drafts().create(userId=user_id, body=message).execute()
     print('Draft id: %s\nDraft message: %s' % (draft['id'], draft['message']))
     return draft
-  except errors.HttpError as  error:
+  except errors.HttpError as error:
     print('An error occurred: %s' % error)
-    return None
+    return error
 
 def SendMessage(sender, to, subject, body, attachmentFile=None):
     credentials = get_credentials()

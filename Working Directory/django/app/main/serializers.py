@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from main.models import clgData,tempCollegeData
+from main.models import clgData
 
 class ClgDataSerializer(serializers.ModelSerializer):
 

@@ -36,7 +36,7 @@
                         <p>-----------------------or------------------------</p>
                         <p>Upload csv file</p>
                         <label>File:
-                        <input type="file" accept=".csv" id="file" ref="file" v-on:change="handleFileUpload()"/>
+                        <input type="file" accept=".xlsx" id="file" ref="file" v-on:change="handleFileUpload()"/>
                       </label>
                         <button v-on:click="submitFile()" class="btn btn-success">Submit</button>
                     </div>
@@ -50,20 +50,20 @@
   <b-container title="Response" v-show="!isNight">
      <!-- <p class="my-4">Key: {{output.key}}</p> -->
      <form>
-     <p>Key:</p>
-     <input v-if = "key1" v-model = "output.key"
-     @blur= "key1 = false; $emit('update')"
-     @keyup.enter = "key1=false; $emit('update')">
-           <div v-else>
-       <label @click = "key1 = true;">{{output.key}} </label>
-     </div>
      <!-- <p class="my-4">Recipient ID:{{output.recipientId}}</p> -->
      <p>recipientId:</p>
-     <input v-if = "key2" v-model = "output.recipientId"
+     <input v-if = "key1" v-model = "output.remail"
+     @blur= "key1 = false; $emit('update')"
+     @keyup.enter = "key1=false; $emit('update')">
+     <div v-else>
+       <label @click = "key1 = true;"> {{output.remail}} </label>
+     </div>
+     <p>cc/bcc:</p>
+     <input v-if = "key2" v-model = "output.ccbcc"
      @blur= "key2 = false; $emit('update')"
      @keyup.enter = "key2=false; $emit('update')">
            <div v-else>
-       <label @click = "key2 = true;"> {{output.recipientId}} </label>
+       <label @click = "key2 = true;">{{output.ccbcc}} </label>
      </div>
      <!-- <p class="my-4">Subject: {{output.subject}}</p> -->
      <!-- <p class="my-4">Body: {{output.body}}</p> -->
@@ -81,6 +81,42 @@
            <div v-else>
        <label @click = "key4 = true;"> {{output.body}} </label>
      </div>
+     <h2>Extra details:</h2>
+     <p>name:</p>
+     <input v-if = "key5" v-model = "output.name"
+     @blur= "key5 = false; $emit('update')"
+     @keyup.enter = "key5=false; $emit('update')">
+           <div v-else>
+       <label @click = "key5 = true;">{{output.name}} </label>
+     </div>
+     <p>Designation:</p>
+     <input v-if = "key6" v-model = "output.designation"
+     @blur= "key6 = false; $emit('update')"
+     @keyup.enter = "key6=false; $emit('update')">
+           <div v-else>
+       <label @click = "key6 = true;">{{output.designation}} </label>
+     </div>
+   <p>Department:</p>
+   <input v-if = "key7" v-model = "output.department"
+   @blur= "key7 = false; $emit('update')"
+   @keyup.enter = "key7=false; $emit('update')">
+         <div v-else>
+     <label @click = "key7 = true;">{{output.department}} </label>
+   </div>
+   <p>College name:</p>
+   <input v-if = "key8" v-model = "output.cname"
+   @blur= "key8 = false; $emit('update')"
+   @keyup.enter = "key8=false; $emit('update')">
+         <div v-else>
+     <label @click = "key8 = true;">{{output.cname}} </label>
+   </div>
+   <p>Contact number:</p>
+   <input v-if = "key9" v-model = "output.cno"
+   @blur= "key9 = false; $emit('update')"
+   @keyup.enter = "key9=false; $emit('update')">
+  <div v-else>
+     <label @click = "key9 = true;">{{output.cno}} </label>
+   </div>
    </form>
    </b-container></b-col>
   <b-col cols="2" v-show="isNight">" nothing to show right now"<img alt="no-thumbnail" src="../assets/no-thumbnail.jpg"> </b-col>
@@ -120,7 +156,7 @@
           </template>
           <div>
             <b-button @click="gsave" size="sm" variant="primary">Save to draft</b-button>
-            <b-button @click="reject" size="sm" variant="danger">Discard</b-button>
+            <b-button size="sm" variant="danger">Discard</b-button>
           </div>
         </b-popover>
     <!-- </div> -->
@@ -161,13 +197,18 @@ export default {
       key2: '',
       key3: '',
       key4: '',
+      key5: '',
+      key6: '',
+      key7: '',
+      key8: '',
+      key9: '',
       editedTodo: null
     }
   },
   watch: {
   },
   methods: {
-    editTodo: function (output) {
+    editTodo: output => {
       this.editedTodo = output
     },
     handleFileUpload () {
@@ -209,7 +250,6 @@ export default {
       const currentObj = this
       this.isNight = false
       this.axios.post('http://localhost:8081/api/main/submit', {
-        captureid: 'sim',
         remail: this.remail,
         ccbcc: this.ccbcc,
         name: this.name,
@@ -229,7 +269,10 @@ export default {
       e.preventDefault()
       const currentObj = this
       this.axios.post('http://localhost:8081/api/main/approve', {
-        captureid: 'approvesim'
+        remail: this.output.remail,
+        ccbcc: this.output.ccbcc,
+        body: this.output.body,
+        subject: this.output.subject
       })
         .then(function (response) {
           currentObj.output = response.data
@@ -241,42 +284,14 @@ export default {
         })
       this.popoverShow1 = false
     },
-    edit (e) {
-      e.preventDefault()
-      const currentObj = this
-      this.axios.post('http://localhost:8081/api/main/edit', {
-        captureid: 'editsim'
-      })
-        .then(function (response) {
-          currentObj.output = response.data
-          console.log(currentObj.output)
-        })
-        .catch(function (error) {
-          currentObj.output = error
-          console.log(currentObj.output)
-        })
-    },
-    reject (e) {
-      e.preventDefault()
-      const currentObj = this
-      this.axios.post('http://localhost:8081/api/main/reject', {
-        captureid: 'rejectsim'
-      })
-        .then(function (response) {
-          currentObj.output = response.data
-          console.log(currentObj.output)
-        })
-        .catch(function (error) {
-          currentObj.output = error
-          console.log(currentObj.output)
-        })
-      this.popoverShow2 = false
-    },
     gsave (e) {
       e.preventDefault()
       const currentObj = this
       this.axios.post('http://localhost:8081/api/main/gsave', {
-        captureid: 'gsavesim'
+        remail: this.output.remail,
+        ccbcc: this.output.ccbcc,
+        body: this.output.body,
+        subject: this.output.subject
       })
         .then(function (response) {
           currentObj.output = response.data

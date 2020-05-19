@@ -19,16 +19,4 @@ from django.conf.urls import url,include
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^',include('main.urls')),
-<<<<<<< HEAD
-=======
-=======
-from django.urls import path,include
-from main import views
-from django.conf.urls import url, include
-
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    url(r'^', include('main.urls')),
->>>>>>> refs/remotes/origin/master
->>>>>>> refs/remotes/origin/master
 ]
