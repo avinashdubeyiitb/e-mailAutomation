@@ -177,7 +177,11 @@ export default {
       const formData = new FormData()
       // const currentObj = this
       formData.append('file', this.file)
+<<<<<<< HEAD
+      this.axios.post('http://localhost:8081/api/main/csvsubmit',
+=======
       this.axios.post('http://localhost:8081/api/main/savefile',
+>>>>>>> refs/remotes/origin/master
         formData,
         {
           headers: {
@@ -207,7 +211,11 @@ export default {
       e.preventDefault()
       const currentObj = this
       this.isNight = false
+<<<<<<< HEAD
       this.axios.post('http://localhost:8081/api', {
+=======
+      this.axios.post('http://localhost:8081/api/main/submit', {
+>>>>>>> 39889007f3b7070c1116568fb3a2e301889f7fb3
         captureid: 'sim',
         remail: this.remail,
         ccbcc: this.ccbcc,
@@ -227,7 +235,7 @@ export default {
     approve (e) {
       e.preventDefault()
       const currentObj = this
-      this.axios.post('http://localhost:8081/api/teg', {
+      this.axios.post('http://localhost:8081/api/main/approve', {
         captureid: 'approvesim'
       })
         .then(function (response) {
@@ -243,7 +251,7 @@ export default {
     edit (e) {
       e.preventDefault()
       const currentObj = this
-      this.axios.post('http://localhost:8081/api/teg', {
+      this.axios.post('http://localhost:8081/api/main/edit', {
         captureid: 'editsim'
       })
         .then(function (response) {
@@ -258,7 +266,7 @@ export default {
     reject (e) {
       e.preventDefault()
       const currentObj = this
-      this.axios.post('http://localhost:8081/api/teg', {
+      this.axios.post('http://localhost:8081/api/main/reject', {
         captureid: 'rejectsim'
       })
         .then(function (response) {
@@ -274,7 +282,7 @@ export default {
     gsave (e) {
       e.preventDefault()
       const currentObj = this
-      this.axios.post('http://localhost:8081/api/teg', {
+      this.axios.post('http://localhost:8081/api/main/gsave', {
         captureid: 'gsavesim'
       })
         .then(function (response) {
