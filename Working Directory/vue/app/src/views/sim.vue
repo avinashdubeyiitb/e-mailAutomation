@@ -35,8 +35,8 @@
                         <p>{{key}}</p>
                         <p>-----------------------or------------------------</p>
                         <p>Upload csv file</p>
-                        <label>File:accept=".csv"
-                        <input type="file"  id="file" ref="file" v-on:change="handleFileUpload()"/>
+                        <label>File:
+                        <input type="file" accept=".csv" id="file" ref="file" v-on:change="handleFileUpload()"/>
                       </label>
                         <button v-on:click="submitFile()" class="btn btn-success">Submit</button>
                     </div>
