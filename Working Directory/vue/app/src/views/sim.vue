@@ -105,9 +105,6 @@
             <b-button @click="approve" size="sm" variant="primary">Sure</b-button>
           </div>
         </b-popover>
-    <form @submit="edit">
-    <button class="btn btn-success" >Edit</button>
-    </form>
     <b-button id="popover-reactive-2" ref="button2" class="btn btn-success" >Reject</b-button>
     <b-popover
           target="popover-reactive-2"
@@ -180,11 +177,8 @@ export default {
       const formData = new FormData()
       // const currentObj = this
       formData.append('file', this.file)
-<<<<<<< HEAD
+
       this.axios.post('http://localhost:8081/api/main/csvsubmit',
-=======
-      this.axios.post('http://localhost:8081/api/main/savefile',
->>>>>>> refs/remotes/origin/master
         formData,
         {
           headers: {

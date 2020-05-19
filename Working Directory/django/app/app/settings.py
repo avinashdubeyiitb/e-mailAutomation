@@ -137,4 +137,7 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'intrnaakash@gmail.com'
 EMAIL_HOST_PASSWORD = 'intrn@aakash1'
 EMAIL_USE_SSL = False
+<<<<<<< HEAD
 '''
+=======
+>>>>>>> refs/remotes/origin/master
