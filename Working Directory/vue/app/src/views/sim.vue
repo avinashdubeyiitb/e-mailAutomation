@@ -180,7 +180,7 @@ export default {
       const formData = new FormData()
       // const currentObj = this
       formData.append('file', this.file)
-      this.axios.post('http://localhost:8081/api/teg',
+      this.axios.post('http://localhost:8081/api/main/csvsubmit',
         formData,
         {
           headers: {
@@ -210,7 +210,7 @@ export default {
       e.preventDefault()
       const currentObj = this
       this.isNight = false
-      this.axios.post('http://localhost:8081/api/teg', {
+      this.axios.post('http://localhost:8081/api/main/submit', {
         captureid: 'sim',
         remail: this.remail,
         ccbcc: this.ccbcc,
@@ -230,7 +230,7 @@ export default {
     approve (e) {
       e.preventDefault()
       const currentObj = this
-      this.axios.post('http://localhost:8081/api/teg', {
+      this.axios.post('http://localhost:8081/api/main/approve', {
         captureid: 'approvesim'
       })
         .then(function (response) {
@@ -246,7 +246,7 @@ export default {
     edit (e) {
       e.preventDefault()
       const currentObj = this
-      this.axios.post('http://localhost:8081/api/teg', {
+      this.axios.post('http://localhost:8081/api/main/edit', {
         captureid: 'editsim'
       })
         .then(function (response) {
@@ -261,7 +261,7 @@ export default {
     reject (e) {
       e.preventDefault()
       const currentObj = this
-      this.axios.post('http://localhost:8081/api/teg', {
+      this.axios.post('http://localhost:8081/api/main/reject', {
         captureid: 'rejectsim'
       })
         .then(function (response) {
@@ -277,7 +277,7 @@ export default {
     gsave (e) {
       e.preventDefault()
       const currentObj = this
-      this.axios.post('http://localhost:8081/api/teg', {
+      this.axios.post('http://localhost:8081/api/main/gsave', {
         captureid: 'gsavesim'
       })
         .then(function (response) {
