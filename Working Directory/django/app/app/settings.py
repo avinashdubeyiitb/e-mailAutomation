@@ -128,7 +128,8 @@ STATIC_URL = '/static/'
 CORS_ORIGIN_ALLOW_ALL = True
 SETTINGS_DIR = ''
 STATIC_DIR = ''
-
+EMAIL_HOST_USER = 'intrnaakash@gmail.com'
+'''
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
@@ -136,3 +137,4 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'intrnaakash@gmail.com'
 EMAIL_HOST_PASSWORD = 'intrn@aakash1'
 EMAIL_USE_SSL = False
+'''

@@ -22,8 +22,9 @@ import os.path
 import httplib2
 import base64
 import mimetypes
-from .models import clgData,tempCollegeData
-from .serializers import ClgDataSerializer,TempSerializer
+
+from .models import clgData
+from .serializers import ClgDataSerializer
 from app.settings import EMAIL_HOST_USER
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = [
@@ -31,104 +32,95 @@ SCOPES = [
     'https://www.googleapis.com/auth/gmail.send'
 ]
 
-@api_view(['POST'])
-<<<<<<< HEAD
-def submit(request):
-=======
 def savefile(request):
     file = request.FILES['file']
     file_name = default_storage.save(file.name, file)
     return JsonResponse({'key':'done'})
 
-def base(info):
->>>>>>> refs/remotes/origin/master
+@api_view(['POST'])
+def submit(request):
         try:
             var = JSONParser().parse(request)
             clg = var.get('cname')
-            tmpSrz = TempSerializer(data = var)
-            obj = tempCollegeData.objects.filter(cname = clg)
-            #print(obj.count(),obj)
-            if obj.count()==0 :
-                if tmpSrz.is_valid():
-                    tmpSrz.save()    
-                else :
-                    return JsonResponse(tmpSrz.errors)       
-            return JsonResponse({'status':'try for approve option'})
+            obj = clgData.objects.filter(cname = clg)
+            if obj.count() >= 1:
+                subject = "Send Information Mail"
+                body = "You are already registered."
+            else:
+                clgSrz = ClgDataSerializer(data = {'cname' : clg})
+                if clgSrz.is_valid():
+                    clgSrz.save()
+                subject = "Send Information Mail"
+                body = "Welcome to our eyrc program."
+            return JsonResponse(var.update({'subject':subject,'body':body}))
         except ValueError as e:
             return JsonResponse({'status':'failed','info':e.args[0]})
 
 @api_view(['POST'])
 def approve(request):
         try:        
-            obj = tempCollegeData.objects.first()
-            clg = getattr(obj, 'cname') 
-            remail = getattr(obj,'remail')
-            ccbcc = getattr(obj,'ccbcc')
-            #print(clg,remail,ccbcc)
-            tempCollegeData.objects.filter().delete() 
-            obj = clgData.objects.filter(cname = clg)
-            #print(obj,obj.count())
-            if obj.count() >= 1:
-                subject = "Send Information Mail"
-                body = "You are already registered."
-                email = EmailMessage(subject,body, EMAIL_HOST_USER, to=[remail], bcc=[ccbcc],
-                        connection=None, attachments=None, headers=None, cc=[ccbcc],reply_to=None)
-                sent = email.send()
-                #print(sent,'!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-                if sent :      
-                    return JsonResponse({'status':'success','info':'you are already registered'})
-                else :
-                    return JsonResponse({'status':'failure','info':'mail was not sent'})    
-            else:
-                clgSrz = ClgDataSerializer(data = {'cname' : clg})
-                #print(clgSrz.is_valid(),clgSrz.errors,clgSrz)
-                if clgSrz.is_valid():
-                    clgSrz.save()
-                subject = "Send Information Mail"
-                body = "Welcome to our eyrc program."
-                email = EmailMessage(subject,body, EMAIL_HOST_USER, to=[remail], bcc=[ccbcc],
-                        connection=None, attachments=None, headers=None, cc=[ccbcc],reply_to=None)
-                sent = email.send()
-                #print(sent,'!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-                if sent :      
-                    return JsonResponse({'status':'success','info':'you are now registered'})
-                else :
-                    return JsonResponse({'status':'failure','info':'mail was not sent'}) 
+            var = JSONParser().parse(request)
+            to = var.get('remail')
+            subject = var.get('subject')
+            body = var.get('body')
+            sent  = SendMessage(EMAIL_HOST_USER,to,subject,body)
+            if sent :      
+                return JsonResponse({'status':'success','info':'mail sent successfully'})
+            else :
+                return JsonResponse({'status':'failure','info':'mail was not sent'})          
         except ValueError as e:
             return Response(e.args[0],status.HTTP_400_BAD_REQUEST)
-'''
-def get(info):
-    try :
-        d=dict(json.loads(info.body))
-        to = d['remail']
-        sender = "intrnaakash@gmail.com"
-        subject = "subject"
-        msgHtml = ''
-        data=collegeData.objects.get(college = d['cname'])
-        with open('templates/registered.html', 'r') as email_content:
-            msgHtml = email_content.read()
-        msgPlain = "Hi\nPlain Email"
-        SendMessage(sender, to, subject, msgHtml, msgPlain)
-    except (NameError,ObjectDoesNotExist) as e :
-        print(e.args[0])
-        data = collegeData(mail_id = d['mail_id'],name = d['name'],designation = d['designation'],department = d['department'],college = d['college'],contact = d['contact'] )
-        data.save('self')
-        with open('templates/new.html', 'r') as email_content:
-            msgHtml = email_content.read()
-        msgPlain = "Hi\nPlain Email"
-        SendMessage(sender, to, subject, msgHtml, msgPlain)
 
-def SendMessage(sender, to, subject, msg, attachmentFile=None):
-    #credentials = get_credentials()
+@api_view(['POST'])
+def gsave(request):
+    var = JSONParser().parse(request)
+    to = var.get('remail')
+    subject = var.get('subject')
+    body = var.get('body')
+    credentials = get_credentials()
     # http = credentials.authorize(httplib2.Http())
     # service = discovery.build('gmail', 'v1', http=http)
-    #service = build('gmail', 'v1', credentials=credentials)
+    service = build('gmail', 'v1', credentials=credentials)
     if attachmentFile:
         pass
-       #message1 = createMessageWithAttachment(sender, to, subject, msg,attachmentFile)
+        #message = createMessageWithAttachment(sender, to, subject, msgHtml, msgPlain, attachmentFile)
     else:
-        message1 = CreateMessageHtml(sender, to, subject, msg)
-    result = SendMessageInternal(service, "me", message1)
+        message = CreateMessageHtml(EMAIL_HOST_USER, to, subject, body)    
+    result = CreateDraft(service,"me",message)
+    return result
+
+def CreateDraft(service, user_id, message_body):
+  """Create and insert a draft email. Print the returned draft's message and id.
+
+  Args:
+    service: Authorized Gmail API service instance.
+    user_id: User's email address. The special value "me"
+    can be used to indicate the authenticated user.
+    message_body: The body of the email message, including headers.
+
+  Returns:
+    Draft object, including draft id and message meta data.
+  """
+  try:
+    message = {'message': message_body}
+    draft = service.users().drafts().create(userId=user_id, body=message).execute()
+    print('Draft id: %s\nDraft message: %s' % (draft['id'], draft['message']))
+    return draft
+  except errors.HttpError as  error:
+    print('An error occurred: %s' % error)
+    return None
+
+def SendMessage(sender, to, subject, body, attachmentFile=None):
+    credentials = get_credentials()
+    # http = credentials.authorize(httplib2.Http())
+    # service = discovery.build('gmail', 'v1', http=http)
+    service = build('gmail', 'v1', credentials=credentials)
+    if attachmentFile:
+        pass
+       #message1 = createMessageWithAttachment(sender, to, subject, msgPlain, msgHtml, attachmentFile)
+    else:
+        message = CreateMessageHtml(sender, to, subject, body)
+    result = SendMessageInternal(service, "me", message)
     return result
 
 def get_credentials():
@@ -153,25 +145,14 @@ def get_credentials():
         with open('pickle.token', 'wb') as token:
             pickle.dump(creds, token)
     return creds
-<<<<<<< HEAD
- '''   
-def CreateMessageHtml(sender, to, subject, msg):
-    message = MIMEText(msg)
-    message['Subject'] = subject
-    message['From'] = sender
-    message['To'] = to
-    #msg.attach(MIMEText(msgPlain, 'plain'))
-    #msg.attach(MIMEText(msgHtml, 'html'))
-=======
 
-def CreateMessageHtml(sender, to, subject, msgHtml, msgPlain):
+def CreateMessageHtml(sender, to, subject, body, msgHtml=None):
     msg = MIMEMultipart('alternative')
     msg['Subject'] = subject
     msg['From'] = sender
     msg['To'] = to
-    msg.attach(MIMEText(msgPlain, 'plain'))
-    msg.attach(MIMEText(msgHtml, 'html'))
->>>>>>> refs/remotes/origin/master
+    msg.attach(MIMEText(body, 'plain'))
+    #msg.attach(MIMEText(msgHtml, 'html'))
     return {'raw': base64.urlsafe_b64encode(msg.as_string().encode()).decode()}
 
 def SendMessageInternal(service, user_id, message):
@@ -183,7 +164,7 @@ def SendMessageInternal(service, user_id, message):
         print('An error occurred: %s' % error)
         return "Error"
     return "OK"
-'''
+
 def createMessageWithAttachment(
     sender, to, subject, msgHtml, msgPlain, attachmentFile):
     """Create a message for an email.
@@ -241,4 +222,3 @@ def createMessageWithAttachment(
     message.attach(msg)
 
     return {'raw': base64.urlsafe_b64encode(message.as_string().encode()).decode()}
-'''
