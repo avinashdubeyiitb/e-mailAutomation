@@ -96,7 +96,7 @@ def gsave(request):
     else:
         message = CreateMessageHtml(EMAIL_HOST_USER, to, subject, body)
     result = CreateDraft(service,"me",message)
-    return result
+    return JsonResponse(result)
 
 def CreateDraft(service, user_id, message_body):
   """Create and insert a draft email. Print the returned draft's message and id.
