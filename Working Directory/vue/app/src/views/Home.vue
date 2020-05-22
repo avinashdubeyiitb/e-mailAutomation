@@ -1,51 +1,112 @@
 <template>
-  <!-- <div class="home"> -->
-    <!-- <img alt="Vue logo" src="../assets/logo.png"> -->
-    <!-- <HelloWorld msg="This is my first Vue.js App"/> -->
-    <!-- <b-jumbotron> -->
-    <div>
-    <b-container class="bv-example-row">
-      <b-row>
-        <b-col cols="8">  <div>
-          <!-- <img alt="Vue logo" src="../assets/logo.png" > -->
-          <b-jumbotron header="Home" lead="Prototyping the final product">
-            <p>For more information visit the link</p>
-            <b-button variant="primary" href="#">More Info</b-button>
-          </b-jumbotron>
-        </div></b-col>
-        <div>
-         <b-button v-b-toggle.sidebar-right>Available features</b-button>
-         <b-sidebar id="sidebar-right" title="features" right shadow>
-           <b-col cols="8">  <table id="table" >
-               <tr>
-             <td><router-link to="/sim">Send information mail</router-link></td>
-               </tr>
-               <tr>
-             <td><router-link to="/aws">Announce Workshop</router-link></td>
-               </tr>
-               <tr>
-             <td>  <router-link to="/tsa">ALGO</router-link></td>
-               </tr>
-             </table></b-col>
-
-         </b-sidebar>
+    <div id="app">
+      <div id="app2">
+        <h1>Welcome to our App :)</h1>
+          <h3>Available features:</h3>
+        <div id="a">
+          <button id="but1" type="button" name="button"><router-link to="/sim">Send information mail</router-link></button>
        </div>
-    <!--  <router-link to="/about">About</router-link> -->
+       <div id="b">
+       <button id="but2" type="button" name="button"><router-link to="/aws">Announce Workshop</router-link></button>
+       </div>
+       <div>
+       <button id="but3" type="button" name="button"><router-link to="/tsa">Coming soon :(</router-link></button>
+       </div>
     <router-view/>
-    </b-row>
-    </b-container>
   </div>
-  <!-- </b-jumbotron> -->
+  </div>
 </template>
 
-<script>
-// @ is an alias to /src
-// import HelloWorld from '@/components/HelloWorld.vue'
-//
-// export default {
-//   name: 'Home',
-//   components: {
-//     HelloWorld
-//   }
-// }
-// </script>
+<style>
+#but1{
+  position: absolute;
+  width: 200px;
+  height: 40px;
+  left: 15%;
+  top: 45%;
+
+  box-shadow: 4px 6px 4px rgba(0, 0, 0, 0.25);
+  background: #F5C8C8;
+  border-radius: 19px;
+}
+#but2{
+  position: absolute;
+  width: 200px;
+  height: 40px;
+  left: 15%;
+  top: 57%;
+
+  background: #F5C8C8;
+box-shadow: 4px 6px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 19px;
+}
+#but3{
+  position: absolute;
+  width: 200px;
+  height: 40px;
+  left: 15%;
+  top: 69%;
+
+  background: #F5C8C8;
+  box-shadow: 4px 6px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 19px;
+}
+#app{
+  background: #8B7980;
+position: absolute;
+width: 100%;
+height: 100%;
+left: 0px;
+top: 0px;
+}
+h1{
+  position: absolute;
+width: 796px;
+height: 148px;
+left: 25%;
+top: 0%;
+
+font-family: Radley;
+font-style: normal;
+font-weight: normal;
+font-size: 48px;
+line-height: 61px;
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #000000;
+
+}
+#app2{
+  position: absolute;
+width: 70%;
+height: 70%;
+left: 165px;
+top: 113px;
+
+background: linear-gradient(180deg, #D9B3B3 99.99%, rgba(239, 191, 191, 0) 100%);
+border: 1px solid #544242;
+box-sizing: border-box;
+box-shadow: 0px 8px 4px rgba(13, 12, 12, 0.3);
+border-radius: 10px;
+}
+h3{
+  position: absolute;
+width: 283px;
+height: 55px;
+left: 5%;
+top: 32%;
+
+font-family: Radley;
+font-style: normal;
+font-weight: normal;
+font-size: 30px;
+line-height: 38px;
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #000000;
+}
+</style>
