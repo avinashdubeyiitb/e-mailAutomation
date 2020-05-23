@@ -31,7 +31,7 @@
     <p id="or">-----------------------or------------------------</p>
     <p id="up">Upload csv file</p>
     <label id="file">File:
-    <input type="file" accept=".csv" id="file" ref="file" v-on:change="handleFileUpload()"/>
+    <input type="file" accept=".xlsx,.csv" id="file" ref="file" v-on:change="handleFileUpload()"/>
   </label>
     <button id="csub" v-on:click="submitFile()">Submit</button>
   </div>
@@ -47,21 +47,19 @@
 <input type="checkbox" v-model="selectAll" @click="select">
 </label>
 </th>
-<th>id</th>
-<th>name</th>
-<th>email</th>
+<th>College Name</th>
+<th>Receipient Id</th>
 </tr>
 </thead>
 <tbody>
-<tr v-bind:key="i" v-for="(pk,i) in items" v-on:click="clickList(pk)">
+<tr v-bind:key="i" v-for="(pk,i) in items" v-on:click="clickList(pk,i)">
 <td>
 <label class="form-checkbox">
-<input type="checkbox" :value="pk.age" v-model="selected">
+<input type="checkbox" :value="pk" v-model="selected">
 </label>
 </td>
-<td>{{pk.age}}</td>
-<td>{{pk.first_name}}</td>
-<td>{{pk.last_name}}</td>
+<td>{{i}}</td>
+<td>{{pk}}</td>
 </tr>
 </tbody>
 </table>
@@ -242,35 +240,35 @@
 <div v-show="!isNight2">
      <form>
      <label  id="sremail"><strong >Recipient Id:</strong>
-     <input v-if = "key1" v-model = "output.remail"
+     <input v-if = "key1" v-model = "reqdata.to"
      @blur= "key1 = false; $emit('update')"
      @keyup.enter = "key1=false; $emit('update')">
      <div v-else>
-       <label @click = "key1 = true;"> {{output.remail}} </label>
+       <label @click = "key1 = true;"> {{reqdata.to}} </label>
      </div>
    </label><br>
      <label id="srccbcc"><strong>cc/bcc:</strong>
-     <input v-if = "key2" v-model = "output.ccbcc"
+     <input v-if = "key2" v-model = "reqdata.ccbcc"
      @blur= "key2 = false; $emit('update')"
      @keyup.enter = "key2=false; $emit('update')" >
            <div v-else>
-       <label @click = "key2 = true;">{{output.ccbcc}} </label>
+       <label @click = "key2 = true;">{{reqdata.ccbcc}} </label>
      </div>
       </label><br>
      <label id="srsubject"><strong>subject:</strong>
-     <input v-if = "key3" v-model = "output.subject"
+     <input v-if = "key3" v-model = "reqdata.subject"
      @blur= "key3 = false; $emit('update')"
      @keyup.enter = "key3=false; $emit('update')" id="isrsubject">
            <div v-else>
-       <label @click = "key3 = true;"> {{output.subject}} </label>
+       <label @click = "key3 = true;"> {{reqdata.subject}} </label>
      </div>
      </label><br>
      <label id="srbody"><strong>body:</strong>
-     <input v-if = "key4" v-model = "output.body"
+     <input v-if = "key4" v-model = "reqdata.body"
      @blur= "key4 = false; $emit('update')"
      @keyup.enter = "key4=false; $emit('update')" id="isrbody">
       <div v-else>
-       <label @click = "key4 = true;"> {{output.body}} </label>
+       <label @click = "key4 = true;"> {{reqdata.body}} </label>
      </div>
     </label><br>
     <label id="srattach"><strong>Attachment:</strong>
@@ -315,20 +313,7 @@ export default {
       cname: '',
       cno: '',
       output: '',
-      items: [
-        { age: 1, first_name: 'Dickerson', last_name: 'Mzxacdonald' },
-        { age: 2, first_name: 'Larsen', last_name: 'Shzxaw' },
-        { age: 3, first_name: 'Geneva', last_name: 'Wilson' },
-        { age: 4, first_name: 'Jami', last_name: 'Carney' },
-        { age: 5, first_name: 'Dicxzkerson', last_name: 'Macdonald' },
-        { age: 6, first_name: 'Larszxen', last_name: 'Shaw' },
-        { age: 7, first_name: 'Genevzxa', last_name: 'Wilzxson' },
-        { age: 8, first_name: 'Jamzxi', last_name: 'Carnezxy' },
-        { age: 9, first_name: 'Diczxkerson', last_name: 'Maxzcdonald' },
-        { age: 10, first_name: 'Lazxrsen', last_name: 'Shxzaw' },
-        { age: 11, first_name: 'Genzxeva', last_name: 'Wilsoadsn' },
-        { age: 12, first_name: 'Jamzxi', last_name: 'Carnezy' }
-      ],
+      items: [],
       selected: [],
       selectAll: false,
       file: '',
@@ -341,6 +326,7 @@ export default {
       key7: '',
       key8: '',
       key9: '',
+      reqdata: '',
       editedTodo: null
     }
   },
@@ -351,7 +337,7 @@ export default {
       this.selected = []
       if (!this.selectAll) {
         for (const pk in this.items) {
-          this.selected.push(this.items[pk].age)
+          this.selected.push(this.items[pk])
         }
       }
     },
@@ -402,8 +388,10 @@ export default {
           }
         }
       )
-        .then(function () {
+        .then(items => {
           console.log('SUCCESS!!')
+          this.items = items.data
+          console.log(this.items)
         })
         .catch(function () {
           console.log('FAILURE!!')
@@ -429,8 +417,19 @@ export default {
     gsaveselected () {
 
     },
-    clickList: function (pk) {
-      console.log('clickList fired with ' + pk.age)
+    clickList: function (pk, i) {
+      console.log('clickList fired with ' + pk)
+      const currentObj = this
+      this.axios.post('http://localhost:8081/api/main/idrequest', {
+        remail: pk,
+        cname: i
+      })
+        .then(reqdata => {
+          this.reqdata = reqdata.data
+        })
+        .catch(function (error) {
+          currentObj.reqdata = error
+        })
     },
     formSubmit (e) {
       e.preventDefault()

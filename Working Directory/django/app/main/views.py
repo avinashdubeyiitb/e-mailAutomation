@@ -27,7 +27,7 @@ from django.core.files.storage import default_storage
 
 from .models import clgData,editMail
 from .serializers import ClgDataSerializer,EditMailSerializer
-from app.settings import EMAIL_HOST_USER,STATIC_DIR,BASE_DIR
+from app.settings import EMAIL_HOST_USER,STATIC_DIR,BASE_DIR,CSV_DIR
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = [
     'https://www.googleapis.com/auth/gmail.readonly',
@@ -48,8 +48,17 @@ def csvdraft(request):
 def idrequest(request):
     var = JSONParser().parse(request)
     clg = var.get('cname')
+    rema = var.get('remail')
     obj = clgData.objects.filter(cname = clg)
-    d = {'to' :  getattr(obj,'remail') ,'ccbcc' : getattr(obj,'ccbcc'),'subject': '','body':'',attachments : ''} 
+    file_path = os.path.join(CSV_DIR,'clgData.csv')
+    f = open(file_path)
+    reader = csv.DictReader(f)
+    for rows in reader:
+        if (rows['remail'] == rema):
+            ccbcc = (rows['ccbcc'])
+        print(rows['remail'])
+        print(rema)
+    d = {'to' : rema  ,'ccbcc' : ccbcc,'subject': '','body':''}
     if obj.count() >= 1:
         subject = "Send Information Mail"
         body = "You are already registered."
@@ -60,10 +69,10 @@ def idrequest(request):
         body = "Welcome to our eyrc program."
         d['subject']=subject
         d['body']=body
-    return JsonResponse(d)            
+    return JsonResponse(d)
 
-@api_view(['POST'])  
-def save(request):    
+@api_view(['POST'])
+def save(request):
     var = JSONParser().parse(request)
     mlSrz= EditMailSerializer(data = {'to':var.get('to'),'ccbcc':var.get('ccbcc'),
                             'subject':var.get('subject'),'body':var.get('body'),
@@ -82,8 +91,8 @@ def csvsubmit(request):
         reader = csv.DictReader(csvfile)
         clist = []
         for rows in reader :
-            clist = clist + [(rows['cname'],rows['remail'])] 
-        #print(dict(clist))              
+            clist = clist + [(rows['cname'],rows['remail'])]
+            print(dict(clist))
         return JsonResponse(dict(clist))
 
 @api_view(['POST'])
