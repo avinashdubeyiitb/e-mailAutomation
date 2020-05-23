@@ -30,7 +30,7 @@
     <p id="or">-----------------------or------------------------</p>
     <p id="up">Upload csv file</p>
     <label id="file">File:
-    <input type="file" accept=".xlsx" id="file" ref="file" v-on:change="handleFileUpload()"/>
+    <input type="file" accept=".csv" id="file" ref="file" v-on:change="handleFileUpload()"/>
   </label>
     <button id="csub" v-on:click="submitFile()">Submit</button>
   </div>

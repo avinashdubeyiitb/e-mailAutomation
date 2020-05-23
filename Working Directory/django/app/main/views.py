@@ -22,11 +22,12 @@ import os.path
 import httplib2
 import base64
 import mimetypes
+import csv
 from django.core.files.storage import default_storage
 
-from .models import clgData
-from .serializers import ClgDataSerializer
-from app.settings import EMAIL_HOST_USER
+from .models import clgData,editMail
+from .serializers import ClgDataSerializer,EditMailSerializer
+from app.settings import EMAIL_HOST_USER,STATIC_DIR,BASE_DIR
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = [
     'https://www.googleapis.com/auth/gmail.readonly',
@@ -36,10 +37,54 @@ SCOPES = [
 ]
 
 @api_view(['POST'])
-def savefile(request):
+def csvapprove(request):
+    pass
+
+@api_view(['POST'])
+def csvdraft(request):
+    pass
+
+@api_view(['POST'])
+def idrequest(request):
+    var = JSONParser().parse(request)
+    clg = var.get('cname')
+    obj = clgData.objects.filter(cname = clg)
+    d = {'to' :  getattr(obj,'remail') ,'ccbcc' : getattr(obj,'ccbcc'),'subject': '','body':'',attachments : ''} 
+    if obj.count() >= 1:
+        subject = "Send Information Mail"
+        body = "You are already registered."
+        d['subject']=subject
+        d['body']=body
+    else:
+        subject = "Send Information Mail"
+        body = "Welcome to our eyrc program."
+        d['subject']=subject
+        d['body']=body
+    return JsonResponse(d)            
+
+@api_view(['POST'])  
+def save(request):    
+    var = JSONParser().parse(request)
+    mlSrz= EditMailSerializer(data = {'to':var.get('to'),'ccbcc':var.get('ccbcc'),
+                            'subject':var.get('subject'),'body':var.get('body'),
+                            'attachemnts':var.get('attachments')})
+    # work on attachments i.e., whether there are new attachments or not
+    if mlSrz.is_valid():
+                    mlSrz.save()
+    return JsonResponse({'status':'saved'})
+
+@api_view(['POST'])
+def csvsubmit(request):
     file = request.FILES['file']
-    file_name = default_storage.save(file.name, file)
-    return JsonResponse({'key':'done'})
+    print(type(file),type(file.name))
+    file_name = default_storage.save(file.name,file)
+    with open(file_name, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        clist = []
+        for rows in reader :
+            clist = clist + [(rows['cname'],rows['remail'])] 
+        #print(dict(clist))              
+        return JsonResponse(dict(clist))
 
 @api_view(['POST'])
 def submit(request):
