@@ -2,6 +2,7 @@
   <div id="app">
     <h1>Send Information Mail</h1>
     <button id="butt" type="button" name="button"><router-link to="/">Home</router-link></button>
+    <button id="goback" v-show="iscsvtrue" type="button" name="button" @click="gobacktoform">!form</button>
   <div id="col1inner" >
     <div v-show="isNight3" >
     <strong><p id="fd">Fill details:</p></strong>
@@ -33,6 +34,78 @@
     <input type="file" accept=".xlsx" id="file" ref="file" v-on:change="handleFileUpload()"/>
   </label>
     <button id="csub" v-on:click="submitFile()">Submit</button>
+  </div>
+  <div v-show="!isNight2">
+    <p v-show="!isNight2">"comming soon"</p>
+    <div id="content">
+      <div class="text-uppercase text-bold">id selected: {{selected}}</div>
+<table class="table table-striped table-hover">
+<thead>
+<tr>
+<th>
+<label class="form-checkbox">
+<input type="checkbox" v-model="selectAll" @click="select">
+</label>
+</th>
+<th>id</th>
+<th>name</th>
+<th>email</th>
+</tr>
+</thead>
+<tbody>
+<tr v-bind:key="i" v-for="(pk,i) in items" v-on:click="clickList(pk)">
+<td>
+<label class="form-checkbox">
+<input type="checkbox" :value="pk.age" v-model="selected">
+</label>
+</td>
+<td>{{pk.age}}</td>
+<td>{{pk.first_name}}</td>
+<td>{{pk.last_name}}</td>
+</tr>
+</tbody>
+</table>
+  </div>
+  <form>
+  <b-button id="popover-reactive-3" ref="button3">Approve Selected</b-button>
+</form>
+  <b-popover
+        target="popover-reactive-3"
+        triggers="click"
+        :show.sync="popoverShow3"
+        placement="auto"
+        container="my-container"
+        ref="popover"
+        @hidden="onHidden"
+      >
+        <template v-slot:title>
+          Are you sure you want to continue?
+        </template>
+        <div >
+          <b-button id="bcancel" @click="onClose" size="sm" variant="danger">Cancel</b-button>
+          <b-button id="bsure" @click="approveselect" size="sm" variant="primary">Sure</b-button>
+        </div>
+      </b-popover>
+    <form>
+  <b-button id="popover-reactive-4" ref="button4" >Reject Selected</b-button>
+</form>
+  <b-popover
+        target="popover-reactive-4"
+        triggers="click"
+        :show.sync="popoverShow4"
+        placement="auto"
+        container="my-container"
+        ref="popover"
+        @hidden="onHidden"
+      >
+        <template v-slot:title>
+          Are you want to save it in gmail draft or discard it ?
+        </template>
+        <div>
+          <b-button id="bstd" @click="gsaveselected" size="sm" variant="primary">Save to draft</b-button>
+          <b-button id="bdiscard" @click="discardselected" size="sm" variant="danger">Discard</b-button>
+        </div>
+      </b-popover>
   </div>
 </div>
 <div id="col2inner">
@@ -167,25 +240,60 @@
 </div>
 <p id="para1" v-show="!isNight2">"show right now"</p>
 <div v-show="!isNight2">
-  <p id="para1" v-show="!isNight2">"comming soon"</p>
+     <form>
+     <label  id="sremail"><strong >Recipient Id:</strong>
+     <input v-if = "key1" v-model = "output.remail"
+     @blur= "key1 = false; $emit('update')"
+     @keyup.enter = "key1=false; $emit('update')">
+     <div v-else>
+       <label @click = "key1 = true;"> {{output.remail}} </label>
+     </div>
+   </label><br>
+     <label id="srccbcc"><strong>cc/bcc:</strong>
+     <input v-if = "key2" v-model = "output.ccbcc"
+     @blur= "key2 = false; $emit('update')"
+     @keyup.enter = "key2=false; $emit('update')" >
+           <div v-else>
+       <label @click = "key2 = true;">{{output.ccbcc}} </label>
+     </div>
+      </label><br>
+     <label id="srsubject"><strong>subject:</strong>
+     <input v-if = "key3" v-model = "output.subject"
+     @blur= "key3 = false; $emit('update')"
+     @keyup.enter = "key3=false; $emit('update')" id="isrsubject">
+           <div v-else>
+       <label @click = "key3 = true;"> {{output.subject}} </label>
+     </div>
+     </label><br>
+     <label id="srbody"><strong>body:</strong>
+     <input v-if = "key4" v-model = "output.body"
+     @blur= "key4 = false; $emit('update')"
+     @keyup.enter = "key4=false; $emit('update')" id="isrbody">
+      <div v-else>
+       <label @click = "key4 = true;"> {{output.body}} </label>
+     </div>
+    </label><br>
+    <label id="srattach"><strong>Attachment:</strong>
+    <!-- <input v-if = "key5" v-model = "output.body" -->
+    <!-- @blur= "key5 = false; $emit('update')" -->
+    <!-- @keyup.enter = "key5=false; $emit('update')" id="isrbody"> -->
+    <!-- <div v-else> -->
+      <!-- <label @click = "key4 = true;"> {{output.body}} </label> -->
+      <label > not Available </label>
+      <b-button id="save"> Save </b-button>
+    <!-- </div> -->
+   </label><br>
+ </form>
 </div>
-</div>
-<div v-show="!isNight3">
-  <p v-show="!isNight2">"comming soon"</p>
 </div>
   </div>
 </template>
-
 <script>
-import { mapState } from 'vuex'
 export default {
   mounted () {
     console.log('Component mounted.')
   },
   computed: {
-    ...mapState([
-      'key'
-    ])
   },
   data () {
     return {
@@ -193,8 +301,11 @@ export default {
       isNight1: true,
       isNight2: true,
       isNight3: true,
+      iscsvtrue: false,
       popoverShow1: false,
       popoverShow2: false,
+      popoverShow3: false,
+      popoverShow4: false,
       captureid: '',
       remail: '',
       ccbcc: '',
@@ -204,6 +315,22 @@ export default {
       cname: '',
       cno: '',
       output: '',
+      items: [
+        { age: 1, first_name: 'Dickerson', last_name: 'Mzxacdonald' },
+        { age: 2, first_name: 'Larsen', last_name: 'Shzxaw' },
+        { age: 3, first_name: 'Geneva', last_name: 'Wilson' },
+        { age: 4, first_name: 'Jami', last_name: 'Carney' },
+        { age: 5, first_name: 'Dicxzkerson', last_name: 'Macdonald' },
+        { age: 6, first_name: 'Larszxen', last_name: 'Shaw' },
+        { age: 7, first_name: 'Genevzxa', last_name: 'Wilzxson' },
+        { age: 8, first_name: 'Jamzxi', last_name: 'Carnezxy' },
+        { age: 9, first_name: 'Diczxkerson', last_name: 'Maxzcdonald' },
+        { age: 10, first_name: 'Lazxrsen', last_name: 'Shxzaw' },
+        { age: 11, first_name: 'Genzxeva', last_name: 'Wilsoadsn' },
+        { age: 12, first_name: 'Jamzxi', last_name: 'Carnezy' }
+      ],
+      selected: [],
+      selectAll: false,
       file: '',
       key1: '',
       key2: '',
@@ -220,6 +347,14 @@ export default {
   watch: {
   },
   methods: {
+    select () {
+      this.selected = []
+      if (!this.selectAll) {
+        for (const pk in this.items) {
+          this.selected.push(this.items[pk].age)
+        }
+      }
+    },
     editTodo: output => {
       this.editedTodo = output
     },
@@ -229,6 +364,7 @@ export default {
       this.isNight = true
       this.isNight1 = true
       this.isNight2 = true
+      this.iscsvtrue = false
       this.output.remail = ''
       this.output.ccbcc = ''
       this.output.name = ''
@@ -242,6 +378,13 @@ export default {
     handleFileUpload () {
       this.file = this.$refs.file.files[0]
     },
+    gobacktoform () {
+      this.isNight = true
+      this.isNight1 = true
+      this.isNight2 = true
+      this.isNight3 = true
+      this.iscsvtrue = false
+    },
     submitFile () {
       const formData = new FormData()
       // const currentObj = this
@@ -250,6 +393,7 @@ export default {
       this.isNight1 = true
       this.isNight2 = false
       this.isNight3 = false
+      this.iscsvtrue = true
       this.axios.post('http://localhost:8081/api/main/csvsubmit',
         formData,
         {
@@ -275,6 +419,18 @@ export default {
       this.focusRef(this.$refs.button)
     },
     focusRef (ref) {
+    },
+    approveselect () {
+
+    },
+    discardselected () {
+
+    },
+    gsaveselected () {
+
+    },
+    clickList: function (pk) {
+      console.log('clickList fired with ' + pk.age)
     },
     formSubmit (e) {
       e.preventDefault()
@@ -635,6 +791,16 @@ position: absolute;
 top:80%;
 left:30%;
 }
+#popover-reactive-3{
+position: absolute;
+top:70%;
+left:4%;
+}
+#popover-reactive-4{
+position: absolute;
+top:70%;
+left:40%;
+}
 #bcancel {
   position: absolute;
   top:80%;
@@ -659,5 +825,29 @@ left:30%;
   top:100%;
   left:130px;
   margin:30px;
+}
+#save{
+  position: absolute;
+  top:80%;
+  right:10%;
+}
+
+#content{
+  position: absolute;
+  height:300px;
+  width:500px;
+  top:7%;
+  left:4%;
+  background-color: #f1f1c1;
+
+  margin:4px, 4px;
+   overflow-x: hidden;
+   overflow-x: auto;
+   text-align:justify;
+}
+tr ,td,thead,table,th{
+  padding:0px;
+  padding-left:6px;
+
 }
 </style>

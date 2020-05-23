@@ -8,7 +8,8 @@ import VueAxios from 'vue-axios'
 import BootstrapVue from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
-
+import XLSX from 'xlsx'
+Vue.use(XLSX)
 Vue.use(VueAxios, axios)
 Vue.config.productionTip = false
 Vue.use(BootstrapVue)
