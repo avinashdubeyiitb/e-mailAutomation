@@ -65,6 +65,7 @@
 </table>
   </div>
   <form>
+    <p id="rmsg">{{approvecsv}}</p>
   <b-button id="popover-reactive-3" ref="button3">Approve Selected</b-button>
 </form>
   <b-popover
@@ -278,7 +279,8 @@
     <!-- <div v-else> -->
       <!-- <label @click = "key4 = true;"> {{output.body}} </label> -->
       <label > not Available </label>
-      <b-button id="save"> Save </b-button>
+      <b-button id="save" @click="save"> Save </b-button>
+      <p>{{saveoutput}}</p>
     <!-- </div> -->
    </label><br>
  </form>
@@ -327,7 +329,9 @@ export default {
       key8: '',
       key9: '',
       reqdata: '',
-      editedTodo: null
+      editedTodo: null,
+      saveoutput: '',
+      approvecsv: ''
     }
   },
   watch: {
@@ -380,7 +384,7 @@ export default {
       this.isNight2 = false
       this.isNight3 = false
       this.iscsvtrue = true
-      this.axios.post('http://localhost:8081/api/main/csvsubmit',
+      this.axios.post('http://localhost:8081/api/main/csv/submit',
         formData,
         {
           headers: {
@@ -400,6 +404,8 @@ export default {
     onClose () {
       this.popoverShow1 = false
       this.popoverShow2 = false
+      this.popoverShow3 = false
+      this.popoverShow4 = false
     },
     onHidden () {
       // Called just after the popover has finished hiding
@@ -409,13 +415,56 @@ export default {
     focusRef (ref) {
     },
     approveselect () {
-
+      const currentObj = this
+      this.axios.post('http://localhost:8081/api/main/csv/approve', {
+        list: this.selected
+      })
+        .then(function (response) {
+          currentObj.approvecsv = response.data
+        })
+        .catch(function (error) {
+          currentObj.approvecsv = error
+        })
+      this.popoverShow3 = false
     },
     discardselected () {
-
+      this.popoverShow3 = false
+      this.popoverShow4 = false
+      this.approvecsv = ''
+      this.saveoutput = ''
+      this.reqdata.to = ''
+      this.reqdata.ccbcc = ''
+      this.reqdata.subject = ''
+      this.reqdata.body = ''
     },
     gsaveselected () {
-
+      const currentObj = this
+      this.axios.post('http://localhost:8081/api/main/csv/gsave', {
+        list: this.selected
+      })
+        .then(function (response) {
+          currentObj.approvecsv = response.data
+        })
+        .catch(function (error) {
+          currentObj.approvecsv = error
+        })
+      this.popoverShow4 = false
+    },
+    save (e) {
+      e.preventDefault()
+      const currentObj = this
+      this.axios.post('http://localhost:8081/api/main/save', {
+        remail: this.reqdata.to,
+        ccbcc: this.reqdata.ccbcc,
+        body: this.reqdata.body,
+        subject: this.reqdata.subject
+      })
+        .then(function (response) {
+          currentObj.saveoutput = response.data
+        })
+        .catch(function (error) {
+          currentObj.saveoutput = error
+        })
     },
     clickList: function (pk, i) {
       console.log('clickList fired with ' + pk)

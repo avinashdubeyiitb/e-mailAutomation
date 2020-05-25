@@ -25,9 +25,9 @@ import mimetypes
 import csv
 from django.core.files.storage import default_storage
 
-from .models import clgData,editMail
-from .serializers import ClgDataSerializer,EditMailSerializer
-from app.settings import EMAIL_HOST_USER,STATIC_DIR,BASE_DIR,CSV_DIR
+from .models import clgData
+from .serializers import ClgDataSerializer
+from app.settings import EMAIL_HOST_USER,BASE_DIR
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = [
     'https://www.googleapis.com/auth/gmail.readonly',
@@ -38,11 +38,85 @@ SCOPES = [
 
 @api_view(['POST'])
 def csvapprove(request):
-    pass
+    var = JSONParser().parse(request)
+    with open('scripts/info.json','r') as read:
+        obj = json.load(read)
+    file_path = obj['file_path']
+    with open(file_path,'r') as csvinput:
+        r = csv.reader(csvinput)
+        all=[]
+        res = {}
+        for row in r:
+            if row[0] in var.get('list') :
+                l=row[0]
+                body = None
+                subject = None
+                sent = None
+                if  len(row) > 7 :
+                    body = row[-1]
+                    subject = row[-2]
+                obj = clgData.objects.filter(cname = row[5])
+                if obj.count() >= 1:
+                    if body == None :
+                        body = "You are already registered"
+                        subject = "Send Information Mail"
+                else:
+                    clgSrz = ClgDataSerializer(data = {'cname' : row[5]})
+                    if clgSrz.is_valid():
+                        clgSrz.save()
+                    if body == None :
+                        body = "Welcome to our eyrc program."
+                        subject = "Send Information Mail"
+                sent = SendMessage(EMAIL_HOST_USER,l,row[1],row[1], subject, body)
+                #print(l,sent)
+                if sent :
+                    res[l] = "mail sent successfully"
+                else:
+                    res[l] = "failed to send mail"
+        return JsonResponse(res)
 
 @api_view(['POST'])
 def csvdraft(request):
-    pass
+    var = JSONParser().parse(request)
+    with open('scripts/info.json','r') as read:
+        obj = json.load(read)
+    file_path = obj['file_path']
+    credentials = get_credentials()
+    service = build('gmail', 'v1', credentials=credentials)
+    with open(file_path,'r') as csvinput:
+        r = csv.reader(csvinput)
+        all=[]
+        res = {}
+        for row in r:
+            if row[0] in var.get('list') :
+                l=row[0]
+                body = None
+                subject = None
+                result = None
+                attachmentFile = None
+                if  len(row) > 7 :
+                    body = row[-1]
+                    subject = row[-2]
+                obj = clgData.objects.filter(cname = row[5])
+                if obj.count() >= 1:
+                    if body == None :
+                        body = "You are already registered"
+                        subject = "Send Information Mail"
+                else:
+                    if body == None :
+                        body = "Welcome to our eyrc program."
+                        subject = "Send Information Mail"
+                if attachmentFile:
+                    pass
+                    #message = createMessageWithAttachment(sender, to, subject, msgHtml, msgPlain, attachmentFile)
+                else:
+                    message = CreateMessageHtml(EMAIL_HOST_USER,l,row[1],row[1], subject, body)
+                result = CreateDraft(service,"me",message)
+                if result :
+                    res[l] = "saved to draft"
+                else :
+                    res[l] = "failed to save to draft"
+        return JsonResponse(res)
 
 @api_view(['POST'])
 def idrequest(request):
@@ -50,14 +124,14 @@ def idrequest(request):
     clg = var.get('cname')
     rema = var.get('remail')
     obj = clgData.objects.filter(cname = clg)
-    file_path = os.path.join(CSV_DIR,'clgData.csv')
+    file_path = os.path.join(BASE_DIR,'clgData.csv')
     f = open(file_path)
     reader = csv.DictReader(f)
     for rows in reader:
         if (rows['remail'] == rema):
             ccbcc = (rows['ccbcc'])
-        print(rows['remail'])
-        print(rema)
+        #print(rows['remail'])
+        #print(rema)
     d = {'to' : rema  ,'ccbcc' : ccbcc,'subject': '','body':''}
     if obj.count() >= 1:
         subject = "Send Information Mail"
@@ -74,25 +148,43 @@ def idrequest(request):
 @api_view(['POST'])
 def save(request):
     var = JSONParser().parse(request)
-    mlSrz= EditMailSerializer(data = {'to':var.get('to'),'ccbcc':var.get('ccbcc'),
-                            'subject':var.get('subject'),'body':var.get('body'),
-                            'attachemnts':var.get('attachments')})
-    # work on attachments i.e., whether there are new attachments or not
-    if mlSrz.is_valid():
-                    mlSrz.save()
+    with open('scripts/info.json','r') as read:
+        obj = json.load(read)
+    file_path = obj['file_path']
+    write_path = os.path.join(BASE_DIR,'test.csv')
+    with open(file_path,'r') as csvinput:
+        r = csv.reader(csvinput)
+        all=[]
+        for row in r:
+            if row[0] == 'remail':
+                row.append('body')
+                row.append('subject')
+            elif row[0] == var.get('remail') :
+                row[1] = var.get('ccbcc')
+                row.append(var.get('subject'))
+                row.append(var.get('body'))
+            all.append(row)
+        with open(file_path, 'w') as csvoutput:
+            writer = csv.writer(csvoutput, lineterminator='\n')
+            writer.writerows(all)
     return JsonResponse({'status':'saved'})
 
 @api_view(['POST'])
 def csvsubmit(request):
     file = request.FILES['file']
-    print(type(file),type(file.name))
+    if os.path.getsize('scripts/info.json') :
+        with open('scripts/info.json','r') as read:
+            obj = json.load(read)
+            os.remove(obj['file_name'])
     file_name = default_storage.save(file.name,file)
+    CSV_DIR = os.path.join(BASE_DIR,file_name)
+    with open('scripts/info.json','w') as write :
+        json.dump({'file_path':CSV_DIR,'file_name':file_name},write)
     with open(file_name, newline='') as csvfile:
         reader = csv.DictReader(csvfile)
         clist = []
         for rows in reader :
             clist = clist + [(rows['cname'],rows['remail'])]
-            print(dict(clist))
         return JsonResponse(dict(clist))
 
 @api_view(['POST'])
@@ -106,6 +198,7 @@ def submit(request):
                 body = "You are already registered."
                 var['subject']=subject
                 var['body']=body
+                #var['attachments'] = None
             else:
                 clgSrz = ClgDataSerializer(data = {'cname' : clg})
                 if clgSrz.is_valid():
@@ -114,6 +207,7 @@ def submit(request):
                 body = "Welcome to our eyrc program."
                 var['subject']=subject
                 var['body']=body
+                #var['attachments'] = 'scripts/letter-of-intent.docx'
             return JsonResponse(var)
         except ValueError as e:
             return JsonResponse({'status':'failed','info':e.args[0]})
@@ -124,9 +218,11 @@ def approve(request):
             var = JSONParser().parse(request)
             to = var.get('remail')
             cc = var.get('ccbcc')
+            bcc = var.get('ccbcc')
             subject = var.get('subject')
             body = var.get('body')
-            sent  = SendMessage(EMAIL_HOST_USER,to,cc,subject,body)
+            #attachments = var.get('attachments')
+            sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body)
             if sent :
                 return JsonResponse({'status':'success','info':'mail sent successfully'})
             else :
@@ -137,19 +233,19 @@ def approve(request):
 @api_view(['POST'])
 def gsave(request):
     var = JSONParser().parse(request)
-    to = 'aakashkhandelwal56@gmail.com'
-    subject = 'subject'
-    body = "hiii"
+    to = var.get('remail')
+    cc = var.get('ccbcc')
+    bcc = var.get('ccbcc')
+    subject = var.get('subject')
+    body = var.get('body')
     credentials = get_credentials()
     attachmentFile=None
-    # http = credentials.authorize(httplib2.Http())
-    # service = discovery.build('gmail', 'v1', http=http)
     service = build('gmail', 'v1', credentials=credentials)
     if attachmentFile:
         pass
         #message = createMessageWithAttachment(sender, to, subject, msgHtml, msgPlain, attachmentFile)
     else:
-        message = CreateMessageHtml(EMAIL_HOST_USER, to, subject, body)
+        message = CreateMessageHtml(EMAIL_HOST_USER, to, cc, bcc, subject, body)
     result = CreateDraft(service,"me",message)
     return JsonResponse(result)
 
@@ -174,16 +270,17 @@ def CreateDraft(service, user_id, message_body):
     print('An error occurred: %s' % error)
     return error
 
-def SendMessage(sender, to,cc, subject, body, attachmentFile=None):
+def SendMessage(sender, to, cc, bcc, subject, body, attachmentFile=None):
     credentials = get_credentials()
-    # http = credentials.authorize(httplib2.Http())
-    # service = discovery.build('gmail', 'v1', http=http)
     service = build('gmail', 'v1', credentials=credentials)
+    #msgPlain = body
+    #with open('templates/new.html' ,'r') as email_content:
+        #msgHtml = email_content.read()
     if attachmentFile:
         pass
-       #message1 = createMessageWithAttachment(sender, to, subject, msgPlain, msgHtml, attachmentFile)
+        #message = createMessageWithAttachment(sender, to, subject, msgPlain, msgHtml, attachmentFile)
     else:
-        message = CreateMessageHtml(sender, to,cc, subject, body)
+        message = CreateMessageHtml(sender, to, cc, bcc, subject, body)
     result = SendMessageInternal(service, "me", message)
     return result
 
@@ -210,12 +307,16 @@ def get_credentials():
             pickle.dump(creds, token)
     return creds
 
-def CreateMessageHtml(sender, to,cc, subject, body, msgHtml=None):
+def CreateMessageHtml(sender, to, cc, bcc, subject, body, msgHtml=None):
     msg = MIMEMultipart('alternative')
     msg['Subject'] = subject
     msg['From'] = sender
     msg['Bcc'] = cc
     msg['To'] = to
+    msg['Cc'] = cc
+    #msg['Bcc'] = bcc
+    #with open('templates/new.html', 'r') as email_content:
+        #msgHtml = email_content.read()
     msg.attach(MIMEText(body, 'plain'))
     #msg.attach(MIMEText(msgHtml, 'html'))
     return {'raw': base64.urlsafe_b64encode(msg.as_string().encode()).decode()}

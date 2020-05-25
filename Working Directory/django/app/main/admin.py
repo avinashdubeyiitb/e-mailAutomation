@@ -1,5 +1,4 @@
 from django.contrib import admin
-from .models import clgData,editMail
+from .models import clgData
 
 admin.site.register(clgData)
-admin.site.register(editMail)

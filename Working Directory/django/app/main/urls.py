@@ -6,8 +6,8 @@ urlpatterns = [
     url(r'^api/main/approve', views.approve),
     url(r'^api/main/gsave', views.gsave),
     url(r'^api/main/idrequest',views.idrequest),
-    url(r'^api/main/csvsubmit', views.csvsubmit),
+    url(r'^api/main/csv/submit', views.csvsubmit),
     url(r'^api/main/save',views.save),
-    url(r'^api/main/csvapprove', views.csvapprove),
-    url(r'^api/main/csvdraft', views.csvdraft),
+    url(r'^api/main/csv/approve', views.csvapprove),
+    url(r'^api/main/csv/gsave', views.csvdraft),
 ]
