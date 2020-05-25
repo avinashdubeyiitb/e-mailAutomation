@@ -55,12 +55,7 @@
 <div v-show="!isNight1">
    <form>
    <label id="srccbcc"><strong>cc/bcc:</strong>
-   <input v-if = "key2" v-model = "output.remail"
-   @blur= "key2 = false; $emit('update')"
-   @keyup.enter = "key2=false; $emit('update')" >
-         <div v-else>
-     <label @click = "key2 = true;">{{output.remail}} </label>
-   </div>
+   <b-button v-for='(p,inn) in output.remail' v-bind:key='inn' v-model = "output.remail" >{{p}}<b-button @click="disc(p,inn)" class="close" aria-label="Close"><span class="d-inline-block" aria-hidden="true">&times;</span></b-button></b-button>
     </label><br>
    <label id="srsubject"><strong>subject:</strong>
    <input v-if = "key3" v-model = "output.subject"
@@ -197,6 +192,7 @@ export default {
       statedisdata: statedisdata,
       state: '',
       index: '',
+      in: '',
       districts: [],
       district: '',
       isNight: true,
@@ -258,6 +254,10 @@ export default {
       this.index = index
       this.districts = []
       this.districts.push(this.statedisdata.states[index].districts)
+    },
+    disc (p, inn) {
+      console.log(p, inn)
+      this.$delete(this.output.remail, inn)
     },
     selecteddistrict (district) {
       this.district = district
