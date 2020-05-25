@@ -10,4 +10,5 @@ urlpatterns = [
     url(r'^api/main/save',views.save),
     url(r'^api/main/csv/approve', views.csvapprove),
     url(r'^api/main/csv/gsave', views.csvdraft),
+    url(r'^api/main/awssubmit', views.awssubmit),
 ]

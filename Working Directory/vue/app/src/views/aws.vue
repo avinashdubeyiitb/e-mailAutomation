@@ -7,19 +7,19 @@
     <strong><p id="fd">Fill details:</p></strong>
     <form @submit="formSubmit">
     <strong id="hcn" >Host College Name:</strong>
-    <input id="hcni" type="text" v-model="remail"><br>
+    <input id="hcni" type="text" v-model="hcn"><br>
     <strong id="startdate">Start Date:</strong>
-    <input id="startdatei" type="date" v-model="ccbcc"><br>
+    <input id="startdatei" type="date" v-model="startdate"><br>
     <strong id="enddate">End Date:</strong>
-    <input id="enddatei" type="date" v-model="name"><br>
+    <input id="enddatei" type="date" v-model="enddate"><br>
     <strong id="venueadd">Venue Address:</strong>
-    <input id="venueaddi" type="text" v-model="designation"><br>
+    <input id="venueaddi" type="text" v-model="venueadd"><br>
     <strong id="cooname">Coordinator Name:</strong>
-    <input id="coonamei" type="text" v-model="department"><br>
+    <input id="coonamei" type="text" v-model="cooname"><br>
     <strong id="cooemail">Coordinator Email:</strong>
-    <input id="cooemaili" type="email" v-model="cname"><br>
+    <input id="cooemaili" type="email" v-model="cooemail"><br>
     <strong id="coono">Coordinator Cont.:</strong>
-    <input id="coonoi" type="tel" v-model="cno"><br>
+    <input id="coonoi" type="tel" v-model="coono"><br>
     <strong id="recipientstate">Recipient State:</strong>
     <div>
         <b-dropdown id="recipientstatei" text="State" >
@@ -47,76 +47,6 @@
     </pre> -->
     <p id="rmsg">{{output}}</p>
   </div>
-  <div v-show="!isNight2">
-    <p v-show="!isNight2">"comming soon"</p>
-    <div id="content">
-      <div class="text-uppercase text-bold">id selected: {{selected}}</div>
-<table class="table table-striped table-hover">
-<thead>
-<tr>
-<th>
-<label class="form-checkbox">
-<input type="checkbox" v-model="selectAll" @click="select">
-</label>
-</th>
-<th>College Name</th>
-<th>Receipient Id</th>
-</tr>
-</thead>
-<tbody>
-<tr v-bind:key="i" v-for="(pk,i) in items" v-on:click="clickList(pk,i)">
-<td>
-<label class="form-checkbox">
-<input type="checkbox" :value="pk" v-model="selected">
-</label>
-</td>
-<td>{{i}}</td>
-<td>{{pk}}</td>
-</tr>
-</tbody>
-</table>
-  </div>
-  <form>
-  <b-button id="popover-reactive-3" ref="button3">Approve Selected</b-button>
-</form>
-  <b-popover
-        target="popover-reactive-3"
-        triggers="click"
-        :show.sync="popoverShow3"
-        placement="auto"
-        container="my-container"
-        ref="popover"
-        @hidden="onHidden"
-      >
-        <template v-slot:title>
-          Are you sure you want to continue?
-        </template>
-        <div >
-          <b-button id="bcancel" @click="onClose" size="sm" variant="danger">Cancel</b-button>
-          <b-button id="bsure" @click="approveselect" size="sm" variant="primary">Sure</b-button>
-        </div>
-      </b-popover>
-    <form>
-  <b-button id="popover-reactive-4" ref="button4" >Reject Selected</b-button>
-</form>
-  <b-popover
-        target="popover-reactive-4"
-        triggers="click"
-        :show.sync="popoverShow4"
-        placement="auto"
-        container="my-container"
-        ref="popover"
-        @hidden="onHidden"
-      >
-        <template v-slot:title>
-          Are you want to save it in gmail draft or discard it ?
-        </template>
-        <div>
-          <b-button id="bstd" @click="gsaveselected" size="sm" variant="primary">Save to draft</b-button>
-          <b-button id="bdiscard" @click="discardselected" size="sm" variant="danger">Discard</b-button>
-        </div>
-      </b-popover>
-  </div>
 </div>
 <div id="col2inner">
   <p id="para1" v-show="isNight">" nothing to show right now" </p>
@@ -124,20 +54,12 @@
 <p id="para1" v-show="!isNight1">"show right now"</p>
 <div v-show="!isNight1">
    <form>
-   <label  id="sremail"><strong >Recipient Id:</strong>
-   <input v-if = "key1" v-model = "output.remail"
-   @blur= "key1 = false; $emit('update')"
-   @keyup.enter = "key1=false; $emit('update')">
-   <div v-else>
-     <label @click = "key1 = true;"> {{output.remail}} </label>
-   </div>
- </label><br>
    <label id="srccbcc"><strong>cc/bcc:</strong>
-   <input v-if = "key2" v-model = "output.ccbcc"
+   <input v-if = "key2" v-model = "output.remail"
    @blur= "key2 = false; $emit('update')"
    @keyup.enter = "key2=false; $emit('update')" >
          <div v-else>
-     <label @click = "key2 = true;">{{output.ccbcc}} </label>
+     <label @click = "key2 = true;">{{output.remail}} </label>
    </div>
     </label><br>
    <label id="srsubject"><strong>subject:</strong>
@@ -166,42 +88,6 @@
 
   <!-- </div> -->
  </label><br>
-    <!-- <h2>Extra details:</h2>
-   <p>name:</p>
-   <input v-if = "key5" v-model = "output.name"
-   @blur= "key5 = false; $emit('update')"
-   @keyup.enter = "key5=false; $emit('update')">
-         <div v-else>
-     <label @click = "key5 = true;">{{output.name}} </label>
-   </div>
-   <p>Designation:</p>
-   <input v-if = "key6" v-model = "output.designation"
-   @blur= "key6 = false; $emit('update')"
-   @keyup.enter = "key6=false; $emit('update')">
-         <div v-else>
-     <label @click = "key6 = true;">{{output.designation}} </label>
-   </div>
- <p>Department:</p>
- <input v-if = "key7" v-model = "output.department"
- @blur= "key7 = false; $emit('update')"
- @keyup.enter = "key7=false; $emit('update')">
-       <div v-else>
-   <label @click = "key7 = true;">{{output.department}} </label>
- </div>
- <p>College name:</p>
- <input v-if = "key8" v-model = "output.cname"
- @blur= "key8 = false; $emit('update')"
- @keyup.enter = "key8=false; $emit('update')">
-       <div v-else>
-   <label @click = "key8 = true;">{{output.cname}} </label>
- </div>
- <p>Contact number:</p>
- <input v-if = "key9" v-model = "output.cno"
- @blur= "key9 = false; $emit('update')"
- @keyup.enter = "key9=false; $emit('update')">
-<div v-else>
-   <label @click = "key9 = true;">{{output.cno}} </label>
- </div> -->
  </form>
  </div>
 <div v-show="!isNight1">
@@ -317,24 +203,21 @@ export default {
       isNight1: true,
       isNight2: true,
       isNight3: true,
-      iscsvtrue: false,
       popoverShow1: false,
       popoverShow2: false,
       popoverShow3: false,
       popoverShow4: false,
-      captureid: '',
-      remail: '',
-      ccbcc: '',
-      name: '',
-      designation: '',
-      department: '',
-      cname: '',
-      cno: '',
+      hcn: '',
+      startdate: '',
+      enddate: '',
+      venueadd: '',
+      cooname: '',
+      cooemail: '',
+      coono: '',
       output: '',
       items: [],
       selected: [],
       selectAll: false,
-      file: '',
       key1: '',
       key2: '',
       key3: '',
@@ -351,43 +234,23 @@ export default {
   watch: {
   },
   methods: {
-    select () {
-      this.selected = []
-      if (!this.selectAll) {
-        for (const pk in this.items) {
-          this.selected.push(this.items[pk])
-        }
-      }
-    },
-    editTodo: output => {
-      this.editedTodo = output
-    },
     discard () {
       this.popoverShow1 = false
       this.popoverShow2 = false
       this.isNight = true
       this.isNight1 = true
       this.isNight2 = true
-      this.iscsvtrue = false
-      this.output.remail = ''
-      this.output.ccbcc = ''
-      this.output.name = ''
-      this.output.designation = ''
-      this.output.department = ''
-      this.output.cname = ''
-      this.output.cno = ''
+      this.output.hcn = ''
+      this.output.startdate = ''
+      this.output.enddate = ''
+      this.output.venueadd = ''
+      this.output.cooname = ''
+      this.output.cooemail = ''
+      this.output.coono = ''
+      this.output.state = ''
+      this.output.district = ''
       this.output.body = ''
       this.output.subject = ''
-    },
-    handleFileUpload () {
-      this.file = this.$refs.file.files[0]
-    },
-    gobacktoform () {
-      this.isNight = true
-      this.isNight1 = true
-      this.isNight2 = true
-      this.isNight3 = true
-      this.iscsvtrue = false
     },
     selectedstate (state, index) {
       console.log(state, index)
@@ -400,32 +263,6 @@ export default {
       this.district = district
       console.log(district)
     },
-    submitFile () {
-      const formData = new FormData()
-      // const currentObj = this
-      formData.append('file', this.file)
-      this.isNight = false
-      this.isNight1 = true
-      this.isNight2 = false
-      this.isNight3 = false
-      this.iscsvtrue = true
-      this.axios.post('http://localhost:8081/api/main/csvsubmit',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        }
-      )
-        .then(items => {
-          console.log('SUCCESS!!')
-          this.items = items.data
-          console.log(this.items)
-        })
-        .catch(function () {
-          console.log('FAILURE!!')
-        })
-    },
     onClose () {
       this.popoverShow1 = false
       this.popoverShow2 = false
@@ -437,29 +274,6 @@ export default {
     },
     focusRef (ref) {
     },
-    approveselect () {
-
-    },
-    discardselected () {
-
-    },
-    gsaveselected () {
-
-    },
-    clickList: function (pk, i) {
-      console.log('clickList fired with ' + pk)
-      const currentObj = this
-      this.axios.post('http://localhost:8081/api/main/idrequest', {
-        remail: pk,
-        cname: i
-      })
-        .then(reqdata => {
-          this.reqdata = reqdata.data
-        })
-        .catch(function (error) {
-          currentObj.reqdata = error
-        })
-    },
     formSubmit (e) {
       e.preventDefault()
       const currentObj = this
@@ -467,14 +281,16 @@ export default {
       this.isNight1 = false
       this.isNight2 = true
       this.isNight3 = true
-      this.axios.post('http://localhost:8081/api/main/submit', {
-        remail: this.remail,
-        ccbcc: this.ccbcc,
-        name: this.name,
-        designation: this.designation,
-        department: this.department,
-        cname: this.cname,
-        cno: this.cno
+      this.axios.post('http://localhost:8081/api/main/awssubmit', {
+        hcn: this.hcn,
+        startdate: this.startdate,
+        enddate: this.enddate,
+        venueadd: this.venueadd,
+        cooname: this.cooname,
+        cooemail: this.cooemail,
+        coono: this.coono,
+        state: this.state,
+        district: this.district
       })
         .then(output => {
           this.output = output.data
@@ -487,8 +303,7 @@ export default {
       e.preventDefault()
       const currentObj = this
       this.axios.post('http://localhost:8081/api/main/approve', {
-        remail: this.output.remail,
-        ccbcc: this.output.ccbcc,
+        ccbcc: this.output.remail,
         body: this.output.body,
         subject: this.output.subject
       })
@@ -506,8 +321,7 @@ export default {
       e.preventDefault()
       const currentObj = this
       this.axios.post('http://localhost:8081/api/main/gsave', {
-        remail: this.output.remail,
-        ccbcc: this.output.ccbcc,
+        ccbcc: this.output.remail,
         body: this.output.body,
         subject: this.output.subject
       })

@@ -25,7 +25,7 @@ import mimetypes
 import csv
 from django.core.files.storage import default_storage
 
-from .models import clgData
+from .models import clgData,locData
 from .serializers import ClgDataSerializer
 from app.settings import EMAIL_HOST_USER,BASE_DIR
 # If modifying these scopes, delete the file token.pickle.
@@ -209,6 +209,35 @@ def submit(request):
                 var['body']=body
                 #var['attachments'] = 'scripts/letter-of-intent.docx'
             return JsonResponse(var)
+        except ValueError as e:
+            return JsonResponse({'status':'failed','info':e.args[0]})
+
+
+@api_view(['POST'])
+def awssubmit(request):
+        try:
+            var = JSONParser().parse(request)
+            state = var.get('state')
+            district = var.get('district')
+            obj1 = locData.objects.filter(locstate = state)
+            if obj1.count() >= 1:
+                obj2 = locData.objects.filter(locdistrict = district)
+                if obj2.count() >= 1:
+                    dict={}
+                    clist=[]
+                    for rows in list(obj2.values()) :
+                        clist = clist + [(rows['locemail'])]
+                    dict['remail'] = clist
+                    print(dict)
+                    subject = "Send workshop Mail"
+                    body = "heyyyyy"
+                    dict['subject']=subject
+                    dict['body']=body
+                    return JsonResponse(dict)
+                return JsonResponse({'key':'nodata'})
+                #var['attachments'] = None
+            else:
+                return JsonResponse({'key':'nodata'})
         except ValueError as e:
             return JsonResponse({'status':'failed','info':e.args[0]})
 
