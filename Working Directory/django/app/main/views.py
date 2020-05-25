@@ -123,9 +123,10 @@ def approve(request):
         try:
             var = JSONParser().parse(request)
             to = var.get('remail')
+            cc = var.get('ccbcc')
             subject = var.get('subject')
             body = var.get('body')
-            sent  = SendMessage(EMAIL_HOST_USER,to,subject,body)
+            sent  = SendMessage(EMAIL_HOST_USER,to,cc,subject,body)
             if sent :
                 return JsonResponse({'status':'success','info':'mail sent successfully'})
             else :
@@ -173,7 +174,7 @@ def CreateDraft(service, user_id, message_body):
     print('An error occurred: %s' % error)
     return error
 
-def SendMessage(sender, to, subject, body, attachmentFile=None):
+def SendMessage(sender, to,cc, subject, body, attachmentFile=None):
     credentials = get_credentials()
     # http = credentials.authorize(httplib2.Http())
     # service = discovery.build('gmail', 'v1', http=http)
@@ -182,7 +183,7 @@ def SendMessage(sender, to, subject, body, attachmentFile=None):
         pass
        #message1 = createMessageWithAttachment(sender, to, subject, msgPlain, msgHtml, attachmentFile)
     else:
-        message = CreateMessageHtml(sender, to, subject, body)
+        message = CreateMessageHtml(sender, to,cc, subject, body)
     result = SendMessageInternal(service, "me", message)
     return result
 
@@ -209,10 +210,11 @@ def get_credentials():
             pickle.dump(creds, token)
     return creds
 
-def CreateMessageHtml(sender, to, subject, body, msgHtml=None):
+def CreateMessageHtml(sender, to,cc, subject, body, msgHtml=None):
     msg = MIMEMultipart('alternative')
     msg['Subject'] = subject
     msg['From'] = sender
+    msg['Bcc'] = cc
     msg['To'] = to
     msg.attach(MIMEText(body, 'plain'))
     #msg.attach(MIMEText(msgHtml, 'html'))
