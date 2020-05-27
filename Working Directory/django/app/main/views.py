@@ -15,6 +15,7 @@ from email.mime.base import MIMEBase
 from rest_framework.parsers import JSONParser
 from django.core.mail import EmailMessage
 from django.http.response import JsonResponse
+from django.core.files.storage import default_storage
 import smtplib
 import json
 import pickle
@@ -23,11 +24,11 @@ import httplib2
 import base64
 import mimetypes
 import csv
-from django.core.files.storage import default_storage
 
-from .models import clgData,locData
+from .models import clgData,locData,ElsiCollegeDtls
 from .serializers import ClgDataSerializer
 from app.settings import EMAIL_HOST_USER,BASE_DIR
+
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = [
     'https://www.googleapis.com/auth/gmail.readonly',
@@ -35,6 +36,17 @@ SCOPES = [
     'https://www.googleapis.com/auth/gmail.compose',
     'https://www.googleapis.com/auth/gmail.modify',
 ]
+
+@api_view(['POST'])
+def collegedetail(request):
+    var = JSONParser().parse(request)
+    clgCode = var.get('clgcode')
+    obj = ElsiCollegeDtls.objects.filter(clg_code = clgCode)
+    if obj.count() == 1:
+        l = str(obj[0]).split(';')
+        return JsonResponse({'status':None,'college_name':l[0],'eyic_allowed':l[1],'tbt_allowed':l[2],'loi_status':l[3]})
+    else :
+        return JsonResponse({'status':'college code not found'})
 
 @api_view(['POST'])
 def csvapprove(request):
@@ -67,7 +79,7 @@ def csvapprove(request):
                     if body == None :
                         body = "Welcome to our eyrc program."
                         subject = "Send Information Mail"
-                sent = SendMessage(EMAIL_HOST_USER,l,row[1],row[1], subject, body)
+                #sent = SendMessage(EMAIL_HOST_USER,l,row[1],row[1], subject, body)
                 #print(l,sent)
                 if sent :
                     res[l] = "mail sent successfully"
@@ -110,8 +122,9 @@ def csvdraft(request):
                     pass
                     #message = createMessageWithAttachment(sender, to, subject, msgHtml, msgPlain, attachmentFile)
                 else:
-                    message = CreateMessageHtml(EMAIL_HOST_USER,l,row[1],row[1], subject, body)
-                result = CreateDraft(service,"me",message)
+                    message = None
+                    #message = CreateMessageHtml(EMAIL_HOST_USER,l,row[1],row[1], subject, body)
+                #result = CreateDraft(service,"me",message)
                 if result :
                     res[l] = "saved to draft"
                 else :
@@ -250,8 +263,9 @@ def approve(request):
             bcc = var.get('ccbcc')
             subject = var.get('subject')
             body = var.get('body')
+            sent = None
             #attachments = var.get('attachments')
-            sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body)
+            #sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body)
             if sent :
                 return JsonResponse({'status':'success','info':'mail sent successfully'})
             else :
@@ -269,13 +283,15 @@ def gsave(request):
     body = var.get('body')
     credentials = get_credentials()
     attachmentFile=None
+    result = None
     service = build('gmail', 'v1', credentials=credentials)
     if attachmentFile:
         pass
         #message = createMessageWithAttachment(sender, to, subject, msgHtml, msgPlain, attachmentFile)
     else:
-        message = CreateMessageHtml(EMAIL_HOST_USER, to, cc, bcc, subject, body)
-    result = CreateDraft(service,"me",message)
+        message = None
+        #message = CreateMessageHtml(EMAIL_HOST_USER, to, cc, bcc, subject, body)
+    #result = CreateDraft(service,"me",message)
     return JsonResponse(result)
 
 def CreateDraft(service, user_id, message_body):

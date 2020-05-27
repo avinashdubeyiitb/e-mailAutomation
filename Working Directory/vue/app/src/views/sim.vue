@@ -52,13 +52,13 @@
 </tr>
 </thead>
 <tbody>
-<tr v-bind:key="i" v-for="(pk,i) in items" v-on:click="clickList(pk,i)">
+<tr v-bind:key="i" v-for="(pk,i) in items">
 <td>
 <label class="form-checkbox">
 <input type="checkbox" :value="pk" v-model="selected">
 </label>
 </td>
-<td>{{i}}</td>
+<td v-on:click="clickList(pk,i)">{{i}}</td>
 <td>{{pk}}</td>
 </tr>
 </tbody>
@@ -263,7 +263,7 @@
            <div v-else>
        <label @click = "key3 = true;"> {{reqdata.subject}} </label>
      </div>
-     </label><br>
+     </label><br><!--
      <label id="srbody"><strong>body:</strong>
      <input v-if = "key4" v-model = "reqdata.body"
      @blur= "key4 = false; $emit('update')"
@@ -271,7 +271,19 @@
       <div v-else>
        <label @click = "key4 = true;"> {{reqdata.body}} </label>
      </div>
-    </label><br>
+    </label><br>-->
+    <b-button v-b-modal.modal-1 id="srbody">body</b-button>
+
+    <b-modal id="modal-1" title="Body" hide-footer v-on:keyup.enter = "NoEnter" >
+    <b-container class="px-2" >
+     <b-form-textarea  v-if = "key4" v-model = "reqdata.body"
+     @blur= "key4 = false; $emit('update')"
+     @keyup.enter = "key4=false; $emit('update')" id="isrbody" rows="10" max-rows="50" onsubmit="return false">
+     </b-form-textarea>
+     <pre  v-else @click = "key4 = true;">{{reqdata.body}}</pre>
+    </b-container>
+    <b-button block @click="$bvModal.hide('modal-1')">OK</b-button>
+    </b-modal><br>
     <label id="srattach"><strong>Attachment:</strong>
     <!-- <input v-if = "key5" v-model = "output.body" -->
     <!-- @blur= "key5 = false; $emit('update')" -->
@@ -344,6 +356,10 @@ export default {
           this.selected.push(this.items[pk])
         }
       }
+    },
+    NoEnter (e) {
+      e.preventDefault()
+      console.log(e)
     },
     editTodo: output => {
       this.editedTodo = output
