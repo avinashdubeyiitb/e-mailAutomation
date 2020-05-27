@@ -237,6 +237,7 @@ export default {
       this.isNight1 = true
       this.isNight2 = true
       this.output.hcn = ''
+      this.output.remail = ''
       this.output.startdate = ''
       this.output.enddate = ''
       this.output.venueadd = ''
@@ -644,7 +645,7 @@ top: 53%;
 #rmsg{
   position: absolute;
   left:35%;
-  top: 55%;
+  top: 70%;
 }
 #or{
   position: absolute;

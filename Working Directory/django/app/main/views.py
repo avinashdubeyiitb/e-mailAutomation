@@ -30,6 +30,19 @@ from .serializers import ClgDataSerializer
 from app.settings import EMAIL_HOST_USER,BASE_DIR
 
 # If modifying these scopes, delete the file token.pickle.
+############################################################################################################################
+import googlemaps
+import requests, json
+API_KEY = 'AIzaSyD9qTJmiFUe3FQWlo5Z-A3l6pigxA3s8U8'
+gmaps = googlemaps.Client(key = API_KEY)
+print(gmaps)
+url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
+input='India%I%OF%T%kanpur'
+other='&inputtype=textquery&fields=name'
+result = requests.get(url+'input='+input+other+'&key='+API_KEY)
+x = result.json()
+print(x)
+############################################################################################################################
 SCOPES = [
     'https://www.googleapis.com/auth/gmail.readonly',
     'https://www.googleapis.com/auth/gmail.send',
@@ -259,8 +272,9 @@ def approve(request):
         try:
             var = JSONParser().parse(request)
             to = var.get('remail')
-            cc = var.get('ccbcc')
-            bcc = var.get('ccbcc')
+            cc = ','.join(map(str,var.get('ccbcc') ))
+            bcc = ','.join(map(str,var.get('ccbcc') ))
+            print(bcc)
             subject = var.get('subject')
             body = var.get('body')
             sent = None
@@ -277,8 +291,8 @@ def approve(request):
 def gsave(request):
     var = JSONParser().parse(request)
     to = var.get('remail')
-    cc = var.get('ccbcc')
-    bcc = var.get('ccbcc')
+    cc = ','.join(map(str,var.get('ccbcc') ))
+    bcc = ','.join(map(str,var.get('ccbcc') ))
     subject = var.get('subject')
     body = var.get('body')
     credentials = get_credentials()
