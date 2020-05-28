@@ -29,20 +29,23 @@ from .models import clgData,locData,ElsiCollegeDtls
 from .serializers import ClgDataSerializer
 from app.settings import EMAIL_HOST_USER,BASE_DIR
 
-# If modifying these scopes, delete the file token.pickle.
 ############################################################################################################################
 import googlemaps
-import requests, json
+import requests
+
 API_KEY = 'AIzaSyD9qTJmiFUe3FQWlo5Z-A3l6pigxA3s8U8'
 gmaps = googlemaps.Client(key = API_KEY)
 print(gmaps)
 url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
-input='India%I%OF%T%kanpur'
+input='mbm Raj.'
 other='&inputtype=textquery&fields=name'
 result = requests.get(url+'input='+input+other+'&key='+API_KEY)
 x = result.json()
 print(x)
+# zero_results
+# input='manganiram banghar memorial'
 ############################################################################################################################
+# If modifying these scopes, delete the file token.pickle.
 SCOPES = [
     'https://www.googleapis.com/auth/gmail.readonly',
     'https://www.googleapis.com/auth/gmail.send',
@@ -291,8 +294,14 @@ def approve(request):
 def gsave(request):
     var = JSONParser().parse(request)
     to = var.get('remail')
-    cc = ','.join(map(str,var.get('ccbcc') ))
-    bcc = ','.join(map(str,var.get('ccbcc') ))
+    if var.get('ccbcc') is not None :
+        cc = ','.join(map(str,var.get('ccbcc') ))
+    else :
+        cc = ''
+    if var.get('ccbcc') is not None :         
+        bcc = ','.join(map(str,var.get('ccbcc') ))
+    else :
+        bcc = ''    
     subject = var.get('subject')
     body = var.get('body')
     credentials = get_credentials()
@@ -306,7 +315,7 @@ def gsave(request):
         message = None
         #message = CreateMessageHtml(EMAIL_HOST_USER, to, cc, bcc, subject, body)
     #result = CreateDraft(service,"me",message)
-    return JsonResponse(result)
+    return JsonResponse({'status':'saved to draft'})
 
 def CreateDraft(service, user_id, message_body):
   """Create and insert a draft email. Print the returned draft's message and id.
