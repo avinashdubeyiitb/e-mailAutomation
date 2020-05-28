@@ -230,16 +230,21 @@ def submit(request):
 def awssubmit(request):
         try:
             var = JSONParser().parse(request)
+            dict={}
+            clist=[]
             state = var.get('state')
-            district = var.get('district')
+            districts = var.get('district')
+            print(districts)
             obj1 = locData.objects.filter(locstate = state)
             if obj1.count() >= 1:
-                obj2 = locData.objects.filter(locdistrict = district)
-                if obj2.count() >= 1:
-                    dict={}
-                    clist=[]
-                    for rows in list(obj2.values()) :
-                        clist = clist + [(rows['locemail'])]
+                for district in districts:
+                    obj2 = locData.objects.filter(locdistrict = district)
+                    if obj2.count() >= 1:
+                        for rows in list(obj2.values()) :
+                            clist = clist + [(rows['locemail'])]
+                if len(clist) == 0:
+                    return JsonResponse({'key':'nodata'})
+                else:
                     dict['remail'] = clist
                     print(dict)
                     subject = "Send workshop Mail"
@@ -247,7 +252,6 @@ def awssubmit(request):
                     dict['subject']=subject
                     dict['body']=body
                     return JsonResponse(dict)
-                return JsonResponse({'key':'nodata'})
                 #var['attachments'] = None
             else:
                 return JsonResponse({'key':'nodata'})
