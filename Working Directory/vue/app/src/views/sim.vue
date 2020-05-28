@@ -21,7 +21,7 @@
     <input id="cnamei" type="text" v-model="cname"><br>
     <strong id="cno">Contact No.:</strong>
     <input id="cnoi" type="tel" v-model="cno"><br>
-    <button id="msub" v-b-modal.modal-1>Submit</button>
+    <button id="msub">Submit</button>
     </form>
     <!-- <strong>Response:</strong> -->
     <!-- <pre>
@@ -39,7 +39,7 @@
     <p v-show="!isNight2">"comming soon"</p>
     <div id="content">
       <div class="text-uppercase text-bold">id selected: {{selected}}</div>
-<table class="table table-striped table-hover">
+<table class="table table-hover">
 <thead>
 <tr>
 <th>
@@ -52,13 +52,13 @@
 </tr>
 </thead>
 <tbody>
-<tr v-bind:key="i" v-for="(pk,i) in items" v-on:click="clickList(pk,i)">
+<tr v-bind:key="i" v-for="(pk,i) in items" :class="getClass(pk)">
 <td>
 <label class="form-checkbox">
 <input type="checkbox" :value="pk" v-model="selected">
 </label>
 </td>
-<td>{{i}}</td>
+<td v-on:click="clickList(pk,i)">{{i}}</td>
 <td>{{pk}}</td>
 </tr>
 </tbody>
@@ -137,6 +137,7 @@
      <label @click = "key3 = true;"> {{output.subject}} </label>
    </div>
    </label><br>
+  <!--
    <label id="srbody"><strong>body:</strong>
    <input v-if = "key4" v-model = "output.body"
    @blur= "key4 = false; $emit('update')"
@@ -145,6 +146,19 @@
      <label @click = "key4 = true;"> {{output.body}} </label>
    </div>
   </label><br>
+  -->
+      <b-button v-b-modal.modal-2 id="srbody">body</b-button>
+
+    <b-modal id="modal-2" title="Body" hide-footer v-on:keyup.enter = "NoEnter" >
+    <b-container class="px-2" >
+     <b-form-textarea  v-if = "key4" v-model = "output.body"
+     @blur= "key4 = false; $emit('update')"
+     @keyup.enter = "key4=false; $emit('update')" id="isrbody" rows="10" max-rows="50" onsubmit="return false">
+     </b-form-textarea>
+     <pre  v-else @click = "key4 = true;">{{output.body}}</pre>
+    </b-container>
+    <b-button block @click="$bvModal.hide('modal-2')">OK</b-button>
+    </b-modal><br>
   <label id="srattach"><strong>Attachment:</strong>
   <!-- <input v-if = "key5" v-model = "output.body" -->
   <!-- @blur= "key5 = false; $emit('update')" -->
@@ -263,7 +277,7 @@
            <div v-else>
        <label @click = "key3 = true;"> {{reqdata.subject}} </label>
      </div>
-     </label><br>
+     </label><br><!--
      <label id="srbody"><strong>body:</strong>
      <input v-if = "key4" v-model = "reqdata.body"
      @blur= "key4 = false; $emit('update')"
@@ -271,7 +285,19 @@
       <div v-else>
        <label @click = "key4 = true;"> {{reqdata.body}} </label>
      </div>
-    </label><br>
+    </label><br>-->
+    <b-button v-b-modal.modal-1 id="srbody">body</b-button>
+
+    <b-modal id="modal-1" title="Body" hide-footer v-on:keyup.enter = "NoEnter" >
+    <b-container class="px-2" >
+     <b-form-textarea  v-if = "key4" v-model = "reqdata.body"
+     @blur= "key4 = false; $emit('update')"
+     @keyup.enter = "key4=false; $emit('update')" id="isrbody" rows="10" max-rows="50" onsubmit="return false">
+     </b-form-textarea>
+     <pre  v-else @click = "key4 = true;">{{reqdata.body}}</pre>
+    </b-container>
+    <b-button block @click="$bvModal.hide('modal-1')">OK</b-button>
+    </b-modal><br>
     <label id="srattach"><strong>Attachment:</strong>
     <!-- <input v-if = "key5" v-model = "output.body" -->
     <!-- @blur= "key5 = false; $emit('update')" -->
@@ -331,12 +357,26 @@ export default {
       reqdata: '',
       editedTodo: null,
       saveoutput: '',
-      approvecsv: ''
+      approvecsv: '',
+      aprovselected: [],
+      gsvselected: [],
+      dscrdselected: []
     }
   },
   watch: {
   },
   methods: {
+    getClass (pk) {
+      if (this.aprovselected.indexOf(pk) !== -1) {
+        return 'first'
+      }
+      if (this.gsvselected.indexOf(pk) !== -1) {
+        return 'second'
+      }
+      if (this.dscrdselected.indexOf(pk) !== -1) {
+        return 'third'
+      }
+    },
     select () {
       this.selected = []
       if (!this.selectAll) {
@@ -344,6 +384,10 @@ export default {
           this.selected.push(this.items[pk])
         }
       }
+    },
+    NoEnter (e) {
+      e.preventDefault()
+      console.log(e)
     },
     editTodo: output => {
       this.editedTodo = output
@@ -426,16 +470,28 @@ export default {
           currentObj.approvecsv = error
         })
       this.popoverShow3 = false
+      for (var i = 0; i < this.selected.length; i++) {
+        if (this.aprovselected.indexOf(this.selected[i]) === -1) {
+          this.aprovselected.push(this.selected[i])
+        }
+      }
     },
     discardselected () {
       this.popoverShow3 = false
       this.popoverShow4 = false
       this.approvecsv = ''
       this.saveoutput = ''
-      this.reqdata.to = ''
-      this.reqdata.ccbcc = ''
-      this.reqdata.subject = ''
-      this.reqdata.body = ''
+      if (this.reqdata !== '') {
+        this.reqdata.to = ''
+        this.reqdata.ccbcc = ''
+        this.reqdata.subject = ''
+        this.reqdata.body = ''
+      }
+      for (var i = 0; i < this.selected.length; i++) {
+        if (this.dscrdselected.indexOf(this.selected[i]) === -1) {
+          this.dscrdselected.push(this.selected[i])
+        }
+      }
     },
     gsaveselected () {
       const currentObj = this
@@ -449,6 +505,11 @@ export default {
           currentObj.approvecsv = error
         })
       this.popoverShow4 = false
+      for (var i = 0; i < this.selected.length; i++) {
+        if (this.gsvselected.indexOf(this.selected[i]) === -1) {
+          this.gsvselected.push(this.selected[i])
+        }
+      }
     },
     save (e) {
       e.preventDefault()
@@ -546,6 +607,24 @@ export default {
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.first {
+  background-color: lightgreen;
+}
+.first:hover {
+  background-color: green;
+}
+.second {
+  background-color: lightblue;
+}
+.second:hover {
+  background-color: rgb(0, 204, 255);
+}
+.third {
+  background-color: lightcoral;
+}
+.third:hover {
+  background-color: rgba(255, 38, 0, 0.925);
+}
 h3 {
   margin: 40px 0 0;
 }

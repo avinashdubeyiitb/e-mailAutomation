@@ -15,6 +15,7 @@ from email.mime.base import MIMEBase
 from rest_framework.parsers import JSONParser
 from django.core.mail import EmailMessage
 from django.http.response import JsonResponse
+from django.core.files.storage import default_storage
 import smtplib
 import json
 import pickle
@@ -23,31 +24,45 @@ import httplib2
 import base64
 import mimetypes
 import csv
-from django.core.files.storage import default_storage
 
-from .models import clgData,locData
+from .models import clgData,locData,ElsiCollegeDtls
 from .serializers import ClgDataSerializer
 from app.settings import EMAIL_HOST_USER,BASE_DIR
-# If modifying these scopes, delete the file token.pickle.
+
 ############################################################################################################################
 import googlemaps
-import requests, json
+import requests
+
 API_KEY = 'AIzaSyD9qTJmiFUe3FQWlo5Z-A3l6pigxA3s8U8'
 gmaps = googlemaps.Client(key = API_KEY)
 print(gmaps)
 url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
-input='India%I%OF%T%kanpur'
+input='mbm Raj.'
 other='&inputtype=textquery&fields=name'
 result = requests.get(url+'input='+input+other+'&key='+API_KEY)
 x = result.json()
 print(x)
+# zero_results
+# input='manganiram banghar memorial'
 ############################################################################################################################
+# If modifying these scopes, delete the file token.pickle.
 SCOPES = [
     'https://www.googleapis.com/auth/gmail.readonly',
     'https://www.googleapis.com/auth/gmail.send',
     'https://www.googleapis.com/auth/gmail.compose',
     'https://www.googleapis.com/auth/gmail.modify',
 ]
+
+@api_view(['POST'])
+def collegedetail(request):
+    var = JSONParser().parse(request)
+    clgCode = var.get('clgcode')
+    obj = ElsiCollegeDtls.objects.filter(clg_code = clgCode)
+    if obj.count() == 1:
+        l = str(obj[0]).split(';')
+        return JsonResponse({'status':None,'college_name':l[0],'eyic_allowed':l[1],'tbt_allowed':l[2],'loi_status':l[3]})
+    else :
+        return JsonResponse({'status':'college code not found'})
 
 @api_view(['POST'])
 def csvapprove(request):
@@ -80,7 +95,7 @@ def csvapprove(request):
                     if body == None :
                         body = "Welcome to our eyrc program."
                         subject = "Send Information Mail"
-                sent = SendMessage(EMAIL_HOST_USER,l,row[1],row[1], subject, body)
+                #sent = SendMessage(EMAIL_HOST_USER,l,row[1],row[1], subject, body)
                 #print(l,sent)
                 if sent :
                     res[l] = "mail sent successfully"
@@ -123,8 +138,9 @@ def csvdraft(request):
                     pass
                     #message = createMessageWithAttachment(sender, to, subject, msgHtml, msgPlain, attachmentFile)
                 else:
-                    message = CreateMessageHtml(EMAIL_HOST_USER,l,row[1],row[1], subject, body)
-                result = CreateDraft(service,"me",message)
+                    message = None
+                    #message = CreateMessageHtml(EMAIL_HOST_USER,l,row[1],row[1], subject, body)
+                #result = CreateDraft(service,"me",message)
                 if result :
                     res[l] = "saved to draft"
                 else :
@@ -268,8 +284,9 @@ def approve(request):
             print(bcc)
             subject = var.get('subject')
             body = var.get('body')
+            sent = None
             #attachments = var.get('attachments')
-            sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body)
+            #sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body)
             if sent :
                 return JsonResponse({'status':'success','info':'mail sent successfully'})
             else :
@@ -281,20 +298,28 @@ def approve(request):
 def gsave(request):
     var = JSONParser().parse(request)
     to = var.get('remail')
-    cc = ','.join(map(str,var.get('ccbcc') ))
-    bcc = ','.join(map(str,var.get('ccbcc') ))
+    if var.get('ccbcc') is not None :
+        cc = ','.join(map(str,var.get('ccbcc') ))
+    else :
+        cc = ''
+    if var.get('ccbcc') is not None :         
+        bcc = ','.join(map(str,var.get('ccbcc') ))
+    else :
+        bcc = ''    
     subject = var.get('subject')
     body = var.get('body')
     credentials = get_credentials()
     attachmentFile=None
+    result = None
     service = build('gmail', 'v1', credentials=credentials)
     if attachmentFile:
         pass
         #message = createMessageWithAttachment(sender, to, subject, msgHtml, msgPlain, attachmentFile)
     else:
-        message = CreateMessageHtml(EMAIL_HOST_USER, to, cc, bcc, subject, body)
-    result = CreateDraft(service,"me",message)
-    return JsonResponse(result)
+        message = None
+        #message = CreateMessageHtml(EMAIL_HOST_USER, to, cc, bcc, subject, body)
+    #result = CreateDraft(service,"me",message)
+    return JsonResponse({'status':'saved to draft'})
 
 def CreateDraft(service, user_id, message_body):
   """Create and insert a draft email. Print the returned draft's message and id.
