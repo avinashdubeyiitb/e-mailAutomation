@@ -16,6 +16,7 @@ from rest_framework.parsers import JSONParser
 from django.core.mail import EmailMessage
 from django.http.response import JsonResponse
 from django.core.files.storage import default_storage
+from django.shortcuts import render
 import smtplib
 import json
 import pickle
@@ -27,12 +28,12 @@ import csv
 
 from .models import clgData,locData,ElsiCollegeDtls
 from .serializers import ClgDataSerializer
-from app.settings import EMAIL_HOST_USER,BASE_DIR
+from app.settings import EMAIL_HOST_USER,BASE_DIR,SCRIPTS_DIR
 
 ############################################################################################################################
 import googlemaps
 import requests
-
+'''
 API_KEY = 'AIzaSyD9qTJmiFUe3FQWlo5Z-A3l6pigxA3s8U8'
 gmaps = googlemaps.Client(key = API_KEY)
 print(gmaps)
@@ -42,6 +43,7 @@ other='&inputtype=textquery&fields=name'
 result = requests.get(url+'input='+input+other+'&key='+API_KEY)
 x = result.json()
 print(x)
+'''
 # zero_results
 # input='manganiram banghar memorial'
 ############################################################################################################################
@@ -221,25 +223,33 @@ def submit(request):
         try:
             var = JSONParser().parse(request)
             clg = var.get('cname')
-            obj = clgData.objects.filter(cname = clg)
-            if obj.count() >= 1:
-                subject = "Send Information Mail"
-                body = "You are already registered."
-                var['subject']=subject
-                var['body']=body
-                #var['attachments'] = None
+            district = "Not present"
+            state = " Not present"  
+            obj = ElsiCollegeDtls.objects.filter(college_name = clg)
+            if obj.count() < 1:
+                subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): " +\
+                    "Information for e-Yantra Lab Setup Initiative (eLSI): " +\
+                     clg + " , " + district + " , " + state
+                with open('scripts/temp.html','r',encoding="utf-8") as reader:
+                    body = reader.read()
+                    body = body.replace('%(eLSI lab count (floored to 10))','300')
             else:
-                clgSrz = ClgDataSerializer(data = {'cname' : clg})
-                if clgSrz.is_valid():
-                    clgSrz.save()
-                subject = "Send Information Mail"
-                body = "Welcome to our eyrc program."
-                var['subject']=subject
-                var['body']=body
-                #var['attachments'] = 'scripts/letter-of-intent.docx'
+                subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): " +\
+                    "Information for e-Yan<p>tra Lab Setup Initiative (eLSI): " +\
+                    obj[0].college_name + " , " + obj[0].district + " , " + obj[0].state
+                with open('scripts/temp.html','r',encoding="utf-8") as reader:
+                    body = reader.read()
+                    body = body.replace('%(eLSI lab count (floored to 10))','300')
+            var['subject']=subject
+            var['body']=body
+            p = open('templates/new.html','r',encoding='utf-8').read()
+            var['attachments'] = [p]    
             return JsonResponse(var)
         except ValueError as e:
             return JsonResponse({'status':'failed','info':e.args[0]})
+
+def xyz(request):
+    return render(request,'new.html')
 
 
 @api_view(['POST'])
@@ -361,10 +371,10 @@ def get_credentials():
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    #file_path = os.path.join(SETTINGS_DIR,'pickle.token')
-    #credentials_path=os.path.join(STATIC_DIR,'credentials.json')
-    if os.path.exists('scripts/pickle.token'):
-        with open('scripts/pickle.token', 'rb') as token:
+    file_path = os.path.join(SCRIPTS_DIR,'pickle.token')
+    credentials_path=os.path.join(SCRIPTS_DIR,'credentials.json')
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as token:
             creds = pickle.load(token)
         # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
@@ -372,10 +382,10 @@ def get_credentials():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
+                credentials_path, SCOPES)
             creds = flow.run_local_server(host='127.0.0.1',port=8081)
             # Save the credentials for the next run
-        with open('pickle.token', 'wb') as token:
+        with open(file_path, 'wb') as token:
             pickle.dump(creds, token)
     return creds
 

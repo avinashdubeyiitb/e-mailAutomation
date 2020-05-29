@@ -149,25 +149,21 @@
   -->
       <b-button v-b-modal.modal-2 id="srbody">body</b-button>
 
-    <b-modal id="modal-2" title="Body" hide-footer v-on:keyup.enter = "NoEnter" >
+    <b-modal id="modal-2" size="lg" title="Body" hide-footer v-on:keyup.enter = "NoEnter" >
     <b-container class="px-2" >
-     <b-form-textarea  v-if = "key4" v-model = "output.body"
-     @blur= "key4 = false; $emit('update')"
-     @keyup.enter = "key4=false; $emit('update')" id="isrbody" rows="10" max-rows="50" onsubmit="return false">
-     </b-form-textarea>
-     <pre  v-else @click = "key4 = true;">{{output.body}}</pre>
+    <span v-html="output.body"></span>
     </b-container>
-    <b-button block @click="$bvModal.hide('modal-2')">OK</b-button>
+    <b-button @click="$bvModal.hide('modal-2')">OK</b-button>
     </b-modal><br>
   <label id="srattach"><strong>Attachment:</strong>
-  <!-- <input v-if = "key5" v-model = "output.body" -->
-  <!-- @blur= "key5 = false; $emit('update')" -->
-  <!-- @keyup.enter = "key5=false; $emit('update')" id="isrbody"> -->
-  <!-- <div v-else> -->
-    <!-- <label @click = "key4 = true;"> {{output.body}} </label> -->
-    <label > not Available </label>
-
-  <!-- </div> -->
+       <div v-for="i in output.attachments" v-bind:key="i">
+      <b-button v-b-modal.modal-3>body</b-button>
+    <b-modal id="modal-3" size="lg" hide-footer >
+    <b-container class="px-2" >
+    {{i}}
+    </b-container>
+    </b-modal><br>
+       </div>
  </label><br>
     <!-- <h2>Extra details:</h2>
    <p>name:</p>
