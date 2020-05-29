@@ -302,10 +302,10 @@ def gsave(request):
         cc = ','.join(map(str,var.get('ccbcc') ))
     else :
         cc = ''
-    if var.get('ccbcc') is not None :         
+    if var.get('ccbcc') is not None :
         bcc = ','.join(map(str,var.get('ccbcc') ))
     else :
-        bcc = ''    
+        bcc = ''
     subject = var.get('subject')
     body = var.get('body')
     credentials = get_credentials()
