@@ -2,7 +2,7 @@ from django.db import models
 # Create your models here.
 
 class ElsiCollegeDtls(models.Model):
-    id = models.IntegerField(blank=True,primary_key=True, null=False)
+    id = models.IntegerField(blank=True, null=False, primary_key=True)
     clg_code = models.TextField(blank=True, null=True)
     region_id = models.IntegerField(blank=True, null=True)
     workshop_id = models.IntegerField(blank=True, null=True)
@@ -39,7 +39,7 @@ class ElsiCollegeDtls(models.Model):
     updated_at = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return str(self.college_name+';'+self.eyic_allowed+';'+str(self.tbt_allowed)+';'+str(self.loi_status))
+        return self.college_name
 
     class Meta:
         db_table = 'elsi_college_dtls'

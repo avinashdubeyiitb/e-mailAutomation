@@ -124,6 +124,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+SCRIPTS_DIR = os.path.join(BASE_DIR,'scripts')
 CORS_ORIGIN_ALLOW_ALL = True
 EMAIL_HOST_USER = 'intrnaakash@gmail.com'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
