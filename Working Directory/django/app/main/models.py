@@ -110,6 +110,44 @@ class TbtCollegeDtls(models.Model):
     def __str__(self):
         return str(self.id)
 
+class ElsiTeacherDtls(models.Model):
+    id = models.IntegerField(blank=True, null=False,primary_key=True)
+    user_id = models.IntegerField(blank=True, null=True)
+    clg_id = models.IntegerField(blank=True, null=True)
+    name = models.TextField(blank=True, null=True)
+    emailid = models.TextField(blank=True, null=True)
+    alt_email1 = models.TextField(blank=True, null=True)
+    alt_email2 = models.TextField(blank=True, null=True)
+    contact_num = models.TextField(blank=True, null=True)
+    alt_contact1 = models.TextField(blank=True, null=True)
+    department = models.TextField(blank=True, null=True)
+    designation = models.TextField(blank=True, null=True)
+    gender = models.TextField(blank=True, null=True)
+    coor_flag = models.IntegerField(blank=True, null=True)
+    wo_flag = models.IntegerField(blank=True, null=True)
+    workshop_id = models.IntegerField(blank=True, null=True)
+    wo_attendee = models.IntegerField(blank=True, null=True)
+    wo_count = models.IntegerField(blank=True, null=True)
+    eyrtc_flag = models.IntegerField(blank=True, null=True)
+    tbt_flag = models.IntegerField(blank=True, null=True)
+    eyic_flag = models.TextField(blank=True, null=True)
+    content_flag = models.TextField(blank=True, null=True)
+    status = models.TextField(db_column='Status', blank=True, null=True)  # Field name made lowercase.
+    status_flag = models.TextField(blank=True, null=True)
+    modified_by = models.TextField(blank=True, null=True)
+    elsi_flag = models.TextField(blank=True, null=True)
+    remarks = models.TextField(blank=True, null=True)
+    login_created = models.TextField(blank=True, null=True)
+    created_at = models.TextField(blank=True, null=True)
+    updated_at = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'elsi_teacher_dtls'
+
+    def __str__(self):
+        return str(self.id)
+
 class clgData(models.Model):
     cname = models.CharField(max_length=50,blank=False,default='')
 

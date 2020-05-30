@@ -26,7 +26,7 @@ import base64
 import mimetypes
 import csv
 
-from .models import clgData,locData,ElsiCollegeDtls,WorkshopParticipants,WorkshopDtls,TbtCollegeDtls
+from .models import clgData,locData,ElsiCollegeDtls,WorkshopParticipants,WorkshopDtls,TbtCollegeDtls,ElsiTeacherDtls
 from .serializers import ClgDataSerializer
 from app.settings import EMAIL_HOST_USER,BASE_DIR,SCRIPTS_DIR
 
@@ -254,6 +254,10 @@ def submit(request):
                 elif wo_attend == 1 and tbt_allowed ==0 and lab_inaugurated == 0 :  
                     print('B')
                     print(workshop.values())
+                    elsi_teacher1 = ElsiTeacherDtls.objects.filter(id = workshop[0].tch_id)
+                    elsi_teacher2 = ElsiTeacherDtls.objects.filter(id = workshop[1].tch_id)
+                    elsi_teacher3 = ElsiTeacherDtls.objects.filter(id = workshop[2].tch_id)
+                    elsi_teacher4 = ElsiTeacherDtls.objects.filter(id = workshop[3].tch_id)
                     workshop_id = workshop[0].workshop_id
                     workshop_dtl = WorkshopDtls.objects.filter(id = workshop_id)
                     print(workshop_dtl.values())
@@ -270,6 +274,14 @@ def submit(request):
                         body = body.replace('%(wrkshp_district)',temp[0].district)
                         body = body.replace('%(wrkshp_state)',temp[0].state)
                         body = body.replace('%(wrkshp_dates)',workshop_dtl[0].start_date+' to '+workshop_dtl[0].end_date)
+                        body = body.replace('%(1tn)',elsi_teacher1[0].name)
+                        body = body.replace('%(1dpt)',elsi_teacher1[0].department)
+                        body = body.replace('%(2tn)',elsi_teacher2[0].name)
+                        body = body.replace('%(2dpt)',elsi_teacher2[0].department)
+                        body = body.replace('%(3tn)',elsi_teacher3[0].name)
+                        body = body.replace('%(3dpt)',elsi_teacher3[0].department)
+                        body = body.replace('%(4tn)',elsi_teacher4[0].name)
+                        body = body.replace('%(4dpt)',elsi_teacher4[0].department)
                 elif wo_attend == 1 and tbt_allowed ==1 and lab_inaugurated == 0 :
                     tbt_college_dtl = TbtCollegeDtls.objects.filter(elsi_clg_id = obj[0].id)
                     print(tbt_college_dtl.values())
