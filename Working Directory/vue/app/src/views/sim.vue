@@ -26,7 +26,7 @@
     <!-- <strong>Response:</strong> -->
     <!-- <pre>
     </pre> -->
-    <p id="rmsg">{{output}}</p>
+    <!-- <p id="rmsg">{{output}}</p> -->
     <!-- <div  v-if="{{output.key}} === 'success'"> -->
     <p id="or">-----------------------or------------------------</p>
     <p id="up">Upload csv file</p>
@@ -156,14 +156,15 @@
     <b-button @click="$bvModal.hide('modal-2')">OK</b-button>
     </b-modal><br>
   <label id="srattach"><strong>Attachment:</strong>
-       <div v-for="i in output.attachments" v-bind:key="i">
-      <b-button v-b-modal.modal-3>body</b-button>
-    <b-modal id="modal-3" size="lg" hide-footer >
+      <div v-for="(value,key) in output.attachments" v-bind:key="key">
+      <b-button v-b-modal.modal-3 size="sm" @click='getfile(value)'>{{value}}</b-button>
+    <b-modal  id="modal-3" size="lg" hide-footer >
     <b-container class="px-2" >
-    {{i}}
+    {{sfile}}
     </b-container>
     </b-modal><br>
        </div>
+
  </label><br>
     <!-- <h2>Extra details:</h2>
    <p>name:</p>
@@ -356,12 +357,25 @@ export default {
       approvecsv: '',
       aprovselected: [],
       gsvselected: [],
-      dscrdselected: []
+      dscrdselected: [],
+      sfile: ''
     }
   },
   watch: {
   },
   methods: {
+    getfile (value) {
+      console.log(value)
+      this.axios.post('http://localhost:8081/api/main/getfile', {
+        value: this.value
+      })
+        .then(sfile => {
+          this.sfile = sfile.data
+        })
+        .catch(function (error) {
+          this.sfile = error
+        })
+    },
     getClass (pk) {
       if (this.aprovselected.indexOf(pk) !== -1) {
         return 'first'
