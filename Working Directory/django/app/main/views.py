@@ -26,7 +26,7 @@ import base64
 import mimetypes
 import csv
 
-from .models import clgData,locData,ElsiCollegeDtls
+from .models import clgData,locData,ElsiCollegeDtls,WorkshopParticipants,WorkshopDtls,TbtCollegeDtls
 from .serializers import ClgDataSerializer
 from app.settings import EMAIL_HOST_USER,BASE_DIR,SCRIPTS_DIR
 
@@ -227,23 +227,102 @@ def submit(request):
             state = " Not present"  
             obj = ElsiCollegeDtls.objects.filter(college_name = clg)
             if obj.count() < 1:
+                print('A')
                 subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): " +\
                     "Information for e-Yantra Lab Setup Initiative (eLSI): " +\
                      clg + " , " + district + " , " + state
-                with open('scripts/temp.html','r',encoding="utf-8") as reader:
+                with open('scripts/a.html','r',encoding="utf-8") as reader:
                     body = reader.read()
                     body = body.replace('%(eLSI lab count (floored to 10))','300')
-            else:
+            else :
+                college_name = obj[0].college_name
+                district = obj[0].district
+                state = obj[0].state
+                wo_attend = obj[0].wo_attend
+                tbt_allowed = obj[0].tbt_allowed
+                lab_inaugurated = obj[0].lab_inaugurated  
+                workshop = WorkshopParticipants.objects.filter(clg_id = obj[0].id)
+                print(workshop.values())
                 subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): " +\
-                    "Information for e-Yan<p>tra Lab Setup Initiative (eLSI): " +\
-                    obj[0].college_name + " , " + obj[0].district + " , " + obj[0].state
-                with open('scripts/temp.html','r',encoding="utf-8") as reader:
-                    body = reader.read()
-                    body = body.replace('%(eLSI lab count (floored to 10))','300')
+                        "Information for e-Yan<p>tra Lab Setup Initiative (eLSI): " +\
+                        college_name + " , " + district + " , " + state 
+                if (wo_attend == 0 or  workshop.count() < 1) and (tbt_allowed == 0 or tbt_allowed == 1) and lab_inaugurated == 0 :
+                    print('A')
+                    with open('scripts/a.html','r',encoding="utf-8") as reader:
+                        body = reader.read()
+                        body = body.replace('%(eLSI lab count (floored to 10))','300')
+                elif wo_attend == 1 and tbt_allowed ==0 and lab_inaugurated == 0 :  
+                    print('B')
+                    print(workshop.values())
+                    workshop_id = workshop[0].workshop_id
+                    workshop_dtl = WorkshopDtls.objects.filter(id = workshop_id)
+                    print(workshop_dtl.values())
+                    clg_id = workshop_dtl[0].clg_id
+                    temp = ElsiCollegeDtls.objects.filter(id = clg_id)
+                    print(temp.values())
+                    with open('scripts/b.html','r',encoding="utf-8") as reader:
+                        body = reader.read()
+                        body = body.replace('%(eLSI lab count (floored to 10))','300')
+                        body = body.replace('%(college_name)',college_name)
+                        body = body.replace('%(district)',district)
+                        body = body.replace('%(state)',state)
+                        body = body.replace('%(wrkshp_host_college)',temp[0].college_name)
+                        body = body.replace('%(wrkshp_district)',temp[0].district)
+                        body = body.replace('%(wrkshp_state)',temp[0].state)
+                        body = body.replace('%(wrkshp_dates)',workshop_dtl[0].start_date+' to '+workshop_dtl[0].end_date)
+                elif wo_attend == 1 and tbt_allowed ==1 and lab_inaugurated == 0 :
+                    tbt_college_dtl = TbtCollegeDtls.objects.filter(elsi_clg_id = obj[0].id)
+                    print(tbt_college_dtl.values())
+                    if tbt_college_dtl.count() >=1 and tbt_college_dtl[0].completed == 1:
+                        print('D')
+                        print(workshop.values())
+                        workshop_id = workshop[0].workshop_id
+                        print(workshop_id)
+                        workshop_dtl = WorkshopDtls.objects.filter(id = workshop_id)
+                        clg_id = workshop_dtl[0].clg_id
+                        temp = ElsiCollegeDtls.objects.filter(id = clg_id)
+                        print(temp.values())
+                        with open('scripts/d.html','r',encoding="utf-8") as reader:
+                            body = reader.read()
+                            body = body.replace('%(eLSI lab count (floored to 10))','300')
+                            body = body.replace('%(college_name)',college_name)
+                            body = body.replace('%(district)',district)
+                            body = body.replace('%(state)',state)
+                            body = body.replace('%(wrkshp_host_college)',temp[0].college_name)
+                            body = body.replace('%(wrkshp_district)',temp[0].district)
+                            body = body.replace('%(wrkshp_state)',temp[0].state)
+                            body = body.replace('%(wrkshp_dates)',workshop_dtl[0].start_date+' to '+workshop_dtl[0].end_date)
+                    else :  
+                        print('C')  
+                        print(workshop.values())
+                        workshop_id = workshop[0].workshop_id
+                        workshop_dtl = WorkshopDtls.objects.filter(id = workshop_id)
+                        print(workshop_dtl.values())
+                        clg_id = workshop_dtl[0].clg_id
+                        temp = ElsiCollegeDtls.objects.filter(id = clg_id)
+                        print(temp.values())
+                        with open('scripts/c.html','r',encoding="utf-8") as reader:
+                            body = reader.read()
+                            body = body.replace('%(eLSI lab count (floored to 10))','300')
+                            body = body.replace('%(college_name)',college_name)
+                            body = body.replace('%(district)',district)
+                            body = body.replace('%(state)',state)
+                            body = body.replace('%(wrkshp_host_college)',temp[0].college_name)
+                            body = body.replace('%(wrkshp_district)',temp[0].district)
+                            body = body.replace('%(wrkshp_state)',temp[0].state)
+                            body = body.replace('%(wrkshp_dates)',workshop_dtl[0].start_date+' to '+workshop_dtl[0].end_date)
+                elif lab_inaugurated == 1:
+                    print('E')
+                    with open('scripts/e.html','r',encoding="utf-8") as reader:
+                        body = reader.read()
+                        body = body.replace('%(eLSI lab count (floored to 10))','300')
+                        body = body.replace('%(college_name)',college_name)
+                        body = body.replace('%(district)',district)
+                        body = body.replace('%(state)',state)
             var['subject']=subject
             var['body']=body
-            p = open('templates/new.html','r',encoding='utf-8').read()
-            var['attachments'] = [p]    
+            #p = open('templates/new.html','r',encoding='utf-8').read()
+            var['attachments'] = ['Pamphlet2020.pdf','letter-of-intent.docx']    
             return JsonResponse(var)
         except ValueError as e:
             return JsonResponse({'status':'failed','info':e.args[0]})

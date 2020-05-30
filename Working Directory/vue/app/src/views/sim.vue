@@ -156,14 +156,16 @@
     <b-button @click="$bvModal.hide('modal-2')">OK</b-button>
     </b-modal><br>
   <label id="srattach"><strong>Attachment:</strong>
-       <div v-for="i in output.attachments" v-bind:key="i">
-      <b-button v-b-modal.modal-3>body</b-button>
+  <!--
+       <div v-for="value in output.attachments" v-bind:key="value">
+      <b-button v-b-modal.modal-3>{{value}}</b-button>
     <b-modal id="modal-3" size="lg" hide-footer >
     <b-container class="px-2" >
-    {{i}}
+    {{value}}
     </b-container>
     </b-modal><br>
        </div>
+  -->
  </label><br>
     <!-- <h2>Extra details:</h2>
    <p>name:</p>
