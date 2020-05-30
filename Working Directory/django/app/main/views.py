@@ -17,6 +17,7 @@ from django.core.mail import EmailMessage
 from django.http.response import JsonResponse
 from django.core.files.storage import default_storage
 from django.shortcuts import render
+from django.template.loader import render_to_string
 import smtplib
 import json
 import pickle
@@ -26,7 +27,7 @@ import base64
 import mimetypes
 import csv
 
-from .models import clgData,locData,ElsiCollegeDtls
+from .models import clgData,locData,ElsiCollegeDtls,ElsiTeacherDtls,TbtCollegeDtls,WorkshopDtls,WorkshopParticipants
 from .serializers import ClgDataSerializer
 from app.settings import EMAIL_HOST_USER,BASE_DIR,SCRIPTS_DIR
 
@@ -224,8 +225,13 @@ def submit(request):
             var = JSONParser().parse(request)
             clg = var.get('cname')
             district = "Not present"
-            state = " Not present"  
+            state = " Not present"
             obj = ElsiCollegeDtls.objects.filter(college_name = clg)
+            c = ElsiCollegeDtls.objects.all()
+            count=0
+            for c in c.values('lab_inaugurated'):
+                if c.get('lab_inaugurated') == 1:
+                    count=count+1
             if obj.count() < 1:
                 subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): " +\
                     "Information for e-Yantra Lab Setup Initiative (eLSI): " +\
@@ -233,17 +239,41 @@ def submit(request):
                 with open('scripts/temp.html','r',encoding="utf-8") as reader:
                     body = reader.read()
                     body = body.replace('%(eLSI lab count (floored to 10))','300')
+
+
             else:
                 subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): " +\
-                    "Information for e-Yan<p>tra Lab Setup Initiative (eLSI): " +\
+                    "Information for e-Yantra Lab Setup Initiative (eLSI): " +\
                     obj[0].college_name + " , " + obj[0].district + " , " + obj[0].state
-                with open('scripts/temp.html','r',encoding="utf-8") as reader:
-                    body = reader.read()
-                    body = body.replace('%(eLSI lab count (floored to 10))','300')
+                if  obj[0].lab_inaugurated:
+                    det = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id )
+                    body = render_to_string(os.path.join(SCRIPTS_DIR,'elsi_college.html'),
+                    {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
+                    'count':count,'datas':det})
+                elif not(obj[0].lab_inaugurated) and obj[0].wo_attend and obj[0].tbt_allowed:
+                    tb = TbtCollegeDtls.objects.filter(elsi_clg_id = obj[0].id )
+                    if tb[0].completed:
+                        det = WorkshopDtls.objects.filter(clg_id = obj[0].id )
+                        det2 = WorkshopParticipants.objects.filter(clg_id = obj[0].id )
+                        tch_id = det2[0].tch_id
+                        details = ElsiTeacherDtls.objects.filter(id = tch_id )
+                        body = render_to_string(os.path.join(SCRIPTS_DIR,'tbt_complete.html'),
+                        {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
+                        'count':count,'start_date':det[0].start_date,'end_date':det[0].end_date,'host_college':"not defined",'host_State':"not defined",
+                        'host_District':"not defined","datas":details})
+                    else:
+                        det = WorkshopDtls.objects.filter(clg_id = obj[0].id )
+                        det2 = WorkshopParticipants.objects.filter(clg_id = obj[0].id )
+                        tch_id = det2[0].tch_id
+                        details = ElsiTeacherDtls.objects.filter(id = tch_id )
+                        body = render_to_string(os.path.join(SCRIPTS_DIR,'tbt_complete.html'),
+                        {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
+                        'count':count,'start_date':det[0].start_date,'end_date':det[0].end_date,'host_college':"not defined",'host_State':"not defined",
+                        'host_District':"not defined","datas":details})
             var['subject']=subject
             var['body']=body
-            p = open('templates/new.html','r',encoding='utf-8').read()
-            var['attachments'] = [p]    
+            p = open('templates/registered.html','r',encoding='utf-8').read()
+            var['attachments'] = [p]
             return JsonResponse(var)
         except ValueError as e:
             return JsonResponse({'status':'failed','info':e.args[0]})
