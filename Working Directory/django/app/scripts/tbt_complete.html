@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
+      table, th, td {
+        border: 1px solid black;
+      }
         .fa {
             padding: 10px;
             font-size: 20px;
@@ -15,7 +18,7 @@
           }
           .fa:hover {
             opacity: 0.6;
-          }        
+          }
           .fa-facebook {
             background: #3B5998;
             color: white;
@@ -33,24 +36,52 @@
           }
     </style>
 </head>
-<body> 
+<body>
     <p>Respected Sir/Madam,</p>
     <p>Greetings from e-Yantra!</p>
-    <p>Thank you for your interest in e-Yantra Lab Setup Initiative (eLSI). As per our record, following teachers from your college, %(college_name), %(district), %(state) have already participated in a hands-on two day workshop conducted at %(wrkshp_host_college), %(wrkshp_district), %(wrkshp_state) on %(wrkshp_dates):</p>
-    <p>One robotic kit is given by e-Yantra to the college for teacher team to complete online Task Based Training (TBT). However, the teacher team did not complete the TBT and also the purchase of equipments for the lab setup was not done. Thus the process of e-Yantra Lab Setup at your institute is yet incomplete.</p>
-    <p>We would be happy to have your same/different teacher team attend our workshop as a refresher course and participate in TBT.</p>
-    <p>You may attend any of the workshops planned across the country. Please find their details here: <a href="https://www.e-yantra.org/upcoming_workshops">https://www.e-yantra.org/upcoming_workshops.</a></p>
-    <p>==========================================</p>       
+    <p>Thank you for your interest in e-Yantra Lab Setup Initiative (eLSI). As per our record, your college,
+      {{CollegeName}}, {{District}}, {{State}} has already submitted a Letter of Intent (LoI) to participate
+        in this initiative and following teachers from your college have been trained through a hands-on two day
+        workshop conducted at {{host_college}}, {{host_District}}, {{host_State}} on {{start_date}} to {{end_date}}:</p>
+          <table>
+            <thead>
+              <th>Sr. No.</th>
+              <th>Teacher Name</th>
+              <th>Department</th>
+              <th>Teacher Role</th>
+            </thead>
+            <tbody>
+              <tr>
+                {%for data in datas %}
+                <td>{{data.id}}</td>
+                <td>{{data.name}}</td>
+                <td>{{data.department}}</td>
+                <td>{{data.designation}}</td>
+              </tr>
+              {%endfor%}
+            </tbody>
+          </table>
+    <p>One robotic kit is given by e-Yantra to the college for teacher team to complete online Task Based Training (TBT).
+       Your teacher team has completed TBT, however, the purchase of equipments for the lab setup was not done. Thus
+       the process of e-Yantra Lab Setup at your institute is yet incomplete.</p>
+       <p>We would be happy to have your same/different teacher team attend our workshop as a
+         refresher course and participate in TBT.</p>
+         <p>You may attend any of the workshops planned across the country. Please find their details here:
+           <a href="https://www.e-yantra.org/upcoming_workshops">https://www.e-yantra.org/upcoming_workshops</a>.</p>
+           <p>==========================================</p>
+
     <p>Kindly find the detailed information about the e-Yantra Lab Setup Initiative (eLSI) as below:</p>
-    <p>e-Yantra – a project in the Department of Computer Science and Engineering (CSE), IIT Bombay - is a flagship project of MHRD through the National Mission on Education through ICT (NMEICT) to  spread Embedded systems and Robotics education in colleges across India. e-Yantra Lab Setup  Initiative (eLSI) is a holistic approach to</p>
-    <ul>   
+    <p>e-Yantra – a project in the Department of Computer Science and Engineering (CSE), IIT Bombay - is a flagship project
+      of MHRD through the National Mission on Education through ICT (NMEICT) to  spread Embedded systems and Robotics education
+      in colleges across India. e-Yantra Lab Setup  Initiative (eLSI) is a holistic approach to</p>
+    <ul>
         <li>Impart theoretical and programming knowledge to teachers through workshops</li>
         <li>Provide hands-on experience to teachers through an online Task Based Training (TBT)</li>
         <li>Help colleges set up their own Robotics labs.</li>
     </ul>
-    <p>We have established robotics labs in %(eLSI lab count (floored to 10)) + colleges across India.</p>
+    <p>We have established robotics labs in {{count}} + colleges across India.</p>
     <p>Have a look at this video for a brief overview: <a href="https://www.youtube.com/watch?v=Y-MB7dusGss">eLSI (e-Yantra Lab Setup Initiative)</a></p>
-    <p><b>please find the following documents for your perusal:</b></p>
+    <p><b>Attached please find the following documents for your perusal:</b></p>
     <ol>
         <li><b>eLSI pamphlet</b></li>
         <li>An article titled  that was featured on  <a href="http://www.dqindia.com/how-iit-bombay-is-popularizing-robotics-in-india-through-its-flagship-initiative-e-yantra/">"How IIT Bombay is popularizing robotics in India through its flagship initiative, e-Yantra"www.dqindia.com</a></li>
@@ -63,14 +94,14 @@
              (eLSI) in chronological steps.</li>
     </ol>
     <p>We will be happy to talk to you about this initiative and tell you more about it including setting up your embedded systems and robotics lab.</p><br>
-    
+
     <p>Feel free to contact us on <span class="clr">support@e-yantra.org</span> or call us on 022-2576-4986 in case of any query.<br>
     --<br>
     Thanks and Regards<br>
     e-Yantra Team<br>
     IIT Bombay<br></p>
     <a href="#" class="fa fa-facebook"></a>
-    <a href="#" class="fa fa-instagram"></a>    
+    <a href="#" class="fa fa-instagram"></a>
     <a href="#" class="fa fa-twitter"></a>
 </body>
 </html>

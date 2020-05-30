@@ -21,8 +21,8 @@
     <strong id="coono">Coordinator Cont.:</strong>
     <input id="coonoi" type="tel" v-model="coono"><br>
     <strong id="recipientstate">Recipient State:</strong>
-    <div>
-        <b-dropdown id="recipientstatei" text="State" >
+    <div id="recipientstatei">
+        <b-dropdown  v-bind:text="state" >
           <div v-for="(p,i) in statedisdata" v-bind:key='i' >
             <div v-for="(sta,index) in p" v-bind:key='index' >
               <b-dropdown-item @click='selectedstate(sta.state,index)' v-model="state">{{sta.state}}</b-dropdown-item>
@@ -31,14 +31,15 @@
         </b-dropdown>
     </div>
     <strong id="recipientdis">Recipient District:</strong>
-    <div>
-        <b-dropdown id="recipientdisi" text="District" >
+    <div id="recipientdisi">
+      <p>{{district}}
+        <b-dropdown  v-bind:text="d" >
           <div v-for="(dis,i) in districts" v-bind:key='i'>
             <div v-for="(diss,i) in dis" v-bind:key='i' >
-              <b-dropdown-item  @click='selecteddistrict(diss)' v-model="district">{{diss}}</b-dropdown-item>
+              <b-dropdown-item  @click='selecteddistrict(diss)'>{{diss}}</b-dropdown-item>
             </div>
             </div>
-        </b-dropdown>
+        </b-dropdown></p>
     </div>
     <button id="msub" v-b-modal.modal-1>Submit</button>
     </form>
@@ -190,11 +191,12 @@ export default {
   data () {
     return {
       statedisdata: statedisdata,
-      state: '',
+      state: 'State',
       index: '',
       in: '',
       districts: [],
-      district: '',
+      d: 'District',
+      district: [],
       isNight: true,
       isNight1: true,
       isNight2: true,
@@ -260,9 +262,11 @@ export default {
       console.log(p, inn)
       this.$delete(this.output.remail, inn)
     },
-    selecteddistrict (district) {
-      this.district = district
-      console.log(district)
+    selecteddistrict (diss) {
+      this.district.push(diss)
+      this.d = diss
+      console.log(diss)
+      console.log(this.district)
     },
     onClose () {
       this.popoverShow1 = false

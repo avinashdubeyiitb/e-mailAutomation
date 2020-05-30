@@ -17,6 +17,7 @@ from django.core.mail import EmailMessage
 from django.http.response import JsonResponse
 from django.core.files.storage import default_storage
 from django.shortcuts import render
+from django.template.loader import render_to_string
 import smtplib
 import json
 import pickle
@@ -25,8 +26,13 @@ import httplib2
 import base64
 import mimetypes
 import csv
+<<<<<<< HEAD
 
 from .models import clgData,locData,ElsiCollegeDtls,WorkshopParticipants,WorkshopDtls,TbtCollegeDtls,ElsiTeacherDtls
+=======
+from django.http import FileResponse
+from .models import clgData,locData,ElsiCollegeDtls,ElsiTeacherDtls,TbtCollegeDtls,WorkshopDtls,WorkshopParticipants
+>>>>>>> ee616bf9931c6d49d70ff3972e9f52c55fb98002
 from .serializers import ClgDataSerializer
 from app.settings import EMAIL_HOST_USER,BASE_DIR,SCRIPTS_DIR
 
@@ -224,34 +230,60 @@ def submit(request):
             var = JSONParser().parse(request)
             clg = var.get('cname')
             district = "Not present"
-            state = " Not present"  
+            state = " Not present"
             obj = ElsiCollegeDtls.objects.filter(college_name = clg)
+            c = ElsiCollegeDtls.objects.all()
+            count=0
+            for c in c.values('lab_inaugurated'):
+                if c.get('lab_inaugurated') == 1:
+                    count=count+1
             if obj.count() < 1:
                 print('A')
                 subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): " +\
                     "Information for e-Yantra Lab Setup Initiative (eLSI): " +\
                      clg + " , " + district + " , " + state
-                with open('scripts/a.html','r',encoding="utf-8") as reader:
-                    body = reader.read()
-                    body = body.replace('%(eLSI lab count (floored to 10))','300')
+                body = render_to_string(os.path.join(SCRIPTS_DIR,'a.html'),{'count':count})
+
             else :
                 college_name = obj[0].college_name
                 district = obj[0].district
                 state = obj[0].state
                 wo_attend = obj[0].wo_attend
                 tbt_allowed = obj[0].tbt_allowed
-                lab_inaugurated = obj[0].lab_inaugurated  
+                lab_inaugurated = obj[0].lab_inaugurated
                 workshop = WorkshopParticipants.objects.filter(clg_id = obj[0].id)
                 print(workshop.values())
                 subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): " +\
-                        "Information for e-Yan<p>tra Lab Setup Initiative (eLSI): " +\
-                        college_name + " , " + district + " , " + state 
-                if (wo_attend == 0 or  workshop.count() < 1) and (tbt_allowed == 0 or tbt_allowed == 1) and lab_inaugurated == 0 :
-                    print('A')
-                    with open('scripts/a.html','r',encoding="utf-8") as reader:
-                        body = reader.read()
-                        body = body.replace('%(eLSI lab count (floored to 10))','300')
-                elif wo_attend == 1 and tbt_allowed ==0 and lab_inaugurated == 0 :  
+                        "Information for e-Yantra Lab Setup Initiative (eLSI): " +\
+                        college_name + " , " + district + " , " + state
+                if  obj[0].lab_inaugurated:
+                    print('E')
+                    det = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id )
+                    body = render_to_string(os.path.join(SCRIPTS_DIR,'elsi_college.html'),
+                    {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
+                    'count':count,'datas':det})
+                elif obj[0].wo_attend and obj[0].tbt_allowed:
+                    tb = TbtCollegeDtls.objects.filter(elsi_clg_id = obj[0].id )
+                    if tb[0].completed:
+                        print('D')
+                        det = WorkshopDtls.objects.filter(clg_id = workshop[0].workshop_id )
+                        temp = ElsiCollegeDtls.objects.filter(id = det[0].clg_id)
+                        details = ElsiTeacherDtls.objects.filter(id = workshop[0].tch_id )
+                        body = render_to_string(os.path.join(SCRIPTS_DIR,'tbt_complete.html'),
+                        {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
+                        'count':count,'start_date':det[0].start_date,'end_date':det[0].end_date,'host_college':temp[0].college_name,'host_State':temp[0].state,
+                        'host_District':temp[0].district,"datas":details})
+                    else:
+                        print('C')
+                        det = WorkshopDtls.objects.filter(clg_id = workshop[0].workshop_id )
+                        temp = ElsiCollegeDtls.objects.filter(id = det[0].clg_id)
+                        tch_id = workshop[0].tch_id
+                        details = ElsiTeacherDtls.objects.filter(id = tch_id )
+                        body = render_to_string(os.path.join(SCRIPTS_DIR,'tbt_notcomplete.html'),
+                        {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
+                        'count':count,'start_date':det[0].start_date,'end_date':det[0].end_date,'host_college':temp[0].college_name,'host_State':temp[0].state,
+                        'host_District':temp[0].district,"datas":details})
+                elif obj[0].wo_attend :
                     print('B')
                     print(workshop.values())
                     elsi_teacher1 = ElsiTeacherDtls.objects.filter(id = workshop[0].tch_id)
@@ -261,9 +293,11 @@ def submit(request):
                     workshop_id = workshop[0].workshop_id
                     workshop_dtl = WorkshopDtls.objects.filter(id = workshop_id)
                     print(workshop_dtl.values())
+                    datas = ElsiTeacherDtls.objects.filter(id = workshop[0].tch_id )
                     clg_id = workshop_dtl[0].clg_id
                     temp = ElsiCollegeDtls.objects.filter(id = clg_id)
                     print(temp.values())
+<<<<<<< HEAD
                     with open('scripts/b.html','r',encoding="utf-8") as reader:
                         body = reader.read()
                         body = body.replace('%(eLSI lab count (floored to 10))','300')
@@ -331,14 +365,38 @@ def submit(request):
                         body = body.replace('%(college_name)',college_name)
                         body = body.replace('%(district)',district)
                         body = body.replace('%(state)',state)
+=======
+                    body = render_to_string(os.path.join(SCRIPTS_DIR,'b.html'),
+                    {'CollegeName':college_name,'State': state,'District':district,
+                        'count':count,'start_date':workshop_dtl[0].start_date,'end_date':workshop_dtl[0].end_date,
+                        'host_college':temp[0].college_name,'host_State':temp[0].state,'host_District':temp[0].district,
+                        "datas":datas})
+                else :
+                    print('A')
+                    body = render_to_string(os.path.join(SCRIPTS_DIR,'a.html'),{'count':count})
+
+>>>>>>> ee616bf9931c6d49d70ff3972e9f52c55fb98002
             var['subject']=subject
             var['body']=body
             #p = open('templates/new.html','r',encoding='utf-8').read()
-            var['attachments'] = ['Pamphlet2020.pdf','letter-of-intent.docx']    
+
+            var['attachments'] = {'pamp':'Pamphlet2020.pdf','LoI':'letter-of-intent.docx'}
             return JsonResponse(var)
         except ValueError as e:
             return JsonResponse({'status':'failed','info':e.args[0]})
 
+@api_view(['POST'])
+def getfile(request):
+    var = JSONParser().parse(request)
+    v = var.get('value')
+    if v == 'Pamphlet2020.pdf':
+        f = open(os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'), 'rb')
+        response = FileResponse(f)
+        return response
+    else:
+        f = open(os.path.join(SCRIPTS_DIR,'letter-of-intent.docx'), 'rb')
+        response = FileResponse(f)
+        return response
 def xyz(request):
     return render(request,'new.html')
 
@@ -347,16 +405,21 @@ def xyz(request):
 def awssubmit(request):
         try:
             var = JSONParser().parse(request)
+            dict={}
+            clist=[]
             state = var.get('state')
-            district = var.get('district')
+            districts = var.get('district')
+            print(districts)
             obj1 = locData.objects.filter(locstate = state)
             if obj1.count() >= 1:
-                obj2 = locData.objects.filter(locdistrict = district)
-                if obj2.count() >= 1:
-                    dict={}
-                    clist=[]
-                    for rows in list(obj2.values()) :
-                        clist = clist + [(rows['locemail'])]
+                for district in districts:
+                    obj2 = locData.objects.filter(locdistrict = district)
+                    if obj2.count() >= 1:
+                        for rows in list(obj2.values()) :
+                            clist = clist + [(rows['locemail'])]
+                if len(clist) == 0:
+                    return JsonResponse({'key':'nodata'})
+                else:
                     dict['remail'] = clist
                     print(dict)
                     subject = "Send workshop Mail"
@@ -364,7 +427,6 @@ def awssubmit(request):
                     dict['subject']=subject
                     dict['body']=body
                     return JsonResponse(dict)
-                return JsonResponse({'key':'nodata'})
                 #var['attachments'] = None
             else:
                 return JsonResponse({'key':'nodata'})
@@ -399,10 +461,10 @@ def gsave(request):
         cc = ','.join(map(str,var.get('ccbcc') ))
     else :
         cc = ''
-    if var.get('ccbcc') is not None :         
+    if var.get('ccbcc') is not None :
         bcc = ','.join(map(str,var.get('ccbcc') ))
     else :
-        bcc = ''    
+        bcc = ''
     subject = var.get('subject')
     body = var.get('body')
     credentials = get_credentials()
