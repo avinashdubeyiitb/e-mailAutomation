@@ -1,6 +1,4 @@
 from django.contrib import admin
-from .models import clgData,locData,ElsiCollegeDtls
+from .models import locData
 
-admin.site.register(clgData)
 admin.site.register(locData)
-admin.site.register(ElsiCollegeDtls)

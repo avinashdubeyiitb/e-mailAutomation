@@ -1,11 +1,6 @@
 from rest_framework import serializers
-from main.models import clgData,locData
+from main.models import locData
 
-class ClgDataSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = clgData
-        fields = ('cname',)
 class LocDataSerializer(serializers.ModelSerializer):
 
     class Meta:

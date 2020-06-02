@@ -27,8 +27,7 @@ import base64
 import mimetypes
 import csv
 from django.http import FileResponse
-from .models import clgData,locData,ElsiCollegeDtls,ElsiTeacherDtls,TbtCollegeDtls,WorkshopDtls,WorkshopParticipants
-from .serializers import ClgDataSerializer
+from .models import locData,ElsiCollegeDtls,ElsiTeacherDtls,TbtCollegeDtls,WorkshopDtls,WorkshopParticipants
 from app.settings import EMAIL_HOST_USER,BASE_DIR,SCRIPTS_DIR
 
 ############################################################################################################################
@@ -75,31 +74,23 @@ def csvapprove(request):
     file_path = obj['file_path']
     with open(file_path,'r') as csvinput:
         r = csv.reader(csvinput)
-        all=[]
         res = {}
         for row in r:
             if row[0] in var.get('list') :
                 l=row[0]
-                body = None
-                subject = None
-                sent = None
+                cc = row[1]
+                bcc = row[1]
                 if  len(row) > 7 :
                     body = row[-1]
                     subject = row[-2]
-                obj = clgData.objects.filter(cname = row[5])
-                if obj.count() >= 1:
-                    if body == None :
-                        body = "You are already registered"
-                        subject = "Send Information Mail"
-                else:
-                    clgSrz = ClgDataSerializer(data = {'cname' : row[5]})
-                    if clgSrz.is_valid():
-                        clgSrz.save()
-                    if body == None :
-                        body = "Welcome to our eyrc program."
-                        subject = "Send Information Mail"
-                #sent = SendMessage(EMAIL_HOST_USER,l,row[1],row[1], subject, body)
-                #print(l,sent)
+                else :
+                    clg = row[5]
+                    obj = ElsiCollegeDtls.objects.filter(college_name = clg)
+                    res = getbody(clg,obj) 
+                    subject = res['subject']
+                    body = res['body']       
+                sent = SendMessage(EMAIL_HOST_USER, l, cc, bcc, subject, body)
+                print(l,sent)
                 if sent :
                     res[l] = "mail sent successfully"
                 else:
@@ -116,34 +107,29 @@ def csvdraft(request):
     service = build('gmail', 'v1', credentials=credentials)
     with open(file_path,'r') as csvinput:
         r = csv.reader(csvinput)
-        all=[]
         res = {}
         for row in r:
             if row[0] in var.get('list') :
                 l=row[0]
-                body = None
-                subject = None
-                result = None
+                cc = row[1]
+                bcc = row[1]
                 attachmentFile = None
                 if  len(row) > 7 :
                     body = row[-1]
                     subject = row[-2]
-                obj = clgData.objects.filter(cname = row[5])
-                if obj.count() >= 1:
-                    if body == None :
-                        body = "You are already registered"
-                        subject = "Send Information Mail"
-                else:
-                    if body == None :
-                        body = "Welcome to our eyrc program."
-                        subject = "Send Information Mail"
+                else :
+                    clg = row[5]
+                    obj = ElsiCollegeDtls.objects.filter(college_name = clg)
+                    res = getbody(clg,obj) 
+                    subject = res['subject']
+                    body = res['body'] 
                 if attachmentFile:
                     pass
                     #message = createMessageWithAttachment(sender, to, subject, msgHtml, msgPlain, attachmentFile)
                 else:
                     message = None
-                    #message = CreateMessageHtml(EMAIL_HOST_USER,l,row[1],row[1], subject, body)
-                #result = CreateDraft(service,"me",message)
+                    message = CreateMessageHtml(EMAIL_HOST_USER, l, cc, bcc, subject, body)
+                result = CreateDraft(service,"me",message)
                 if result :
                     res[l] = "saved to draft"
                 else :
@@ -155,7 +141,7 @@ def idrequest(request):
     var = JSONParser().parse(request)
     clg = var.get('cname')
     rema = var.get('remail')
-    obj = clgData.objects.filter(cname = clg)
+    obj = ElsiCollegeDtls.objects.filter(college_name = clg)
     file_path = os.path.join(BASE_DIR,'clgData.csv')
     f = open(file_path)
     reader = csv.DictReader(f)
@@ -164,69 +150,17 @@ def idrequest(request):
             ccbcc = (rows['ccbcc'])
         #print(rows['remail'])
         #print(rema)
-    d = {'to' : rema  ,'ccbcc' : ccbcc,'subject': '','body':''}
-    if obj.count() >= 1:
-        subject = "Send Information Mail"
-        body = "You are already registered."
-        d['subject']=subject
-        d['body']=body
-    else:
-        subject = "Send Information Mail"
-        body = "Welcome to our eyrc program."
-        d['subject']=subject
-        d['body']=body
+    d = {'to' : rema  ,'ccbcc' : ccbcc,'subject': '','body':'','attachments':''}
+    res = getbody(clg,obj)
+    d['subject'] = res['subject']
+    d['body'] = res['body'] 
+    d['attachments'] = {'pamp':'Pamphlet2020.pdf','LoI':'letter-of-intent.docx'} 
     return JsonResponse(d)
 
-@api_view(['POST'])
-def save(request):
-    var = JSONParser().parse(request)
-    with open('scripts/info.json','r') as read:
-        obj = json.load(read)
-    file_path = obj['file_path']
-    write_path = os.path.join(BASE_DIR,'test.csv')
-    with open(file_path,'r') as csvinput:
-        r = csv.reader(csvinput)
-        all=[]
-        for row in r:
-            if row[0] == 'remail':
-                row.append('body')
-                row.append('subject')
-            elif row[0] == var.get('remail') :
-                row[1] = var.get('ccbcc')
-                row.append(var.get('subject'))
-                row.append(var.get('body'))
-            all.append(row)
-        with open(file_path, 'w') as csvoutput:
-            writer = csv.writer(csvoutput, lineterminator='\n')
-            writer.writerows(all)
-    return JsonResponse({'status':'saved'})
-
-@api_view(['POST'])
-def csvsubmit(request):
-    file = request.FILES['file']
-    if os.path.getsize('scripts/info.json') :
-        with open('scripts/info.json','r') as read:
-            obj = json.load(read)
-            os.remove(obj['file_name'])
-    file_name = default_storage.save(file.name,file)
-    CSV_DIR = os.path.join(BASE_DIR,file_name)
-    with open('scripts/info.json','w') as write :
-        json.dump({'file_path':CSV_DIR,'file_name':file_name},write)
-    with open(file_name, newline='') as csvfile:
-        reader = csv.DictReader(csvfile)
-        clist = []
-        for rows in reader :
-            clist = clist + [(rows['cname'],rows['remail'])]
-        return JsonResponse(dict(clist))
-
-@api_view(['POST'])
-def submit(request):
+def getbody(clg,obj):
         try:
-            var = JSONParser().parse(request)
-            clg = var.get('cname')
             district = "Not present"
             state = " Not present"
-            obj = ElsiCollegeDtls.objects.filter(college_name = clg)
             c = ElsiCollegeDtls.objects.all()
             count=0
             for c in c.values('lab_inaugurated'):
@@ -238,7 +172,6 @@ def submit(request):
                     "Information for e-Yantra Lab Setup Initiative (eLSI): " +\
                      clg + " , " + district + " , " + state
                 body = render_to_string(os.path.join(SCRIPTS_DIR,'a.html'),{'count':count})
-
             else :
                 college_name = obj[0].college_name
                 district = obj[0].district
@@ -296,11 +229,64 @@ def submit(request):
                 else :
                     print('A')
                     body = render_to_string(os.path.join(SCRIPTS_DIR,'a.html'),{'count':count})
+            return {'subject':subject,'body':body}      
+        except ValueError as e:
+            return {'status':'failed','info':e.args[0]}   
 
-            var['subject']=subject
-            var['body']=body
-            #p = open('templates/new.html','r',encoding='utf-8').read()
+@api_view(['POST'])
+def save(request):
+    var = JSONParser().parse(request)
+    '''
+    with open('scripts/info.json','r') as read:
+        obj = json.load(read)
+    file_path = obj['file_path']
+    with open(file_path,'r') as csvinput:
+        r = csv.reader(csvinput)
+        all=[]
+        for row in r:
+            if row[0] == 'remail':
+                row.append('body')
+                row.append('subject')
+            elif row[0] == var.get('remail') :
+                row[1] = var.get('ccbcc')
+                row.append(var.get('subject'))
+                row.append(var.get('body'))
+            all.append(row)
+        with open(file_path, 'w') as csvoutput:
+            writer = csv.writer(csvoutput, lineterminator='\n')
+            writer.writerows(all)
+    '''        
+    return JsonResponse({'status':'saved'})
 
+@api_view(['POST'])
+def csvsubmit(request):
+    file = request.FILES['file']
+    if os.path.getsize('scripts/info.json') :
+        with open('scripts/info.json','r') as read:
+            obj = json.load(read)
+            os.remove(obj['file_name'])
+    file_name = default_storage.save(file.name,file)
+    CSV_DIR = os.path.join(BASE_DIR,file_name)
+    with open('scripts/info.json','w') as write :
+        json.dump({'file_path':CSV_DIR,'file_name':file_name},write)
+    with open(file_name, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        clist = []
+        for rows in reader :
+            clist = clist + [(rows['cname'],rows['remail'])]
+        return JsonResponse(dict(clist))
+
+@api_view(['POST'])
+def submit(request):
+        try:
+            var = JSONParser().parse(request)
+            clg = var.get('cname')
+            district = "Not present"
+            state = " Not present"
+            obj = ElsiCollegeDtls.objects.filter(college_name = clg)
+            res = getbody(clg,obj)
+            var['subject']=res['subject']
+            var['body']=res['body']
             var['attachments'] = {'pamp':'Pamphlet2020.pdf','LoI':'letter-of-intent.docx'}
             return JsonResponse(var)
         except ValueError as e:
@@ -318,9 +304,6 @@ def getfile(request):
         f = open(os.path.join(SCRIPTS_DIR,'letter-of-intent.docx'), 'rb')
         response = FileResponse(f)
         return response
-def xyz(request):
-    return render(request,'new.html')
-
 
 @api_view(['POST'])
 def awssubmit(request):
@@ -378,14 +361,8 @@ def approve(request):
 def gsave(request):
     var = JSONParser().parse(request)
     to = var.get('remail')
-    if var.get('ccbcc') is not None :
-        cc = ','.join(map(str,var.get('ccbcc') ))
-    else :
-        cc = ''
-    if var.get('ccbcc') is not None :
-        bcc = ','.join(map(str,var.get('ccbcc') ))
-    else :
-        bcc = ''
+    cc = ','.join(map(str,var.get('ccbcc') ))
+    bcc = ','.join(map(str,var.get('ccbcc') ))
     subject = var.get('subject')
     body = var.get('body')
     credentials = get_credentials()
@@ -396,9 +373,8 @@ def gsave(request):
         pass
         #message = createMessageWithAttachment(sender, to, subject, msgHtml, msgPlain, attachmentFile)
     else:
-        message = None
-        #message = CreateMessageHtml(EMAIL_HOST_USER, to, cc, bcc, subject, body)
-    #result = CreateDraft(service,"me",message)
+        message = CreateMessageHtml(EMAIL_HOST_USER, to, cc, bcc, subject, body)
+    result = CreateDraft(service,"me",message)
     return JsonResponse({'status':'saved to draft'})
 
 def CreateDraft(service, user_id, message_body):
@@ -467,10 +443,7 @@ def CreateMessageHtml(sender, to, cc, bcc, subject, body, msgHtml=None):
     msg['To'] = to
     msg['Cc'] = cc
     #msg['Bcc'] = bcc
-    #with open('templates/new.html', 'r') as email_content:
-        #msgHtml = email_content.read()
     msg.attach(MIMEText(body, 'html'))
-    # msg.attach(MIMEText(msgHtml, 'html'))
     return {'raw': base64.urlsafe_b64encode(msg.as_string().encode()).decode()}
 
 def SendMessageInternal(service, user_id, message):

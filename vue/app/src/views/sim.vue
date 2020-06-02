@@ -65,7 +65,7 @@
 </table>
   </div>
   <form>
-    <p id="rmsg">{{approvecsv}}</p>
+    <!--<p id="rmsg">{{approvecsv}}</p>-->
   <b-button id="popover-reactive-3" ref="button3">Approve Selected</b-button>
 </form>
   <b-popover
@@ -155,6 +155,7 @@
     </b-container>
     <b-button @click="$bvModal.hide('modal-2')">OK</b-button>
     </b-modal><br>
+
   <label id="srattach"><strong>Attachment:</strong>
       <div v-for="(value,key) in output.attachments" v-bind:key="key">
       <b-button v-b-modal.modal-3 size="sm" @click='getfile(value)'>{{value}}</b-button>
@@ -164,7 +165,6 @@
     </b-container>
     </b-modal><br>
        </div>
-
  </label><br>
     <!-- <h2>Extra details:</h2>
    <p>name:</p>
@@ -284,28 +284,24 @@
      </div>
     </label><br>-->
     <b-button v-b-modal.modal-1 id="srbody">body</b-button>
-
-    <b-modal id="modal-1" title="Body" hide-footer v-on:keyup.enter = "NoEnter" >
+    <b-modal id="modal-1" size="lg" title="Body" hide-footer v-on:keyup.enter = "NoEnter" >
     <b-container class="px-2" >
-     <b-form-textarea  v-if = "key4" v-model = "reqdata.body"
-     @blur= "key4 = false; $emit('update')"
-     @keyup.enter = "key4=false; $emit('update')" id="isrbody" rows="10" max-rows="50" onsubmit="return false">
-     </b-form-textarea>
-     <pre  v-else @click = "key4 = true;">{{reqdata.body}}</pre>
+    <span v-html="reqdata.body"></span>
     </b-container>
     <b-button block @click="$bvModal.hide('modal-1')">OK</b-button>
     </b-modal><br>
+
     <label id="srattach"><strong>Attachment:</strong>
-    <!-- <input v-if = "key5" v-model = "output.body" -->
-    <!-- @blur= "key5 = false; $emit('update')" -->
-    <!-- @keyup.enter = "key5=false; $emit('update')" id="isrbody"> -->
-    <!-- <div v-else> -->
-      <!-- <label @click = "key4 = true;"> {{output.body}} </label> -->
-      <label > not Available </label>
-      <b-button id="save" @click="save"> Save </b-button>
-      <p>{{saveoutput}}</p>
-    <!-- </div> -->
+      <div v-for="(value,key) in reqdata.attachments" v-bind:key="key">
+      <b-button v-b-modal.modal-4 size="sm" @click='getfile(value)'>{{value}}</b-button>
+    <b-modal  id="modal-4" size="lg" hide-footer >
+    <b-container class="px-2" >
+    {{sfile}}
+    </b-container>
+    </b-modal><br>
+    </div>
    </label><br>
+      <b-button id="save" @click="save"> Save </b-button>
  </form>
 </div>
 </div>
