@@ -18,6 +18,7 @@ from django.http.response import JsonResponse
 from django.core.files.storage import default_storage
 from django.shortcuts import render
 from django.template.loader import render_to_string
+from django.http import FileResponse
 import smtplib
 import json
 import pickle
@@ -26,14 +27,8 @@ import httplib2
 import base64
 import mimetypes
 import csv
-<<<<<<< HEAD
 
-from .models import clgData,locData,ElsiCollegeDtls,WorkshopParticipants,WorkshopDtls,TbtCollegeDtls,ElsiTeacherDtls
-=======
-from django.http import FileResponse
 from .models import clgData,locData,ElsiCollegeDtls,ElsiTeacherDtls,TbtCollegeDtls,WorkshopDtls,WorkshopParticipants
->>>>>>> ee616bf9931c6d49d70ff3972e9f52c55fb98002
-from .serializers import ClgDataSerializer
 from app.settings import EMAIL_HOST_USER,BASE_DIR,SCRIPTS_DIR
 
 ############################################################################################################################
@@ -286,10 +281,6 @@ def submit(request):
                 elif obj[0].wo_attend :
                     print('B')
                     print(workshop.values())
-                    elsi_teacher1 = ElsiTeacherDtls.objects.filter(id = workshop[0].tch_id)
-                    elsi_teacher2 = ElsiTeacherDtls.objects.filter(id = workshop[1].tch_id)
-                    elsi_teacher3 = ElsiTeacherDtls.objects.filter(id = workshop[2].tch_id)
-                    elsi_teacher4 = ElsiTeacherDtls.objects.filter(id = workshop[3].tch_id)
                     workshop_id = workshop[0].workshop_id
                     workshop_dtl = WorkshopDtls.objects.filter(id = workshop_id)
                     print(workshop_dtl.values())
@@ -297,75 +288,6 @@ def submit(request):
                     clg_id = workshop_dtl[0].clg_id
                     temp = ElsiCollegeDtls.objects.filter(id = clg_id)
                     print(temp.values())
-<<<<<<< HEAD
-                    with open('scripts/b.html','r',encoding="utf-8") as reader:
-                        body = reader.read()
-                        body = body.replace('%(eLSI lab count (floored to 10))','300')
-                        body = body.replace('%(college_name)',college_name)
-                        body = body.replace('%(district)',district)
-                        body = body.replace('%(state)',state)
-                        body = body.replace('%(wrkshp_host_college)',temp[0].college_name)
-                        body = body.replace('%(wrkshp_district)',temp[0].district)
-                        body = body.replace('%(wrkshp_state)',temp[0].state)
-                        body = body.replace('%(wrkshp_dates)',workshop_dtl[0].start_date+' to '+workshop_dtl[0].end_date)
-                        body = body.replace('%(1tn)',elsi_teacher1[0].name)
-                        body = body.replace('%(1dpt)',elsi_teacher1[0].department)
-                        body = body.replace('%(2tn)',elsi_teacher2[0].name)
-                        body = body.replace('%(2dpt)',elsi_teacher2[0].department)
-                        body = body.replace('%(3tn)',elsi_teacher3[0].name)
-                        body = body.replace('%(3dpt)',elsi_teacher3[0].department)
-                        body = body.replace('%(4tn)',elsi_teacher4[0].name)
-                        body = body.replace('%(4dpt)',elsi_teacher4[0].department)
-                elif wo_attend == 1 and tbt_allowed ==1 and lab_inaugurated == 0 :
-                    tbt_college_dtl = TbtCollegeDtls.objects.filter(elsi_clg_id = obj[0].id)
-                    print(tbt_college_dtl.values())
-                    if tbt_college_dtl.count() >=1 and tbt_college_dtl[0].completed == 1:
-                        print('D')
-                        print(workshop.values())
-                        workshop_id = workshop[0].workshop_id
-                        print(workshop_id)
-                        workshop_dtl = WorkshopDtls.objects.filter(id = workshop_id)
-                        clg_id = workshop_dtl[0].clg_id
-                        temp = ElsiCollegeDtls.objects.filter(id = clg_id)
-                        print(temp.values())
-                        with open('scripts/d.html','r',encoding="utf-8") as reader:
-                            body = reader.read()
-                            body = body.replace('%(eLSI lab count (floored to 10))','300')
-                            body = body.replace('%(college_name)',college_name)
-                            body = body.replace('%(district)',district)
-                            body = body.replace('%(state)',state)
-                            body = body.replace('%(wrkshp_host_college)',temp[0].college_name)
-                            body = body.replace('%(wrkshp_district)',temp[0].district)
-                            body = body.replace('%(wrkshp_state)',temp[0].state)
-                            body = body.replace('%(wrkshp_dates)',workshop_dtl[0].start_date+' to '+workshop_dtl[0].end_date)
-                    else :  
-                        print('C')  
-                        print(workshop.values())
-                        workshop_id = workshop[0].workshop_id
-                        workshop_dtl = WorkshopDtls.objects.filter(id = workshop_id)
-                        print(workshop_dtl.values())
-                        clg_id = workshop_dtl[0].clg_id
-                        temp = ElsiCollegeDtls.objects.filter(id = clg_id)
-                        print(temp.values())
-                        with open('scripts/c.html','r',encoding="utf-8") as reader:
-                            body = reader.read()
-                            body = body.replace('%(eLSI lab count (floored to 10))','300')
-                            body = body.replace('%(college_name)',college_name)
-                            body = body.replace('%(district)',district)
-                            body = body.replace('%(state)',state)
-                            body = body.replace('%(wrkshp_host_college)',temp[0].college_name)
-                            body = body.replace('%(wrkshp_district)',temp[0].district)
-                            body = body.replace('%(wrkshp_state)',temp[0].state)
-                            body = body.replace('%(wrkshp_dates)',workshop_dtl[0].start_date+' to '+workshop_dtl[0].end_date)
-                elif lab_inaugurated == 1:
-                    print('E')
-                    with open('scripts/e.html','r',encoding="utf-8") as reader:
-                        body = reader.read()
-                        body = body.replace('%(eLSI lab count (floored to 10))','300')
-                        body = body.replace('%(college_name)',college_name)
-                        body = body.replace('%(district)',district)
-                        body = body.replace('%(state)',state)
-=======
                     body = render_to_string(os.path.join(SCRIPTS_DIR,'b.html'),
                     {'CollegeName':college_name,'State': state,'District':district,
                         'count':count,'start_date':workshop_dtl[0].start_date,'end_date':workshop_dtl[0].end_date,
@@ -375,11 +297,8 @@ def submit(request):
                     print('A')
                     body = render_to_string(os.path.join(SCRIPTS_DIR,'a.html'),{'count':count})
 
->>>>>>> ee616bf9931c6d49d70ff3972e9f52c55fb98002
             var['subject']=subject
             var['body']=body
-            #p = open('templates/new.html','r',encoding='utf-8').read()
-
             var['attachments'] = {'pamp':'Pamphlet2020.pdf','LoI':'letter-of-intent.docx'}
             return JsonResponse(var)
         except ValueError as e:
