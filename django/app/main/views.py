@@ -45,6 +45,7 @@ result = requests.get(url+'input='+input+other+'&key='+API_KEY)
 x = result.json()
 print(x)
 '''
+
 # zero_results
 # input='manganiram banghar memorial'
 ############################################################################################################################
