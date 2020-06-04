@@ -25,12 +25,13 @@ import os.path
 import httplib2
 import base64
 import mimetypes
+import email.encoders
 import csv
-from django.http import FileResponse
-from .models import clgData,locData,ElsiCollegeDtls,ElsiTeacherDtls,TbtCollegeDtls,WorkshopDtls,WorkshopParticipants
-from .serializers import ClgDataSerializer
+from django.http import FileResponse,HttpResponse
+from django.utils.encoding import escape_uri_path
+from .models import locData,ElsiCollegeDtls,ElsiTeacherDtls,TbtCollegeDtls,WorkshopDtls,WorkshopParticipants
 from app.settings import EMAIL_HOST_USER,BASE_DIR,SCRIPTS_DIR
-
+from datetime import datetime
 ############################################################################################################################
 import googlemaps
 import requests
@@ -70,46 +71,90 @@ def collegedetail(request):
 
 @api_view(['POST'])
 def csvapprove(request):
-    var = JSONParser().parse(request)
+    sent = None
     with open('scripts/info.json','r') as read:
         obj = json.load(read)
     file_path = obj['file_path']
     with open(file_path,'r') as csvinput:
         r = csv.reader(csvinput)
-        all=[]
         res = {}
         for row in r:
-            if row[0] in var.get('list') :
-                l=row[0]
-                body = None
-                subject = None
-                sent = None
-                if  len(row) > 7 :
+            if row[0] in request.data.get('list') :
+                to=row[0]
+                cc = row[1]
+                bcc = row[2]
+                district = (row[8])
+                state = (row[7])
+                attachmentFile = None
+                if  len(row) > 10 :
                     body = row[-1]
                     subject = row[-2]
-                obj = clgData.objects.filter(cname = row[5])
-                if obj.count() >= 1:
-                    if body == None :
-                        body = "You are already registered"
-                        subject = "Send Information Mail"
+                else :
+                    clg = row[6]
+                    obj = ElsiCollegeDtls.objects.filter(college_name = clg)
+                    API_KEY = 'AIzaSyD9qTJmiFUe3FQWlo5Z-A3l6pigxA3s8U8'
+                    url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
+                    input=clg
+                    input.replace(" ", "%")
+                    other='&inputtype=textquery&fields=name,formatted_address'
+                    result = requests.get(url+'input='+input+other+'&key='+API_KEY)
+                    collx = result.json()
+                    coll=collx['candidates'][0]['name']
+                    print(coll)
+                    if len(district) >0 and len(state)>0:
+                        input=district
+                        input.replace(" ", "%")
+                        result = requests.get(url+'input='+input+other+'&key='+API_KEY)
+                        x = result.json()
+                        dis=x['candidates'][0]['name']
+                        input=state
+                        input.replace(" ", "%")
+                        result = requests.get(url+'input='+input+other+'&key='+API_KEY)
+                        x = result.json()
+                        sta=x['candidates'][0]['name']
+                    else:
+                        data = collx['candidates'][0]['formatted_address']
+                        data.replace(" ", "")
+                        data = data.split(",")
+                        dis = "".join(filter(lambda x: not x.isdigit(), data[-3]))
+                        print(dis)
+                        sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
+                        print(sta)
+                    res = getbody(clg,obj,sta,dis)
+                    subject = res['subject']
+                    body = res['body']
+                if 'file1' in request.FILES and 'file2' in request.FILES:
+                    file1=request.FILES['file1']
+                    file2=request.FILES['file2']
+                    #  Saving POST'ed file to storage
+                    file_name1 = default_storage.save(file1.name, file1)
+                    file_name2 = default_storage.save(file2.name, file2)
+                    attachments = [os.path.join(BASE_DIR,file_name1),os.path.join(BASE_DIR,file_name2)]
+                elif 'file1' in request.FILES :
+                    file=request.FILES['file1']
+                    #  Saving POST'ed file to storage
+                    file_name = default_storage.save(file.name, file)
+                    attachments = [os.path.join(BASE_DIR,file_name),os.path.join(SCRIPTS_DIR,'letter-of-intent.docx')]
+                elif 'file2' in request.FILES :
+                    file=request.FILES['file2']
+                    #  Saving POST'ed file to storage
+                    file_name = default_storage.save(file.name, file)
+                    attachments = [os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'),os.path.join(BASE_DIR,file_name)]
                 else:
-                    clgSrz = ClgDataSerializer(data = {'cname' : row[5]})
-                    if clgSrz.is_valid():
-                        clgSrz.save()
-                    if body == None :
-                        body = "Welcome to our eyrc program."
-                        subject = "Send Information Mail"
-                #sent = SendMessage(EMAIL_HOST_USER,l,row[1],row[1], subject, body)
-                #print(l,sent)
-                if sent :
-                    res[l] = "mail sent successfully"
-                else:
-                    res[l] = "failed to send mail"
+                    attachments = [os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'),
+                    os.path.join(SCRIPTS_DIR,'letter-of-intent.docx')]
+                sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,attachments)
+            if sent :
+                res['msg'] = "mail sent successfully"
+                res['status'] = "1"
+            else:
+                res['msg'] = "failed to send mail"
+                res['status'] = "0"
         return JsonResponse(res)
 
 @api_view(['POST'])
 def csvdraft(request):
-    var = JSONParser().parse(request)
+    sent = None
     with open('scripts/info.json','r') as read:
         obj = json.load(read)
     file_path = obj['file_path']
@@ -117,117 +162,141 @@ def csvdraft(request):
     service = build('gmail', 'v1', credentials=credentials)
     with open(file_path,'r') as csvinput:
         r = csv.reader(csvinput)
-        all=[]
         res = {}
         for row in r:
-            if row[0] in var.get('list') :
-                l=row[0]
-                body = None
-                subject = None
-                result = None
+            if row[0] in request.data.get('list')  :
+                to=row[0]
+                cc = row[1]
+                bcc = row[2]
+                district = (row[8])
+                state = (row[7])
                 attachmentFile = None
-                if  len(row) > 7 :
+                if  len(row) > 10 :
                     body = row[-1]
                     subject = row[-2]
-                obj = clgData.objects.filter(cname = row[5])
-                if obj.count() >= 1:
-                    if body == None :
-                        body = "You are already registered"
-                        subject = "Send Information Mail"
+                else :
+                    clg = row[6]
+                    obj = ElsiCollegeDtls.objects.filter(college_name = clg)
+                    API_KEY = 'AIzaSyD9qTJmiFUe3FQWlo5Z-A3l6pigxA3s8U8'
+                    url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
+                    input=clg
+                    input.replace(" ", "%")
+                    other='&inputtype=textquery&fields=name,formatted_address'
+                    result = requests.get(url+'input='+input+other+'&key='+API_KEY)
+                    collx = result.json()
+                    coll=collx['candidates'][0]['name']
+                    print(coll)
+                    if len(district) >0 and len(state)>0:
+                        input=district
+                        input.replace(" ", "%")
+                        result = requests.get(url+'input='+input+other+'&key='+API_KEY)
+                        x = result.json()
+                        dis=x['candidates'][0]['name']
+                        input=state
+                        input.replace(" ", "%")
+                        result = requests.get(url+'input='+input+other+'&key='+API_KEY)
+                        x = result.json()
+                        sta=x['candidates'][0]['name']
+                    else:
+                        data = collx['candidates'][0]['formatted_address']
+                        data.replace(" ", "")
+                        data = data.split(",")
+                        dis = "".join(filter(lambda x: not x.isdigit(), data[-3]))
+                        print(dis)
+                        sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
+                        print(sta)
+                    res = getbody(clg,obj,sta,dis)
+                    subject = res['subject']
+                    body = res['body']
+                if 'file1' in request.FILES and 'file2' in request.FILES:
+                    file1=request.FILES['file1']
+                    file2=request.FILES['file2']
+                    #  Saving POST'ed file to storage
+                    file_name1 = default_storage.save(file1.name, file1)
+                    file_name2 = default_storage.save(file2.name, file2)
+                    attachments = [os.path.join(BASE_DIR,file_name1),os.path.join(BASE_DIR,file_name2)]
+                elif 'file1' in request.FILES :
+                    file=request.FILES['file1']
+                    #  Saving POST'ed file to storage
+                    file_name = default_storage.save(file.name, file)
+                    attachments = [os.path.join(BASE_DIR,file_name),os.path.join(SCRIPTS_DIR,'letter-of-intent.docx')]
+                elif 'file2' in request.FILES :
+                    file=request.FILES['file2']
+                    #  Saving POST'ed file to storage
+                    file_name = default_storage.save(file.name, file)
+                    attachments = [os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'),os.path.join(BASE_DIR,file_name)]
                 else:
-                    if body == None :
-                        body = "Welcome to our eyrc program."
-                        subject = "Send Information Mail"
+                    attachments = [os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'),
+                    os.path.join(SCRIPTS_DIR,'letter-of-intent.docx')]
+                attachmentFile = attachments
                 if attachmentFile:
-                    pass
-                    #message = createMessageWithAttachment(sender, to, subject, msgHtml, msgPlain, attachmentFile)
+                    message = createMessageWithAttachment(EMAIL_HOST_USER, to,cc,bcc, subject,body, attachmentFile)
                 else:
                     message = None
-                    #message = CreateMessageHtml(EMAIL_HOST_USER,l,row[1],row[1], subject, body)
-                #result = CreateDraft(service,"me",message)
+                    message = CreateMessageHtml(EMAIL_HOST_USER, to, cc, bcc, subject, body)
+                result = CreateDraft(service,"me",message)
                 if result :
-                    res[l] = "saved to draft"
+                    res['msg'] = "saved to draft"
+                    res['status'] = "1"
                 else :
-                    res[l] = "failed to save to draft"
-        return JsonResponse(res)
+                    res['msg'] = "failed to save to draft"
+                    res['status'] = "0"
+    return JsonResponse(res)
 
 @api_view(['POST'])
 def idrequest(request):
     var = JSONParser().parse(request)
     clg = var.get('cname')
     rema = var.get('remail')
-    obj = clgData.objects.filter(cname = clg)
+    obj = ElsiCollegeDtls.objects.filter(college_name = clg)
     file_path = os.path.join(BASE_DIR,'clgData.csv')
     f = open(file_path)
     reader = csv.DictReader(f)
     for rows in reader:
         if (rows['remail'] == rema):
-            ccbcc = (rows['ccbcc'])
-        #print(rows['remail'])
-        #print(rema)
-    d = {'to' : rema  ,'ccbcc' : ccbcc,'subject': '','body':''}
-    if obj.count() >= 1:
-        subject = "Send Information Mail"
-        body = "You are already registered."
-        d['subject']=subject
-        d['body']=body
+            cc = (rows['cc'])
+            bcc = (rows['bcc'])
+            district = (rows['district'])
+            state = (rows['state'])
+    API_KEY = 'AIzaSyD9qTJmiFUe3FQWlo5Z-A3l6pigxA3s8U8'
+    url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
+    input=str(var.get('cname'))
+    input.replace(" ", "%")
+    other='&inputtype=textquery&fields=name,formatted_address'
+    result = requests.get(url+'input='+input+other+'&key='+API_KEY)
+    collx = result.json()
+    coll=collx['candidates'][0]['name']
+    print(coll)
+    if len(district) >0 and len(state)>0:
+        input=district
+        input.replace(" ", "%")
+        result = requests.get(url+'input='+input+other+'&key='+API_KEY)
+        x = result.json()
+        dis=x['candidates'][0]['name']
+        input=state
+        input.replace(" ", "%")
+        result = requests.get(url+'input='+input+other+'&key='+API_KEY)
+        x = result.json()
+        sta=x['candidates'][0]['name']
     else:
-        subject = "Send Information Mail"
-        body = "Welcome to our eyrc program."
-        d['subject']=subject
-        d['body']=body
+        data = collx['candidates'][0]['formatted_address']
+        data.replace(" ", "")
+        data = data.split(",")
+        dis = "".join(filter(lambda x: not x.isdigit(), data[-3]))
+        print(dis)
+        sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
+        print(sta)
+    d = {'to' : rema  ,'cc' : cc,'bcc' : bcc,'subject': '','body':'','attachments':''}
+    res = getbody(clg,obj,sta,dis)
+    d['subject'] = res['subject']
+    d['body'] = res['body']
+    d['attachments'] = {'pamp':'Pamphlet2020.pdf','LoI':'letter-of-intent.docx'}
     return JsonResponse(d)
 
-@api_view(['POST'])
-def save(request):
-    var = JSONParser().parse(request)
-    with open('scripts/info.json','r') as read:
-        obj = json.load(read)
-    file_path = obj['file_path']
-    write_path = os.path.join(BASE_DIR,'test.csv')
-    with open(file_path,'r') as csvinput:
-        r = csv.reader(csvinput)
-        all=[]
-        for row in r:
-            if row[0] == 'remail':
-                row.append('body')
-                row.append('subject')
-            elif row[0] == var.get('remail') :
-                row[1] = var.get('ccbcc')
-                row.append(var.get('subject'))
-                row.append(var.get('body'))
-            all.append(row)
-        with open(file_path, 'w') as csvoutput:
-            writer = csv.writer(csvoutput, lineterminator='\n')
-            writer.writerows(all)
-    return JsonResponse({'status':'saved'})
-
-@api_view(['POST'])
-def csvsubmit(request):
-    file = request.FILES['file']
-    if os.path.getsize('scripts/info.json') :
-        with open('scripts/info.json','r') as read:
-            obj = json.load(read)
-            os.remove(obj['file_name'])
-    file_name = default_storage.save(file.name,file)
-    CSV_DIR = os.path.join(BASE_DIR,file_name)
-    with open('scripts/info.json','w') as write :
-        json.dump({'file_path':CSV_DIR,'file_name':file_name},write)
-    with open(file_name, newline='') as csvfile:
-        reader = csv.DictReader(csvfile)
-        clist = []
-        for rows in reader :
-            clist = clist + [(rows['cname'],rows['remail'])]
-        return JsonResponse(dict(clist))
-
-@api_view(['POST'])
-def submit(request):
+def getbody(clg,obj,sta,dis):
         try:
-            var = JSONParser().parse(request)
-            clg = var.get('cname')
-            district = "Not present"
-            state = " Not present"
-            obj = ElsiCollegeDtls.objects.filter(college_name = clg)
+            district = dis
+            state = sta
             c = ElsiCollegeDtls.objects.all()
             count=0
             for c in c.values('lab_inaugurated'):
@@ -239,7 +308,6 @@ def submit(request):
                     "Information for e-Yantra Lab Setup Initiative (eLSI): " +\
                      clg + " , " + district + " , " + state
                 body = render_to_string(os.path.join(SCRIPTS_DIR,'a.html'),{'count':count})
-
             else :
                 college_name = obj[0].college_name
                 district = obj[0].district
@@ -265,9 +333,15 @@ def submit(request):
                         det = WorkshopDtls.objects.filter(clg_id = workshop[0].workshop_id )
                         temp = ElsiCollegeDtls.objects.filter(id = det[0].clg_id)
                         details = ElsiTeacherDtls.objects.filter(id = workshop[0].tch_id )
+                        start_date = det[0].start_date
+                        start_date = datetime.strptime(start_date, '%d-%m-%Y')
+                        start_date = datetime.strftime(start_date,'%b %d, %Y')
+                        end_date = det[0].end_date
+                        end_date = datetime.strptime(end_date, '%d-%m-%Y')
+                        end_date = datetime.strftime(end_date,'%b %d, %Y')
                         body = render_to_string(os.path.join(SCRIPTS_DIR,'tbt_complete.html'),
                         {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
-                        'count':count,'start_date':det[0].start_date,'end_date':det[0].end_date,'host_college':temp[0].college_name,'host_State':temp[0].state,
+                        'count':count,'start_date':start_date,'end_date':end_date,'host_college':temp[0].college_name,'host_State':temp[0].state,
                         'host_District':temp[0].district,"datas":details})
                     else:
                         print('C')
@@ -275,9 +349,15 @@ def submit(request):
                         temp = ElsiCollegeDtls.objects.filter(id = det[0].clg_id)
                         tch_id = workshop[0].tch_id
                         details = ElsiTeacherDtls.objects.filter(id = tch_id )
+                        start_date = det[0].start_date
+                        start_date = datetime.strptime(start_date, '%d-%m-%Y')
+                        start_date = datetime.strftime(start_date,'%b %d, %Y')
+                        end_date = det[0].end_date
+                        end_date = datetime.strptime(end_date, '%d-%m-%Y')
+                        end_date = datetime.strftime(end_date,'%b %d, %Y')
                         body = render_to_string(os.path.join(SCRIPTS_DIR,'tbt_notcomplete.html'),
                         {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
-                        'count':count,'start_date':det[0].start_date,'end_date':det[0].end_date,'host_college':temp[0].college_name,'host_State':temp[0].state,
+                        'count':count,'start_date':start_date,'end_date':end_date,'host_college':temp[0].college_name,'host_State':temp[0].state,
                         'host_District':temp[0].district,"datas":details})
                 elif obj[0].wo_attend :
                     print('B')
@@ -291,17 +371,97 @@ def submit(request):
                     print(temp.values())
                     body = render_to_string(os.path.join(SCRIPTS_DIR,'b.html'),
                     {'CollegeName':college_name,'State': state,'District':district,
-                        'count':count,'start_date':workshop_dtl[0].start_date,'end_date':workshop_dtl[0].end_date,
-                        'host_college':temp[0].college_name,'host_State':temp[0].state,'host_District':temp[0].district,
+                        'count':count,'host_college':temp[0].college_name,'host_State':temp[0].state,'host_District':temp[0].district,
                         "datas":datas})
                 else :
                     print('A')
                     body = render_to_string(os.path.join(SCRIPTS_DIR,'a.html'),{'count':count})
+            return {'subject':subject,'body':body}
+        except ValueError as e:
+            return {'status':'failed','info':e.args[0]}
 
-            var['subject']=subject
-            var['body']=body
-            #p = open('templates/new.html','r',encoding='utf-8').read()
+@api_view(['POST'])
+def save(request):
+    var = JSONParser().parse(request)
+    '''
+    with open('scripts/info.json','r') as read:
+        obj = json.load(read)
+    file_path = obj['file_path']
+    with open(file_path,'r') as csvinput:
+        r = csv.reader(csvinput)
+        all=[]
+        for row in r:
+            if row[0] == 'remail':
+                row.append('body')
+                row.append('subject')
+            elif row[0] == var.get('remail') :
+                row[1] = var.get('ccbcc')
+                row.append(var.get('subject'))
+                row.append(var.get('body'))
+            all.append(row)
+        with open(file_path, 'w') as csvoutput:
+            writer = csv.writer(csvoutput, lineterminator='\n')
+            writer.writerows(all)
+    '''
+    return JsonResponse({'status':'saved'})
 
+@api_view(['POST'])
+def csvsubmit(request):
+    file = request.FILES['file']
+    if os.path.getsize('scripts/info.json') :
+        with open('scripts/info.json','r') as read:
+            obj = json.load(read)
+            os.remove(obj['file_name'])
+    file_name = default_storage.save(file.name,file)
+    CSV_DIR = os.path.join(BASE_DIR,file_name)
+    with open('scripts/info.json','w') as write :
+        json.dump({'file_path':CSV_DIR,'file_name':file_name},write)
+    with open(file_name, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        clist = []
+        for rows in reader :
+            clist = clist + [(rows['cname'],rows['remail'])]
+        return JsonResponse(dict(clist))
+
+@api_view(['POST'])
+def submit(request):
+        try:
+            var = JSONParser().parse(request)
+            clg = var.get('cname')
+            district = var.get('district')
+            state = var.get('state')
+            API_KEY = 'AIzaSyD9qTJmiFUe3FQWlo5Z-A3l6pigxA3s8U8'
+            url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
+            input=str(var.get('cname'))
+            input.replace(" ", "%")
+            other='&inputtype=textquery&fields=name,formatted_address'
+            result = requests.get(url+'input='+input+other+'&key='+API_KEY)
+            collx = result.json()
+            coll=collx['candidates'][0]['name']
+            print(coll)
+            if len(district) >0 and len(state)>0:
+                input=str(var.get('district'))
+                input.replace(" ", "%")
+                result = requests.get(url+'input='+input+other+'&key='+API_KEY)
+                x = result.json()
+                dis=x['candidates'][0]['name']
+                input=str(var.get('state'))
+                input.replace(" ", "%")
+                result = requests.get(url+'input='+input+other+'&key='+API_KEY)
+                x = result.json()
+                sta=x['candidates'][0]['name']
+            else:
+                data = collx['candidates'][0]['formatted_address']
+                data.replace(" ", "")
+                data = data.split(",")
+                dis = "".join(filter(lambda x: not x.isdigit(), data[-3]))
+                print(dis)
+                sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
+                print(sta)
+            obj = ElsiCollegeDtls.objects.filter(college_name = clg)
+            res = getbody(clg,obj,sta,dis)
+            var['subject']=res['subject']
+            var['body']=res['body']
             var['attachments'] = {'pamp':'Pamphlet2020.pdf','LoI':'letter-of-intent.docx'}
             return JsonResponse(var)
         except ValueError as e:
@@ -309,19 +469,19 @@ def submit(request):
 
 @api_view(['POST'])
 def getfile(request):
+    print('hii')
     var = JSONParser().parse(request)
     v = var.get('value')
     if v == 'Pamphlet2020.pdf':
-        f = open(os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'), 'rb')
-        response = FileResponse(f)
-        return response
+        with open(os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'), 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+            response['Content-Disposition'] = "attachment; filename={}".format(escape_uri_path('Pamphlet2020.pdf'))
+            return response
     else:
-        f = open(os.path.join(SCRIPTS_DIR,'letter-of-intent.docx'), 'rb')
-        response = FileResponse(f)
-        return response
-def xyz(request):
-    return render(request,'new.html')
-
+        with open(os.path.join(SCRIPTS_DIR,'letter-of-intent.docx'), 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+            response['Content-Disposition'] = "attachment; filename={}".format(escape_uri_path('letter-of-intent.docx'))
+            return response
 
 @api_view(['POST'])
 def awssubmit(request):
@@ -358,16 +518,39 @@ def awssubmit(request):
 @api_view(['POST'])
 def approve(request):
         try:
-            var = JSONParser().parse(request)
-            to = var.get('remail')
-            cc = ','.join(map(str,var.get('ccbcc') ))
-            bcc = ','.join(map(str,var.get('ccbcc') ))
-            print(bcc)
-            subject = var.get('subject')
-            body = var.get('body')
+            to = request.data.get('remail')
+            if type(request.data.get('cc')) == list:
+                cc = ','.join(map(str,request.data.get('cc') ))
+            else:
+                cc = request.data.get('cc')
+            if type(request.data.get('bcc')) == list:
+                bcc = ','.join(map(str,request.data.get('bcc') ))
+            else:
+                bcc = request.data.get('bcc')
+            subject = request.data.get('subject')
+            body = request.data.get('body')
             sent = None
-            #attachments = var.get('attachments')
-            sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body)
+            if 'file1' in request.FILES and 'file2' in request.FILES:
+                file1=request.FILES['file1']
+                file2=request.FILES['file2']
+                #  Saving POST'ed file to storage
+                file_name1 = default_storage.save(file1.name, file1)
+                file_name2 = default_storage.save(file2.name, file2)
+                attachments = [os.path.join(BASE_DIR,file_name1),os.path.join(BASE_DIR,file_name2)]
+            elif 'file1' in request.FILES :
+                file=request.FILES['file1']
+                #  Saving POST'ed file to storage
+                file_name = default_storage.save(file.name, file)
+                attachments = [os.path.join(BASE_DIR,file_name),os.path.join(SCRIPTS_DIR,'letter-of-intent.docx')]
+            elif 'file2' in request.FILES :
+                file=request.FILES['file2']
+                #  Saving POST'ed file to storage
+                file_name = default_storage.save(file.name, file)
+                attachments = [os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'),os.path.join(BASE_DIR,file_name)]
+            else:
+                attachments = [os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'),
+                os.path.join(SCRIPTS_DIR,'letter-of-intent.docx')]
+            sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,attachments)
             if sent :
                 return JsonResponse({'status':'success','info':'mail sent successfully'})
             else :
@@ -377,29 +560,46 @@ def approve(request):
 
 @api_view(['POST'])
 def gsave(request):
-    var = JSONParser().parse(request)
-    to = var.get('remail')
-    if var.get('ccbcc') is not None :
-        cc = ','.join(map(str,var.get('ccbcc') ))
-    else :
-        cc = ''
-    if var.get('ccbcc') is not None :
-        bcc = ','.join(map(str,var.get('ccbcc') ))
-    else :
-        bcc = ''
-    subject = var.get('subject')
-    body = var.get('body')
+    to = request.data.get('remail')
+    if type(request.data.get('cc')) == list:
+        cc = ','.join(map(str,request.data.get('cc') ))
+    else:
+        cc = request.data.get('cc')
+    if type(request.data.get('bcc')) == list:
+        bcc = ','.join(map(str,request.data.get('bcc') ))
+    else:
+        bcc = request.data.get('bcc')
+    subject = request.data.get('subject')
+    body = request.data.get('body')
+    sent = None
+    if 'file1' in request.FILES and 'file2' in request.FILES:
+        file1=request.FILES['file1']
+        file2=request.FILES['file2']
+        #  Saving POST'ed file to storage
+        file_name1 = default_storage.save(file1.name, file1)
+        file_name2 = default_storage.save(file2.name, file2)
+        attachments = [os.path.join(BASE_DIR,file_name1),os.path.join(BASE_DIR,file_name2)]
+    elif 'file1' in request.FILES :
+        file=request.FILES['file1']
+        #  Saving POST'ed file to storage
+        file_name = default_storage.save(file.name, file)
+        attachments = [os.path.join(BASE_DIR,file_name),os.path.join(SCRIPTS_DIR,'letter-of-intent.docx')]
+    elif 'file2' in request.FILES :
+        file=request.FILES['file2']
+        #  Saving POST'ed file to storage
+        file_name = default_storage.save(file.name, file)
+        attachments = [os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'),os.path.join(BASE_DIR,file_name)]
+    else:
+        attachments = [os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'),os.path.join(SCRIPTS_DIR,'letter-of-intent.docx')]
     credentials = get_credentials()
-    attachmentFile=None
+    attachmentFile=attachments
     result = None
     service = build('gmail', 'v1', credentials=credentials)
     if attachmentFile:
-        pass
-        #message = createMessageWithAttachment(sender, to, subject, msgHtml, msgPlain, attachmentFile)
+        message = createMessageWithAttachment(EMAIL_HOST_USER, to,cc,bcc, subject, body, attachmentFile)
     else:
-        message = None
-        #message = CreateMessageHtml(EMAIL_HOST_USER, to, cc, bcc, subject, body)
-    #result = CreateDraft(service,"me",message)
+        message = CreateMessageHtml(EMAIL_HOST_USER, to, cc, bcc, subject, body)
+    result = CreateDraft(service,"me",message)
     return JsonResponse({'status':'saved to draft'})
 
 def CreateDraft(service, user_id, message_body):
@@ -430,8 +630,7 @@ def SendMessage(sender, to, cc, bcc, subject, body, attachmentFile=None):
     #with open('templates/new.html' ,'r') as email_content:
         #msgHtml = email_content.read()
     if attachmentFile:
-        pass
-        #message = createMessageWithAttachment(sender, to, subject, msgPlain, msgHtml, attachmentFile)
+        message = createMessageWithAttachment(sender, to,cc,bcc, subject,body, attachmentFile)
     else:
         message = CreateMessageHtml(sender, to, cc, bcc, subject, body)
     result = SendMessageInternal(service, "me", message)
@@ -464,14 +663,11 @@ def CreateMessageHtml(sender, to, cc, bcc, subject, body, msgHtml=None):
     msg = MIMEMultipart('alternative')
     msg['Subject'] = subject
     msg['From'] = sender
-    msg['Bcc'] = cc
+    msg['Bcc'] = bcc
     msg['To'] = to
     msg['Cc'] = cc
     #msg['Bcc'] = bcc
-    #with open('templates/new.html', 'r') as email_content:
-        #msgHtml = email_content.read()
     msg.attach(MIMEText(body, 'html'))
-    # msg.attach(MIMEText(msgHtml, 'html'))
     return {'raw': base64.urlsafe_b64encode(msg.as_string().encode()).decode()}
 
 def SendMessageInternal(service, user_id, message):
@@ -485,7 +681,7 @@ def SendMessageInternal(service, user_id, message):
     return "OK"
 
 def createMessageWithAttachment(
-    sender, to, subject, msgHtml, msgPlain, attachmentFile):
+    sender, to,cc,bcc, subject,body, attachmentFile):
     """Create a message for an email.
 
     Args:
@@ -501,43 +697,48 @@ def createMessageWithAttachment(
     """
     message = MIMEMultipart('mixed')
     message['to'] = to
+    message['Bcc'] = bcc
+    message['Cc'] = cc
     message['from'] = sender
     message['subject'] = subject
 
     messageA = MIMEMultipart('alternative')
     messageR = MIMEMultipart('related')
 
-    messageR.attach(MIMEText(msgHtml, 'html'))
-    messageA.attach(MIMEText(msgPlain, 'plain'))
+    messageR.attach(MIMEText(body, 'html'))
+    # messageA.attach(MIMEText(msgPlain, 'plain'))
     messageA.attach(messageR)
 
     message.attach(messageA)
 
     print("create_message_with_attachment: file: %s" % attachmentFile)
-    content_type, encoding = mimetypes.guess_type(attachmentFile)
+    for attachment in attachmentFile :
 
-    if content_type is None or encoding is not None:
-        content_type = 'application/octet-stream'
-    main_type, sub_type = content_type.split('/', 1)
-    if main_type == 'text':
-        fp = open(attachmentFile, 'rb')
-        msg = MIMEText(fp.read(), _subtype=sub_type)
-        fp.close()
-    elif main_type == 'image':
-        fp = open(attachmentFile, 'rb')
-        msg = MIMEImage(fp.read(), _subtype=sub_type)
-        fp.close()
-    elif main_type == 'audio':
-        fp = open(attachmentFile, 'rb')
-        msg = MIMEAudio(fp.read(), _subtype=sub_type)
-        fp.close()
-    else:
-        fp = open(attachmentFile, 'rb')
-        msg = MIMEBase(main_type, sub_type)
-        msg.set_payload(fp.read())
-        fp.close()
-    filename = os.path.basename(attachmentFile)
-    msg.add_header('Content-Disposition', 'attachment', filename=filename)
-    message.attach(msg)
+        content_type, encoding = mimetypes.guess_type(attachment)
+
+        if content_type is None or encoding is not None:
+            content_type = 'application/octet-stream'
+        main_type, sub_type = content_type.split('/', 1)
+        if main_type == 'text':
+            fp = open(attachment, 'rb')
+            msg = MIMEText(fp.read(), _subtype=sub_type)
+            fp.close()
+        elif main_type == 'image':
+            fp = open(attachment, 'rb')
+            msg = MIMEImage(fp.read(), _subtype=sub_type)
+            fp.close()
+        elif main_type == 'audio':
+            fp = open(attachment, 'rb')
+            msg = MIMEAudio(fp.read(), _subtype=sub_type)
+            fp.close()
+        else:
+            fp = open(attachment, 'rb')
+            msg = MIMEBase(main_type, sub_type)
+            msg.set_payload(fp.read())
+            fp.close()
+        filename = os.path.basename(attachment)
+        msg.add_header('Content-Disposition', 'attachment', filename=filename)
+        email.encoders.encode_base64(msg)
+        message.attach(msg)
 
     return {'raw': base64.urlsafe_b64encode(message.as_string().encode()).decode()}

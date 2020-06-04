@@ -1,5 +1,4 @@
 'use strict'
-
 import { app, protocol, BrowserWindow } from 'electron'
 import {
   createProtocol,
@@ -13,17 +12,21 @@ let win
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }])
-
+const {shell} = require("electron");
 function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({
     width: 1440,
     height: 1024,
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      webSecurity: false
     }
   })
-
+  win.webContents.on("new-window", function(event, url) {
+    event.preventDefault();
+    shell.openExternal(url);
+  });
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
