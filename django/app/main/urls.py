@@ -2,6 +2,7 @@ from django.conf.urls import url
 from main import views
 from django.contrib import admin
 urlpatterns = [
+
     url(r'^api/main/submit', views.submit),
     url(r'^api/main/approve', views.approve),
     url(r'^api/main/gsave', views.gsave),
@@ -11,6 +12,8 @@ urlpatterns = [
     url(r'^api/main/csv/approve', views.csvapprove),
     url(r'^api/main/csv/gsave', views.csvdraft),
     url(r'^api/main/awssubmit', views.awssubmit),
-    url(r'^api/main/clgdtl',views.collegedetail),
-    url(r'^api/main/getfile',views.getfile)
+    url(r'^api/main/sendmail',views.sendmail),
+    url(r'^api/main/getfile',views.getfile),
+    url(r'^api/main/formdata',views.formdata),
+    url(r'^api/main/form/(?P<uid>[^/]+)/$',views.form) 
 ]

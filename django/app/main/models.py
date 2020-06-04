@@ -1,5 +1,21 @@
 from django.db import models
+import uuid
 # Create your models here.
+
+class userdetail(models.Model):
+    id = models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
+    emailid = models.EmailField(blank=False,null=False)
+
+    def __str__(self):
+        return self.emailid   
+
+class locData(models.Model):
+    locstate = models.CharField(max_length=50,blank=False,default='')
+    locdistrict = models.CharField(max_length=50,blank=False,default='')
+    locemail = models.CharField(max_length=50,blank=False,default='')
+
+    def __str__(self):
+        return self.locstate
 
 class ElsiCollegeDtls(models.Model):
     id = models.IntegerField(blank=True, null=False, primary_key=True)
@@ -212,3 +228,4 @@ class WorkshopParticipants(models.Model):
     class Meta:
         managed = False
         db_table = 'workshop_participants'
+

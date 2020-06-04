@@ -27,7 +27,7 @@ import base64
 import mimetypes
 import csv
 from django.http import FileResponse
-from .models import locData,ElsiCollegeDtls,ElsiTeacherDtls,TbtCollegeDtls,WorkshopDtls,WorkshopParticipants
+from .models import locData,userdetail,ElsiCollegeDtls,ElsiTeacherDtls,TbtCollegeDtls,WorkshopDtls,WorkshopParticipants
 from app.settings import EMAIL_HOST_USER,BASE_DIR,SCRIPTS_DIR
 
 ############################################################################################################################
@@ -55,16 +55,28 @@ SCOPES = [
     'https://www.googleapis.com/auth/gmail.modify',
 ]
 
+def form(request,uid):
+    #print(request.GET['uid'])
+    print(uid)
+    return render(request,'form.html',context={'uuid':uid})
+
 @api_view(['POST'])
-def collegedetail(request):
+def formdata(request):
     var = JSONParser().parse(request)
-    clgCode = var.get('clgcode')
-    obj = ElsiCollegeDtls.objects.filter(clg_code = clgCode)
-    if obj.count() == 1:
-        l = str(obj[0]).split(';')
-        return JsonResponse({'status':None,'college_name':l[0],'eyic_allowed':l[1],'tbt_allowed':l[2],'loi_status':l[3]})
-    else :
-        return JsonResponse({'status':'college code not found'})
+    print(var.get('name'),var.get('cname'),var.get('designation'),var.get('uuid'))
+    return Response('success')
+
+@api_view(['POST'])
+def sendmail(request):
+    obj = userdetail.objects.filter(emailid = '98dikshitajain@gmail.com')
+    to = obj[0].emailid
+    uuid = obj[0].id
+    cc = ''
+    bcc = '' 
+    subject = 'Workshop Team Selection Form'
+    body = render_to_string(os.path.join(SCRIPTS_DIR,'link.html'),{'uid':uuid})
+    sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body)
+    return JsonResponse({'status':'success'})
 
 @api_view(['POST'])
 def csvapprove(request):
@@ -236,7 +248,7 @@ def getbody(clg,obj):
 @api_view(['POST'])
 def save(request):
     var = JSONParser().parse(request)
-    '''
+    
     with open('scripts/info.json','r') as read:
         obj = json.load(read)
     file_path = obj['file_path']
@@ -255,7 +267,7 @@ def save(request):
         with open(file_path, 'w') as csvoutput:
             writer = csv.writer(csvoutput, lineterminator='\n')
             writer.writerows(all)
-    '''        
+           
     return JsonResponse({'status':'saved'})
 
 @api_view(['POST'])
@@ -347,8 +359,6 @@ def approve(request):
             print(bcc)
             subject = var.get('subject')
             body = var.get('body')
-            sent = None
-            #attachments = var.get('attachments')
             sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body)
             if sent :
                 return JsonResponse({'status':'success','info':'mail sent successfully'})
