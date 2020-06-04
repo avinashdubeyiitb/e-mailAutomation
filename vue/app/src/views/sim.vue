@@ -9,8 +9,10 @@
     <form @submit="formSubmit">
     <strong id="rid" >Recipient Email ID:</strong>
     <input id="ridi" type="email" v-model="remail"><br>
-    <strong id="ccbcc">CC/BCC:</strong>
-    <input id="ccbcci" type="email" v-model="ccbcc"><br>
+    <strong id="cc">CC:</strong>
+    <input id="cci" type="email" v-model="cc"><br>
+    <strong id="bcc">BCC:</strong>
+    <input id="bcci" type="email" v-model="bcc"><br>
     <strong id="name">Name:</strong>
     <input id="namei" type="text" v-model="name"><br>
     <strong id="desig">Designation:</strong>
@@ -19,6 +21,24 @@
     <input id="departi" type="text" v-model="department"><br>
     <strong id="cname">College Name:</strong>
     <input id="cnamei" type="text" v-model="cname"><br>
+    <div id="recipientstatei">
+        <b-dropdown  v-bind:text="state" >
+          <div v-for="(p,i) in statedisdata" v-bind:key='i' >
+            <div v-for="(sta,index) in p" v-bind:key='index' >
+              <b-dropdown-item @click='selectedstate(sta.state,index)' v-model="state">{{sta.state}}</b-dropdown-item>
+            </div>
+          </div>
+        </b-dropdown>
+    </div>
+    <div id="recipientdisi">
+        <b-dropdown  v-bind:text="d" >
+          <div v-for="(dis,i) in districts" v-bind:key='i'>
+            <div v-for="(diss,i) in dis" v-bind:key='i' >
+              <b-dropdown-item  @click='selecteddistrict(diss)'>{{diss}}</b-dropdown-item>
+            </div>
+            </div>
+        </b-dropdown>
+        </div>
     <strong id="cno">Contact No.:</strong>
     <input id="cnoi" type="tel" v-model="cno"><br>
     <button id="msub">Submit</button>
@@ -121,14 +141,22 @@
      <label @click = "key1 = true;"> {{output.remail}} </label>
    </div>
  </label><br>
-   <label id="srccbcc"><strong>cc/bcc:</strong>
-   <input v-if = "key2" v-model = "output.ccbcc"
+   <label id="srcc"><strong>CC:</strong>
+   <input v-if = "key2" v-model = "output.cc"
    @blur= "key2 = false; $emit('update')"
    @keyup.enter = "key2=false; $emit('update')" >
          <div v-else>
-     <label @click = "key2 = true;">{{output.ccbcc}} </label>
+     <label @click = "key2 = true;">{{output.cc}} </label>
    </div>
     </label><br>
+    <label id="srbcc"><strong>Bcc:</strong>
+    <input v-if = "key5" v-model = "output.bcc"
+    @blur= "key5 = false; $emit('update')"
+    @keyup.enter = "key5=false; $emit('update')" >
+          <div v-else>
+      <label @click = "key5 = true;">{{output.bcc}} </label>
+    </div>
+     </label><br>
    <label id="srsubject"><strong>subject:</strong>
    <input v-if = "key3" v-model = "output.subject"
    @blur= "key3 = false; $emit('update')"
@@ -148,7 +176,6 @@
   </label><br>
   -->
       <b-button v-b-modal.modal-2 id="srbody">body</b-button>
-
     <b-modal id="modal-2" size="lg" title="Body" hide-footer v-on:keyup.enter = "NoEnter" >
     <b-container class="px-2" >
     <span v-html="output.body"></span>
@@ -158,14 +185,13 @@
 
   <label id="srattach"><strong>Attachment:</strong>
       <div v-for="(value,key) in output.attachments" v-bind:key="key">
-      <b-button v-b-modal.modal-3 size="sm" @click='getfile(value)'>{{value}}</b-button>
-    <b-modal  id="modal-3" size="lg" hide-footer >
-    <b-container class="px-2" >
-    {{sfile}}
-    </b-container>
-    </b-modal><br>
+      <b-button size="sm" @click='getfile(value)'  >{{value}}</b-button>
        </div>
+       <input type="file" id="upfile1" ref="upfile1" v-on:change="handleattachUpload"/>
+       <input type="file" id="upfile2" ref="upfile2" v-on:change="handleattachUpload"/>
+
  </label><br>
+
     <!-- <h2>Extra details:</h2>
    <p>name:</p>
    <input v-if = "key5" v-model = "output.name"
@@ -259,12 +285,20 @@
        <label @click = "key1 = true;"> {{reqdata.to}} </label>
      </div>
    </label><br>
-     <label id="srccbcc"><strong>cc/bcc:</strong>
-     <input v-if = "key2" v-model = "reqdata.ccbcc"
+     <label id="srccbcc"><strong>Cc:</strong>
+     <input v-if = "key2" v-model = "reqdata.cc"
      @blur= "key2 = false; $emit('update')"
      @keyup.enter = "key2=false; $emit('update')" >
            <div v-else>
-       <label @click = "key2 = true;">{{reqdata.ccbcc}} </label>
+       <label @click = "key2 = true;">{{reqdata.cc}} </label>
+     </div>
+     </label><br>
+     <label id="srccbcc"><strong>Bcc:</strong>
+     <input v-if = "key5" v-model = "reqdata.bcc"
+     @blur= "key5 = false; $emit('update')"
+     @keyup.enter = "key5=false; $emit('update')" >
+           <div v-else>
+       <label @click = "key5 = true;">{{reqdata.bcc}} </label>
      </div>
       </label><br>
      <label id="srsubject"><strong>subject:</strong>
@@ -274,15 +308,7 @@
            <div v-else>
        <label @click = "key3 = true;"> {{reqdata.subject}} </label>
      </div>
-     </label><br><!--
-     <label id="srbody"><strong>body:</strong>
-     <input v-if = "key4" v-model = "reqdata.body"
-     @blur= "key4 = false; $emit('update')"
-     @keyup.enter = "key4=false; $emit('update')" id="isrbody">
-      <div v-else>
-       <label @click = "key4 = true;"> {{reqdata.body}} </label>
-     </div>
-    </label><br>-->
+     </label><br>
     <b-button v-b-modal.modal-1 id="srbody">body</b-button>
     <b-modal id="modal-1" size="lg" title="Body" hide-footer v-on:keyup.enter = "NoEnter" >
     <b-container class="px-2" >
@@ -294,12 +320,9 @@
     <label id="srattach"><strong>Attachment:</strong>
       <div v-for="(value,key) in reqdata.attachments" v-bind:key="key">
       <b-button v-b-modal.modal-4 size="sm" @click='getfile(value)'>{{value}}</b-button>
-    <b-modal  id="modal-4" size="lg" hide-footer >
-    <b-container class="px-2" >
-    {{sfile}}
-    </b-container>
-    </b-modal><br>
     </div>
+    <input type="file" id="upfile1" ref="upfile1" v-on:change="handleattachUpload"/>
+    <input type="file" id="upfile2" ref="upfile2" v-on:change="handleattachUpload"/>
    </label><br>
       <b-button id="save" @click="save"> Save </b-button>
  </form>
@@ -308,8 +331,10 @@
   </div>
 </template>
 <script>
-export default {
+import statedisdata from '../assets/states-and-districts.json'
+const FileDownload = require('js-file-download')
 
+export default {
   mounted () {
     console.log('Component mounted.')
   },
@@ -322,13 +347,22 @@ export default {
       isNight2: true,
       isNight3: true,
       iscsvtrue: false,
+      statedisdata: statedisdata,
+      state: 'State',
+      index: '',
+      in: '',
+      value: '',
+      districts: [],
+      d: 'District',
+      district: [],
       popoverShow1: false,
       popoverShow2: false,
       popoverShow3: false,
       popoverShow4: false,
       captureid: '',
       remail: '',
-      ccbcc: '',
+      cc: '',
+      bcc: '',
       name: '',
       designation: '',
       department: '',
@@ -339,6 +373,9 @@ export default {
       selected: [],
       selectAll: false,
       file: '',
+      upfile: '',
+      upfile1: '',
+      upfile2: '',
       key1: '',
       key2: '',
       key3: '',
@@ -361,16 +398,16 @@ export default {
   watch: {
   },
   methods: {
-    func (href) {
-      const { shell } = require('electron')
-      shell.openExternal(href)
-    },
     getfile (value) {
       console.log(value)
-      this.axios.post('http://localhost:8081/api/main/getfile', {
+      let x = ''
+      this.axios.post('http://localhost:8081/api/main/getfile', { responseType: 'blob' }, {
         value: this.value
-      })
+      }
+      )
         .then(sfile => {
+          x = FileDownload(sfile.data, 'hey.docx')
+          console.log(x)
           this.sfile = sfile.data
         })
         .catch(function (error) {
@@ -411,7 +448,8 @@ export default {
       this.isNight2 = true
       this.iscsvtrue = false
       this.output.remail = ''
-      this.output.ccbcc = ''
+      this.output.cc = ''
+      this.output.bcc = ''
       this.output.name = ''
       this.output.designation = ''
       this.output.department = ''
@@ -419,9 +457,17 @@ export default {
       this.output.cno = ''
       this.output.body = ''
       this.output.subject = ''
+      this.output.state = ''
+      this.output.district = ''
+      this.upfile1 = ''
+      this.upfile2 = ''
     },
     handleFileUpload () {
       this.file = this.$refs.file.files[0]
+    },
+    handleattachUpload () {
+      this.upfile1 = this.$refs.upfile1.files[0]
+      this.upfile2 = this.$refs.upfile2.files[0]
     },
     gobacktoform () {
       this.isNight = true
@@ -431,16 +477,18 @@ export default {
       this.iscsvtrue = false
     },
     submitFile () {
-      const formData = new FormData()
+      const frmData = new FormData()
       // const currentObj = this
-      formData.append('file', this.file)
+      frmData.append('file', this.file)
       this.isNight = false
+      this.upfile1 = ''
+      this.upfile2 = ''
       this.isNight1 = true
       this.isNight2 = false
       this.isNight3 = false
       this.iscsvtrue = true
       this.axios.post('http://localhost:8081/api/main/csv/submit',
-        formData,
+        frmData,
         {
           headers: {
             'Content-Type': 'multipart/form-data'
@@ -470,15 +518,24 @@ export default {
     focusRef (ref) {
     },
     approveselect () {
+      const formData = new FormData()
+      formData.append('file1', this.upfile1)
+      formData.append('file2', this.upfile2)
+      formData.append('list', this.selected)
       const currentObj = this
-      this.axios.post('http://localhost:8081/api/main/csv/approve', {
-        list: this.selected
-      })
+      this.axios.post('http://localhost:8081/api/main/csv/approve', formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
         .then(function (response) {
           currentObj.approvecsv = response.data
+          console.log(response.data)
         })
         .catch(function (error) {
           currentObj.approvecsv = error
+          console.log(error)
         })
       this.popoverShow3 = false
       for (var i = 0; i < this.selected.length; i++) {
@@ -486,6 +543,20 @@ export default {
           this.aprovselected.push(this.selected[i])
         }
       }
+      this.selected = []
+    },
+    selectedstate (state, index) {
+      console.log(state, index)
+      this.state = state
+      this.index = index
+      this.districts = []
+      this.districts.push(this.statedisdata.states[index].districts)
+    },
+    selecteddistrict (diss) {
+      this.district = diss
+      this.d = diss
+      console.log(diss)
+      console.log(this.district)
     },
     discardselected () {
       this.popoverShow3 = false
@@ -494,26 +565,39 @@ export default {
       this.saveoutput = ''
       if (this.reqdata !== '') {
         this.reqdata.to = ''
-        this.reqdata.ccbcc = ''
+        this.reqdata.cc = ''
+        this.reqdata.bcc = ''
         this.reqdata.subject = ''
         this.reqdata.body = ''
+        this.reqdata.state = ''
+        this.reqdata.district = ''
       }
       for (var i = 0; i < this.selected.length; i++) {
         if (this.dscrdselected.indexOf(this.selected[i]) === -1) {
           this.dscrdselected.push(this.selected[i])
         }
       }
+      this.selected = []
     },
     gsaveselected () {
+      const formData = new FormData()
+      formData.append('file1', this.upfile1)
+      formData.append('file2', this.upfile2)
+      formData.append('list', this.selected)
       const currentObj = this
-      this.axios.post('http://localhost:8081/api/main/csv/gsave', {
-        list: this.selected
-      })
+      this.axios.post('http://localhost:8081/api/main/csv/gsave', formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
         .then(function (response) {
           currentObj.approvecsv = response.data
+          console.log(response.data)
         })
         .catch(function (error) {
           currentObj.approvecsv = error
+          console.log(error)
         })
       this.popoverShow4 = false
       for (var i = 0; i < this.selected.length; i++) {
@@ -521,13 +605,15 @@ export default {
           this.gsvselected.push(this.selected[i])
         }
       }
+      this.selected = []
     },
     save (e) {
       e.preventDefault()
       const currentObj = this
       this.axios.post('http://localhost:8081/api/main/save', {
         remail: this.reqdata.to,
-        ccbcc: this.reqdata.ccbcc,
+        cc: this.reqdata.cc,
+        bcc: this.reqdata.bcc,
         body: this.reqdata.body,
         subject: this.reqdata.subject
       })
@@ -561,11 +647,14 @@ export default {
       this.isNight3 = true
       this.axios.post('http://localhost:8081/api/main/submit', {
         remail: this.remail,
-        ccbcc: this.ccbcc,
+        cc: this.cc,
+        bcc: this.bcc,
         name: this.name,
         designation: this.designation,
         department: this.department,
         cname: this.cname,
+        state: this.state,
+        district: this.district,
         cno: this.cno
       })
         .then(output => {
@@ -576,14 +665,22 @@ export default {
         })
     },
     approve (e) {
+      const formData = new FormData()
+      formData.append('file1', this.upfile1)
+      formData.append('file2', this.upfile2)
+      formData.append('remail', this.output.remail)
+      formData.append('cc', this.output.cc)
+      formData.append('bcc', this.output.bcc)
+      formData.append('body', this.output.body)
+      formData.append('subject', this.output.subject)
       e.preventDefault()
       const currentObj = this
-      this.axios.post('http://localhost:8081/api/main/approve', {
-        remail: this.output.remail,
-        ccbcc: this.output.ccbcc,
-        body: this.output.body,
-        subject: this.output.subject
-      })
+      this.axios.post('http://localhost:8081/api/main/approve', formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
         .then(function (response) {
           currentObj.output = response.data
           console.log(currentObj.output)
@@ -595,14 +692,22 @@ export default {
       this.popoverShow1 = false
     },
     gsave (e) {
+      const formData = new FormData()
+      formData.append('file1', this.upfile1)
+      formData.append('file2', this.upfile2)
+      formData.append('remail', this.output.remail)
+      formData.append('cc', this.output.cc)
+      formData.append('bcc', this.output.bcc)
+      formData.append('body', this.output.body)
+      formData.append('subject', this.output.subject)
       e.preventDefault()
       const currentObj = this
-      this.axios.post('http://localhost:8081/api/main/gsave', {
-        remail: this.output.remail,
-        ccbcc: this.output.ccbcc,
-        body: this.output.body,
-        subject: this.output.subject
-      })
+      this.axios.post('http://localhost:8081/api/main/gsave', formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
         .then(function (response) {
           currentObj.output = response.data
           console.log(currentObj.output)
@@ -755,7 +860,7 @@ left: 36%;
 top: 8.5%;
 
 }
-#ccbcc{
+#cc{
 position: absolute;
 width: 154px;
 height: 25px;
@@ -772,17 +877,40 @@ text-align: center;
 color: #000000;
 
 }
-#ccbcci{
+
+#cci{
 position: absolute;
 left: 36%;
 top: 15%;
+}
+#bcc{
+position: absolute;
+width: 154px;
+height: 25px;
+left: 4%;
+top: 21%;
+
+font-family: Radley;
+font-size: 17px;
+line-height: 30px;
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #000000;
+
+}
+#bcci{
+position: absolute;
+left: 36%;
+top: 21%;
 }
 #name{
 position: absolute;
 width: 154px;
 height: 25px;
 left: 4%;
-top: 20.5%;
+top: 27%;
 
 font-family: Radley;
 font-size: 17px;
@@ -797,32 +925,9 @@ color: #000000;
 #namei{
 position: absolute;
 left: 36%;
-top: 21%;
+top: 27%;
 }
 #desig{
-position: absolute;
-width: 154px;
-height: 25px;
-left: 4%;
-top: 27%;
-
-font-family: Radley;
-font-size: 17px;
-line-height: 30px;
-display: flex;
-align-items: center;
-text-align: center;
-
-color: #000000;
-
-}
-#desigi{
-position: absolute;
-left: 36%;
-top: 27%;
-
-}
-#depart{
 position: absolute;
 width: 154px;
 height: 25px;
@@ -839,12 +944,13 @@ text-align: center;
 color: #000000;
 
 }
-#departi{
+#desigi{
 position: absolute;
 left: 36%;
-top: 33%;
+top: 33.5%;
+
 }
-#cname{
+#depart{
 position: absolute;
 width: 154px;
 height: 25px;
@@ -861,12 +967,12 @@ text-align: center;
 color: #000000;
 
 }
-#cnamei{
+#departi{
 position: absolute;
 left: 36%;
-top: 39%;
+top: 39.5%;
 }
-#cno{
+#cname{
 position: absolute;
 width: 154px;
 height: 25px;
@@ -883,15 +989,38 @@ text-align: center;
 color: #000000;
 
 }
+#cnamei{
+position: absolute;
+left: 36%;
+top: 45.5%;
+}
+
+#cno{
+position: absolute;
+width: 154px;
+height: 25px;
+left: 4%;
+top: 59%;
+
+font-family: Radley;
+font-size: 17px;
+line-height: 30px;
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #000000;
+
+}
 #cnoi{
 position: absolute;
 left: 36%;
-top: 45%;
+top: 59%;
 }
 #msub{
 position: absolute;
 right:10%;
-top: 53%;
+top: 61%;
 }
 #rmsg{
   position: absolute;
@@ -921,13 +1050,13 @@ top: 53%;
 
 #popover-reactive-1{
 position: absolute;
-top:80%;
-left:4%;
+top:90%;
+left:20%;
 }
 #popover-reactive-2{
 position: absolute;
-top:80%;
-left:30%;
+top:90%;
+left:40%;
 }
 #popover-reactive-3{
 position: absolute;
@@ -970,6 +1099,17 @@ left:40%;
   right:10%;
 }
 
+#recipientstatei{
+position: absolute;
+left: 36%;
+top: 52%;
+}
+
+#recipientdisi{
+position: absolute;
+left: 66%;
+top: 52%;
+}
 #content{
   position: absolute;
   height:300px;
@@ -982,6 +1122,16 @@ left:40%;
    overflow-x: hidden;
    overflow-x: auto;
    text-align:justify;
+}
+#upfile1{
+  position: absolute;
+  top:75%;
+  left:30%;
+}
+#upfile2{
+  position: absolute;
+  top:80%;
+  left:30%;
 }
 tr ,td,thead,table,th{
   padding:0px;

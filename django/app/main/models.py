@@ -71,7 +71,7 @@ class WorkshopParticipants(models.Model):
         db_table = 'workshop_participants'
 
     def __str__(self):
-        return str(self.id)    
+        return str(self.id)
 
 class WorkshopDtls(models.Model):
     id = models.IntegerField(blank=True, null=False,primary_key=True)
@@ -87,7 +87,7 @@ class WorkshopDtls(models.Model):
         db_table = 'workshop_dtls'
 
     def __str__(self):
-        return str(self.id)        
+        return str(self.id)
 
 class TbtCollegeDtls(models.Model):
     id = models.IntegerField(blank=True, null=False,primary_key=True)
@@ -168,6 +168,7 @@ class ElsiTeacherDtls(models.Model):
     class Meta:
         managed = False
         db_table = 'elsi_teacher_dtls'
+<<<<<<< HEAD
 
 
 class TbtCollegeDtls(models.Model):
@@ -229,3 +230,5 @@ class WorkshopParticipants(models.Model):
         managed = False
         db_table = 'workshop_participants'
 
+=======
+>>>>>>> 8b6f71bb6d6a5578eb3191606907e5a696298777
