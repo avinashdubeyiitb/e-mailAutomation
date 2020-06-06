@@ -30,13 +30,7 @@ import base64
 import mimetypes
 import email.encoders
 import csv
-<<<<<<< HEAD
-from .models import locData,userdetail,ElsiCollegeDtls,ElsiTeacherDtls,TbtCollegeDtls,WorkshopDtls,WorkshopParticipants
-=======
-from django.http import FileResponse,HttpResponse
-from django.utils.encoding import escape_uri_path
-from .models import ElsiCollegeDtls,ElsiTeacherDtls,TbtCollegeDtls,WorkshopDtls,WorkshopParticipants,AICTE_list
->>>>>>> b8a0ae76c1c9fa667c5d2438e73135f2ec09f147
+from .models import userdetail,ElsiCollegeDtls,ElsiTeacherDtls,TbtCollegeDtls,WorkshopDtls,WorkshopParticipants,AICTE_list
 from app.settings import EMAIL_HOST_USER,BASE_DIR,SCRIPTS_DIR
 ############################################################################################################################
 import googlemaps
@@ -934,78 +928,6 @@ def submit(request):
             return JsonResponse({'status':'failed','info':e.args[0]})
 
 @api_view(['POST'])
-<<<<<<< HEAD
-=======
-def getfile(request):
-    print('hii')
-    var = JSONParser().parse(request)
-    v = var.get('value')
-    if v == 'Pamphlet2020.pdf':
-        with open(os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'), 'rb') as fh:
-            response = HttpResponse(fh.read(), content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-            response['Content-Disposition'] = "attachment; filename={}".format(escape_uri_path('Pamphlet2020.pdf'))
-            return response
-    else:
-        with open(os.path.join(SCRIPTS_DIR,'letter-of-intent.docx'), 'rb') as fh:
-            response = HttpResponse(fh.read(), content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-            response['Content-Disposition'] = "attachment; filename={}".format(escape_uri_path('letter-of-intent.docx'))
-            return response
-
-@api_view(['POST'])
-def awssubmit(request):
-        try:
-            var = JSONParser().parse(request)
-            dict={}
-            clist=[]
-            hcn = var.get('hcn')
-            getdet = ElsiCollegeDtls.objects.filter(college_name = hcn)
-            startdate = var.get('startdate')
-            enddate = var.get('enddate')
-            startdate = datetime.strptime(startdate, '%Y-%m-%d')
-            day1 = startdate.strftime("%A")
-            startdate = datetime.strftime(startdate,'%b %d, %Y')
-            enddate = datetime.strptime(enddate, '%Y-%m-%d')
-            day2 = enddate.strftime("%A")
-            enddate = datetime.strftime(enddate,'%b %d, %Y')
-            venueadd = var.get('venueadd')
-            cooname = var.get('cooname')
-            cooemail = var.get('cooemail')
-            coono = var.get('coono')
-            state = var.get('state')
-            districts = var.get('district')
-            c = ElsiCollegeDtls.objects.all()
-            count=0
-            for c in c.values('lab_inaugurated'):
-                if c.get('lab_inaugurated') == 1:
-                    count=count+1
-            obj1 = ElsiCollegeDtls.objects.filter(state = state)
-            if obj1.count() >= 1:
-                for district in districts:
-                    obj2 = ElsiCollegeDtls.objects.filter(district = district)
-                    if obj2.count() >= 1:
-                        for rows in list(obj2.values()) :
-                            clist = clist + [(rows['college_name'])]
-                if len(clist) == 0:
-                    return JsonResponse({'key':'nodata'})
-                else:
-                    dict['bcc'] = clist
-                    print(dict)
-                    subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): +\
-                     Invitation to Attend the Two Day Workshop at " + hcn +", " + getdet[0].district +", " + getdet[0].state
-                    body = render_to_string(os.path.join(SCRIPTS_DIR,'announce_workshop.html'),
-                    {'venueadd':venueadd,'cooname': cooname,'cooemail':cooemail, 'coono':coono, 'hcn':hcn ,'hcnstate':getdet[0].state,
-                        'hcndistrict':getdet[0].district,'count':count,'startdate':startdate,'enddate':enddate,'day1':day1,'day2':day2})
-                    dict['subject']=subject
-                    dict['body']=body
-                    dict['attachments'] = {'pamp':'Pamphlet2020.pdf','LoI':'letter-of-intent.docx'}
-                    return JsonResponse(dict)
-            else:
-                return JsonResponse({'key':'nodata'})
-        except ValueError as e:
-            return JsonResponse({'status':'failed','info':e.args[0]})
-
-@api_view(['POST'])
->>>>>>> b8a0ae76c1c9fa667c5d2438e73135f2ec09f147
 def approve(request):
         try:
             to = request.data.get('remail')
@@ -1101,27 +1023,48 @@ def awssubmit(request):
             var = JSONParser().parse(request)
             dict={}
             clist=[]
+            hcn = var.get('hcn')
+            getdet = ElsiCollegeDtls.objects.filter(college_name = hcn)
+            startdate = var.get('startdate')
+            enddate = var.get('enddate')
+            startdate = datetime.strptime(startdate, '%Y-%m-%d')
+            day1 = startdate.strftime("%A")
+            startdate = datetime.strftime(startdate,'%b %d, %Y')
+            enddate = datetime.strptime(enddate, '%Y-%m-%d')
+            day2 = enddate.strftime("%A")
+            enddate = datetime.strftime(enddate,'%b %d, %Y')
+            venueadd = var.get('venueadd')
+            cooname = var.get('cooname')
+            cooemail = var.get('cooemail')
+            coono = var.get('coono')
             state = var.get('state')
             districts = var.get('district')
-            print(districts)
-            obj1 = locData.objects.filter(locstate = state)
+            c = ElsiCollegeDtls.objects.all()
+            count=0
+            for c in c.values('lab_inaugurated'):
+                if c.get('lab_inaugurated') == 1:
+                    count=count+1
+            obj1 = ElsiCollegeDtls.objects.filter(state = state)
             if obj1.count() >= 1:
                 for district in districts:
-                    obj2 = locData.objects.filter(locdistrict = district)
+                    obj2 = ElsiCollegeDtls.objects.filter(district = district)
                     if obj2.count() >= 1:
                         for rows in list(obj2.values()) :
-                            clist = clist + [(rows['locemail'])]
+                            clist = clist + [(rows['college_name'])]
                 if len(clist) == 0:
                     return JsonResponse({'key':'nodata'})
                 else:
-                    dict['remail'] = clist
+                    dict['bcc'] = clist
                     print(dict)
-                    subject = "Send workshop Mail"
-                    body = "heyyyyy"
+                    subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): +\
+                     Invitation to Attend the Two Day Workshop at " + hcn +", " + getdet[0].district +", " + getdet[0].state
+                    body = render_to_string(os.path.join(SCRIPTS_DIR,'announce_workshop.html'),
+                    {'venueadd':venueadd,'cooname': cooname,'cooemail':cooemail, 'coono':coono, 'hcn':hcn ,'hcnstate':getdet[0].state,
+                        'hcndistrict':getdet[0].district,'count':count,'startdate':startdate,'enddate':enddate,'day1':day1,'day2':day2})
                     dict['subject']=subject
                     dict['body']=body
+                    dict['attachments'] = {'pamp':'Pamphlet2020.pdf','LoI':'letter-of-intent.docx'}
                     return JsonResponse(dict)
-                #var['attachments'] = None
             else:
                 return JsonResponse({'key':'nodata'})
         except ValueError as e:

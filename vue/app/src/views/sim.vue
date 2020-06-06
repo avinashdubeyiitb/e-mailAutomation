@@ -166,37 +166,14 @@
      <label @click = "key3 = true;"> {{output.subject}}</label>
    </div>
    </label><br>
-  <div v-if="output.subdiv === 'B'">
-    {{output.subdiv}}{{detail}}
+  <div v-if="output.subdiv !== 'A'">
+    {{output.subdiv}}
     <b-dropdown  v-bind:text="detailprop" >
           <div v-for="(dtl,i) in output.tchdtl" v-bind:key='i'>
               <b-dropdown-item @click="chooseDetails(dtl,i)">{{dtl}}</b-dropdown-item>
             </div>
     </b-dropdown>
-  </div>
-  <div v-else-if="output.subdiv === 'C'">
-    {{output.subdiv}}{{detail}}
-    <b-dropdown  v-bind:text="detailprop" >
-          <div v-for="(dtl,i) in output.tchdtl" v-bind:key='i'>
-              <b-dropdown-item @click="chooseDetails(dtl,i)">{{dtl}}</b-dropdown-item>
-            </div>
-    </b-dropdown>
-  </div>
-  <div v-else-if="output.subdiv === 'D'">
-    {{output.subdiv}}{{detail}}
-    <b-dropdown  v-bind:text="detailprop" >
-          <div v-for="(dtl,i) in output.tchdtl" v-bind:key='i'>
-              <b-dropdown-item @click="chooseDetails(dtl,i)">{{dtl}}</b-dropdown-item>
-            </div>
-    </b-dropdown>
-  </div>
-  <div v-else-if="output.subdiv === 'E'">
-    {{output.subdiv}}{{detail}}
-    <b-dropdown  v-bind:text="detailprop" >
-          <div v-for="(dtl,i) in output.tchdtl" v-bind:key='i'>
-              <b-dropdown-item @click="chooseDetails(dtl,i)">{{dtl}}</b-dropdown-item>
-            </div>
-    </b-dropdown>
+  <b-button @click="refresh">Refresh</b-button>
   </div>
     <b-button v-b-modal.modal-2 id="srbody">body</b-button>
     <b-modal id="modal-2" size="lg" title="Body" hide-footer v-on:keyup.enter = "NoEnter" >
@@ -255,7 +232,7 @@
           <b-button id="bdiscard" @click="discard" size="sm" variant="danger">Discard</b-button>
         </div>
       </b-popover>
-      <b-button id="save" @click="saveDetail"> store changes</b-button>
+      <b-button id="save" @click="saveDetail" v-if="output.subdiv !== 'A'">Store Changes</b-button>
   <!-- </div> -->
   <!-- Output from the popover interaction -->
 </div>
@@ -557,6 +534,9 @@ export default {
         this.detail.splice(this.detail.indexOf('default'), 1)
       }
       this.detail.push(dtl)
+    },
+    refresh () {
+      this.detail = ['default']
     },
     discardselected () {
       this.popoverShow3 = false

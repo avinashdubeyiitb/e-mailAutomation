@@ -9,14 +9,6 @@ class userdetail(models.Model):
     def __str__(self):
         return self.emailid   
 
-class locData(models.Model):
-    locstate = models.CharField(max_length=50,blank=False,default='')
-    locdistrict = models.CharField(max_length=50,blank=False,default='')
-    locemail = models.CharField(max_length=50,blank=False,default='')
-
-    def __str__(self):
-        return self.locstate
-
 class ElsiCollegeDtls(models.Model):
     id = models.IntegerField(blank=True, null=False, primary_key=True)
     clg_code = models.TextField(blank=True, null=True)
@@ -126,8 +118,6 @@ class TbtCollegeDtls(models.Model):
     def __str__(self):
         return str(self.id)
 
-<<<<<<< HEAD
-=======
 class AICTE_list(models.Model):
     institute_name = models.TextField()
     state = models.TextField()
@@ -143,7 +133,6 @@ class AICTE_list(models.Model):
     def __str__(self):
         return self.institute_name
 
->>>>>>> b8a0ae76c1c9fa667c5d2438e73135f2ec09f147
 class ElsiTeacherDtls(models.Model):
     id = models.IntegerField(blank=True, null=False,primary_key=True)
     user_id = models.IntegerField(blank=True, null=True)
