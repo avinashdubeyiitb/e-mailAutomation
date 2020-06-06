@@ -9,7 +9,7 @@ import BootstrapVue from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import XLSX from 'xlsx'
-import UUID from "vue-uuid"
+import UUID from 'vue-uuid'
 
 Vue.use(UUID)
 Vue.use(XLSX)
