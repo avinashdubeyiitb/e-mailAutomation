@@ -56,7 +56,6 @@
     <button id="csub" v-on:click="submitFile()">Submit</button>
   </div>
   <div v-show="!isNight2">
-    <p v-show="!isNight2">"comming soon"</p>
     <div id="content">
       <div class="text-uppercase text-bold">id selected: {{selected}}</div>
 <table class="table table-hover">
@@ -125,6 +124,8 @@
           <b-button id="bdiscard" @click="discardselected" size="sm" variant="danger">Discard</b-button>
         </div>
       </b-popover>
+      <p id="csvresult" v-show="csvapp">Result: [Success {{approvecsv.success}} / {{approvecsv.total}}] - [failure {{approvecsv.failure}} / {{approvecsv.total}}]</p>
+      <p id="csvresult" v-show="csvgsave">Result: [success{{gsavecsv.success}} / {{gsavecsv.total}}] - [failure{{gsavecsv.failure}} / {{gsavecsv.total}}]</p>
   </div>
 </div>
 <div id="col2inner">
@@ -326,6 +327,8 @@ export default {
   },
   data () {
     return {
+      csvapp: false,
+      csvgsave: false,
       isNight: true,
       isNight1: true,
       isNight2: true,
@@ -373,6 +376,7 @@ export default {
       editedTodo: null,
       saveoutput: '',
       approvecsv: '',
+      gsavecsv: '',
       aprovselected: [],
       gsvselected: [],
       dscrdselected: [],
@@ -506,6 +510,7 @@ export default {
     focusRef (ref) {
     },
     approveselect () {
+      this.csvapp = true
       const formData = new FormData()
       formData.append('file1', this.upfile1)
       formData.append('file2', this.upfile2)
@@ -519,7 +524,7 @@ export default {
         })
         .then(function (response) {
           currentObj.approvecsv = response.data
-          console.log(response.data)
+          console.log(currentObj.approvecsv)
         })
         .catch(function (error) {
           currentObj.approvecsv = error
@@ -531,6 +536,7 @@ export default {
           this.aprovselected.push(this.selected[i])
         }
       }
+      this.csvgsave = false
       this.selected = []
     },
     selectedstate (state, index) {
@@ -555,7 +561,6 @@ export default {
     discardselected () {
       this.popoverShow3 = false
       this.popoverShow4 = false
-      this.approvecsv = ''
       this.saveoutput = ''
       if (this.reqdata !== '') {
         this.reqdata.to = ''
@@ -574,6 +579,7 @@ export default {
       this.selected = []
     },
     gsaveselected () {
+      this.csvgsave = true
       const formData = new FormData()
       formData.append('file1', this.upfile1)
       formData.append('file2', this.upfile2)
@@ -586,11 +592,11 @@ export default {
           }
         })
         .then(function (response) {
-          currentObj.approvecsv = response.data
-          console.log(response.data)
+          currentObj.gsavecsv = response.data
+          console.log(currentObj.gsavecsv)
         })
         .catch(function (error) {
-          currentObj.approvecsv = error
+          currentObj.gsavecsv = error
           console.log(error)
         })
       this.popoverShow4 = false
@@ -599,6 +605,7 @@ export default {
           this.gsvselected.push(this.selected[i])
         }
       }
+      this.csvapp = false
       this.selected = []
     },
     save (e) {
@@ -1147,6 +1154,12 @@ top: 52%;
   left:30%;
 }
 #upfile2{
+  position: absolute;
+  top:80%;
+  left:30%;
+}
+
+#csvresult{
   position: absolute;
   top:80%;
   left:30%;

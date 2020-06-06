@@ -55,8 +55,14 @@
 <p id="para1" v-show="!isNight1">"show right now"</p>
 <div v-show="!isNight1">
    <form>
-   <label id="srccbcc"><strong>cc/bcc:</strong>
-   <b-button v-for='(p,inn) in output.remail' v-bind:key='inn' v-model = "output.remail" >{{p}}<b-button @click="disc(p,inn)" class="close" aria-label="Close"><span class="d-inline-block" aria-hidden="true">&times;</span></b-button></b-button>
+   <label id="srbcc"><strong>Bcc:</strong>
+     <b-button v-b-modal.modal-3 >Bcc</b-button>
+     <b-modal id="modal-3" size="lg" title="Bcc" hide-footer v-on:keyup.enter = "NoEnter" >
+     <b-container class="px-2" >
+        <b-button v-for='(p,inn) in output.bcc' v-bind:key='inn' v-model = "output.bcc" >{{p}}<b-button @click="disc(p,inn)" class="close" aria-label="Close"><span class="d-inline-block" aria-hidden="true">&times;</span></b-button></b-button>
+     </b-container>
+     <b-button @click="$bvModal.hide('modal-3')">OK</b-button>
+     </b-modal><br>
     </label><br>
    <label id="srsubject"><strong>subject:</strong>
    <input v-if = "key3" v-model = "output.subject"
@@ -66,24 +72,23 @@
      <label @click = "key3 = true;"> {{output.subject}} </label>
    </div>
    </label><br>
-   <label id="srbody"><strong>body:</strong>
-   <input v-if = "key4" v-model = "output.body"
-   @blur= "key4 = false; $emit('update')"
-   @keyup.enter = "key4=false; $emit('update')" id="isrbody">
-    <div v-else>
-     <label @click = "key4 = true;"> {{output.body}} </label>
-   </div>
-  </label><br>
-  <label id="srattach"><strong>Attachment:</strong>
-  <!-- <input v-if = "key5" v-model = "output.body" -->
-  <!-- @blur= "key5 = false; $emit('update')" -->
-  <!-- @keyup.enter = "key5=false; $emit('update')" id="isrbody"> -->
-  <!-- <div v-else> -->
-    <!-- <label @click = "key4 = true;"> {{output.body}} </label> -->
-    <label > not Available </label>
+   <strong>Body</strong>
+   <b-button v-b-modal.modal-2 id="srbody">body</b-button>
+ <b-modal id="modal-2" size="lg" title="Body" hide-footer v-on:keyup.enter = "NoEnter" >
+ <b-container class="px-2" >
+ <span v-html="output.body"></span>
+ </b-container>
+ <b-button @click="$bvModal.hide('modal-2')">OK</b-button>
+ </b-modal><br>
 
-  <!-- </div> -->
- </label><br>
+   <label id="srattach"><strong>Attachment:</strong>
+       <div v-for="(value,key) in output.attachments" v-bind:key="key">
+       <b-button size="sm" @click='getfile(value)'  >{{value}}</b-button>
+        </div>
+        <input type="file" id="upfile1" ref="upfile1" v-on:change="handleattachUpload"/>
+        <input type="file" id="upfile2" ref="upfile2" v-on:change="handleattachUpload"/>
+
+  </label><br>
  </form>
  </div>
 <div v-show="!isNight1">
@@ -130,58 +135,14 @@
   <!-- </div> -->
   <!-- Output from the popover interaction -->
 </div>
-<p id="para1" v-show="!isNight2">"show right now"</p>
-<div v-show="!isNight2">
-     <form>
-     <label  id="sremail"><strong >Recipient Id:</strong>
-     <input v-if = "key1" v-model = "reqdata.to"
-     @blur= "key1 = false; $emit('update')"
-     @keyup.enter = "key1=false; $emit('update')">
-     <div v-else>
-       <label @click = "key1 = true;"> {{reqdata.to}} </label>
-     </div>
-   </label><br>
-     <label id="srccbcc"><strong>cc/bcc:</strong>
-     <input v-if = "key2" v-model = "reqdata.ccbcc"
-     @blur= "key2 = false; $emit('update')"
-     @keyup.enter = "key2=false; $emit('update')" >
-           <div v-else>
-       <label @click = "key2 = true;">{{reqdata.ccbcc}} </label>
-     </div>
-      </label><br>
-     <label id="srsubject"><strong>subject:</strong>
-     <input v-if = "key3" v-model = "reqdata.subject"
-     @blur= "key3 = false; $emit('update')"
-     @keyup.enter = "key3=false; $emit('update')" id="isrsubject">
-           <div v-else>
-       <label @click = "key3 = true;"> {{reqdata.subject}} </label>
-     </div>
-     </label><br>
-     <label id="srbody"><strong>body:</strong>
-     <input v-if = "key4" v-model = "reqdata.body"
-     @blur= "key4 = false; $emit('update')"
-     @keyup.enter = "key4=false; $emit('update')" id="isrbody">
-      <div v-else>
-       <label @click = "key4 = true;"> {{reqdata.body}} </label>
-     </div>
-    </label><br>
-    <label id="srattach"><strong>Attachment:</strong>
-    <!-- <input v-if = "key5" v-model = "output.body" -->
-    <!-- @blur= "key5 = false; $emit('update')" -->
-    <!-- @keyup.enter = "key5=false; $emit('update')" id="isrbody"> -->
-    <!-- <div v-else> -->
-      <!-- <label @click = "key4 = true;"> {{output.body}} </label> -->
-      <label > not Available </label>
-      <b-button id="save"> Save </b-button>
-    <!-- </div> -->
-   </label><br>
- </form>
-</div>
+
 </div>
   </div>
 </template>
 <script>
 import statedisdata from '../assets/states-and-districts.json'
+const FileDownload = require('js-file-download')
+
 export default {
   mounted () {
     console.log('Component mounted.')
@@ -226,7 +187,9 @@ export default {
       key8: '',
       key9: '',
       reqdata: '',
-      editedTodo: null
+      editedTodo: null,
+      upfile1: '',
+      upfile2: ''
     }
   },
   watch: {
@@ -239,7 +202,7 @@ export default {
       this.isNight1 = true
       this.isNight2 = true
       this.output.hcn = ''
-      this.output.remail = ''
+      this.output.bcc = ''
       this.output.startdate = ''
       this.output.enddate = ''
       this.output.venueadd = ''
@@ -251,6 +214,26 @@ export default {
       this.output.body = ''
       this.output.subject = ''
     },
+    getfile (value) {
+      console.log(value)
+      let x = ''
+      this.axios.post('http://localhost:8081/api/main/getfile', { responseType: 'blob' }, {
+        value: this.value
+      }
+      )
+        .then(sfile => {
+          x = FileDownload(sfile.data, 'hey.docx')
+          console.log(x)
+          this.sfile = sfile.data
+        })
+        .catch(function (error) {
+          this.sfile = error
+        })
+    },
+    handleattachUpload () {
+      this.upfile1 = this.$refs.upfile1.files[0]
+      this.upfile2 = this.$refs.upfile2.files[0]
+    },
     selectedstate (state, index) {
       console.log(state, index)
       this.state = state
@@ -260,7 +243,7 @@ export default {
     },
     disc (p, inn) {
       console.log(p, inn)
-      this.$delete(this.output.remail, inn)
+      this.$delete(this.output.bcc, inn)
     },
     selecteddistrict (diss) {
       this.district.push(diss)
@@ -308,7 +291,7 @@ export default {
       e.preventDefault()
       const currentObj = this
       this.axios.post('http://localhost:8081/api/main/approve', {
-        ccbcc: this.output.remail,
+        bcc: this.output.bcc,
         body: this.output.body,
         subject: this.output.subject
       })
@@ -326,7 +309,7 @@ export default {
       e.preventDefault()
       const currentObj = this
       this.axios.post('http://localhost:8081/api/main/gsave', {
-        ccbcc: this.output.remail,
+        bcc: this.output.bcc,
         body: this.output.body,
         subject: this.output.subject
       })
@@ -736,6 +719,17 @@ left:40%;
    overflow-x: auto;
    text-align:justify;
 }
+#upfile1{
+  position: absolute;
+  top:75%;
+  left:30%;
+}
+#upfile2{
+  position: absolute;
+  top:80%;
+  left:30%;
+}
+
 tr ,td,thead,table,th{
   padding:0px;
   padding-left:6px;
