@@ -7,7 +7,9 @@ class userdetail(models.Model):
     emailid = models.EmailField(blank=False,null=False)
     name = models.CharField(max_length=50,blank=False,null=True)
     def __str__(self):
-        return self.emailid   
+        return self.emailid
+    class Meta:
+        db_table = 'userdetail'
 
 class WorkshopTeamDtls(models.Model):
     name = models.CharField(max_length=50,blank=False,null=False)
@@ -22,6 +24,8 @@ class WorkshopTeamDtls(models.Model):
 
     def __str__(self):
         return self.name
+    class Meta:
+        db_table = 'workshop_team_dtls'
 
 class ElsiCollegeDtls(models.Model):
     id = models.IntegerField(blank=True, null=False, primary_key=True)
@@ -181,4 +185,3 @@ class ElsiTeacherDtls(models.Model):
     class Meta:
         managed = False
         db_table = 'elsi_teacher_dtls'
-
