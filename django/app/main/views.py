@@ -367,6 +367,16 @@ def createMessageWithAttachment(
         message.attach(msg)
 
     return {'raw': base64.urlsafe_b64encode(message.as_string().encode()).decode()}
+
+def getname(name):
+    API_KEY = 'AIzaSyD9qTJmiFUe3FQWlo5Z-A3l6pigxA3s8U8'
+    url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
+    input=name
+    input.replace(" ", "%")
+    other='&inputtype=textquery&fields=name,formatted_address'
+    result = requests.get(url+'input='+input+other+'&key='+API_KEY)
+    collx = result.json()
+    return collx['candidates'][0]['name']
 ################################
 
 ################################
@@ -388,26 +398,11 @@ def store(request):
                 if subdiv in ['C','D','E']:
                     tchdtl2.append('designation')
             print(tchdtl2,district,state,clg)
-            API_KEY = 'AIzaSyD9qTJmiFUe3FQWlo5Z-A3l6pigxA3s8U8'
-            url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
-            input=str(var.get('cname'))
-            input.replace(" ", "%")
-            other='&inputtype=textquery&fields=name,formatted_address'
-            result = requests.get(url+'input='+input+other+'&key='+API_KEY)
-            collx = result.json()
-            coll=collx['candidates'][0]['name']
+            coll = getname(str(var.get('cname')))
             print(coll)
             if len(district) >0 and len(state)>0:
-                input=str(var.get('district'))
-                input.replace(" ", "%")
-                result = requests.get(url+'input='+input+other+'&key='+API_KEY)
-                x = result.json()
-                dis=x['candidates'][0]['name']
-                input=str(var.get('state'))
-                input.replace(" ", "%")
-                result = requests.get(url+'input='+input+other+'&key='+API_KEY)
-                x = result.json()
-                sta=x['candidates'][0]['name']
+                dis = getname(str(var.get('district')))
+                sta = getname(str(var.get('state')))
             else:
                 data = collx['candidates'][0]['formatted_address']
                 data.replace(" ", "")
@@ -581,26 +576,11 @@ def csvapprove(request):
                 else :
                     clg = row[6]
                     obj = ElsiCollegeDtls.objects.filter(college_name = clg)
-                    API_KEY = 'AIzaSyD9qTJmiFUe3FQWlo5Z-A3l6pigxA3s8U8'
-                    url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
-                    input=clg
-                    input.replace(" ", "%")
-                    other='&inputtype=textquery&fields=name,formatted_address'
-                    result = requests.get(url+'input='+input+other+'&key='+API_KEY)
-                    collx = result.json()
-                    coll=collx['candidates'][0]['name']
+                    coll = getname(clg)
                     print(coll)
                     if len(district) >0 and len(state)>0:
-                        input=district
-                        input.replace(" ", "%")
-                        result = requests.get(url+'input='+input+other+'&key='+API_KEY)
-                        x = result.json()
-                        dis=x['candidates'][0]['name']
-                        input=state
-                        input.replace(" ", "%")
-                        result = requests.get(url+'input='+input+other+'&key='+API_KEY)
-                        x = result.json()
-                        sta=x['candidates'][0]['name']
+                        dis = getname(district)
+                        sta = getname(state)
                     else:
                         data = collx['candidates'][0]['formatted_address']
                         data.replace(" ", "")
@@ -696,26 +676,11 @@ def csvdraft(request):
                 else :
                     clg = row[6]
                     obj = ElsiCollegeDtls.objects.filter(college_name = clg)
-                    API_KEY = 'AIzaSyD9qTJmiFUe3FQWlo5Z-A3l6pigxA3s8U8'
-                    url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
-                    input=clg
-                    input.replace(" ", "%")
-                    other='&inputtype=textquery&fields=name,formatted_address'
-                    result = requests.get(url+'input='+input+other+'&key='+API_KEY)
-                    collx = result.json()
-                    coll=collx['candidates'][0]['name']
+                    coll = getname(clg)
                     print(coll)
                     if len(district) >0 and len(state)>0:
-                        input=district
-                        input.replace(" ", "%")
-                        result = requests.get(url+'input='+input+other+'&key='+API_KEY)
-                        x = result.json()
-                        dis=x['candidates'][0]['name']
-                        input=state
-                        input.replace(" ", "%")
-                        result = requests.get(url+'input='+input+other+'&key='+API_KEY)
-                        x = result.json()
-                        sta=x['candidates'][0]['name']
+                        dis=getname(district)
+                        sta = getname(state)
                     else:
                         data = collx['candidates'][0]['formatted_address']
                         data.replace(" ", "")
@@ -804,26 +769,11 @@ def idrequest(request):
             bcc = (rows['bcc'])
             district = (rows['district'])
             state = (rows['state'])
-    API_KEY = 'AIzaSyD9qTJmiFUe3FQWlo5Z-A3l6pigxA3s8U8'
-    url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
-    input=str(var.get('cname'))
-    input.replace(" ", "%")
-    other='&inputtype=textquery&fields=name,formatted_address'
-    result = requests.get(url+'input='+input+other+'&key='+API_KEY)
-    collx = result.json()
-    coll=collx['candidates'][0]['name']
+    coll = getname(var.get('cname'))
     print(coll)
     if len(district) >0 and len(state)>0:
-        input=district
-        input.replace(" ", "%")
-        result = requests.get(url+'input='+input+other+'&key='+API_KEY)
-        x = result.json()
-        dis=x['candidates'][0]['name']
-        input=state
-        input.replace(" ", "%")
-        result = requests.get(url+'input='+input+other+'&key='+API_KEY)
-        x = result.json()
-        sta=x['candidates'][0]['name']
+        dis=getname(district)
+        sta=getname(state)
     else:
         data = collx['candidates'][0]['formatted_address']
         data.replace(" ", "")
@@ -888,26 +838,11 @@ def submit(request):
             clg = var.get('cname')
             district = var.get('district')
             state = var.get('state')
-            API_KEY = 'AIzaSyD9qTJmiFUe3FQWlo5Z-A3l6pigxA3s8U8'
-            url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
-            input=str(var.get('cname'))
-            input.replace(" ", "%")
-            other='&inputtype=textquery&fields=name,formatted_address'
-            result = requests.get(url+'input='+input+other+'&key='+API_KEY)
-            collx = result.json()
-            coll=collx['candidates'][0]['name']
+            coll = getname(var.get('cname'))
             print(coll)
             if len(district) >0 and len(state)>0:
-                input=str(var.get('district'))
-                input.replace(" ", "%")
-                result = requests.get(url+'input='+input+other+'&key='+API_KEY)
-                x = result.json()
-                dis=x['candidates'][0]['name']
-                input=str(var.get('state'))
-                input.replace(" ", "%")
-                result = requests.get(url+'input='+input+other+'&key='+API_KEY)
-                x = result.json()
-                sta=x['candidates'][0]['name']
+                dis=getname(str(var.get('district')))
+                sta=getname(str(var.get('state')))
             else:
                 data = collx['candidates'][0]['formatted_address']
                 data.replace(" ", "")
