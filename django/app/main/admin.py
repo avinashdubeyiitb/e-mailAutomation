@@ -1,4 +1,4 @@
 from django.contrib import admin
-from .models import locData
+# from .models import locData
 
-admin.site.register(locData)
+# admin.site.register(locData)

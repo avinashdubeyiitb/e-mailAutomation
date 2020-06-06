@@ -29,7 +29,7 @@ import email.encoders
 import csv
 from django.http import FileResponse,HttpResponse
 from django.utils.encoding import escape_uri_path
-from .models import locData,ElsiCollegeDtls,ElsiTeacherDtls,TbtCollegeDtls,WorkshopDtls,WorkshopParticipants
+from .models import ElsiCollegeDtls,ElsiTeacherDtls,TbtCollegeDtls,WorkshopDtls,WorkshopParticipants,AICTE_list
 from app.settings import EMAIL_HOST_USER,BASE_DIR,SCRIPTS_DIR
 from datetime import datetime
 ############################################################################################################################
@@ -78,8 +78,11 @@ def csvapprove(request):
     with open(file_path,'r') as csvinput:
         r = csv.reader(csvinput)
         res = {}
+        re = {}
+        total = 0
         for row in r:
             if row[0] in request.data.get('list') :
+                total = total + 1
                 to=row[0]
                 cc = row[1]
                 bcc = row[2]
@@ -144,13 +147,40 @@ def csvapprove(request):
                     attachments = [os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'),
                     os.path.join(SCRIPTS_DIR,'letter-of-intent.docx')]
                 sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,attachments)
-            if sent :
-                res['msg'] = "mail sent successfully"
-                res['status'] = "1"
-            else:
-                res['msg'] = "failed to send mail"
-                res['status'] = "0"
-        return JsonResponse(res)
+                if sent :
+                    if "to" in re:
+                      re["to"].append(to)
+                    else:
+                      re["to"] = [to]
+                    if "status" in re:
+                      re["status"].append("1")
+                    else:
+                      re["status"] = ["1"]
+                    # res['msg'] = "mail sent successfully"
+                else:
+                    # res['msg'] = "failed to send mail"
+                    if "to" in re:
+                      re["to"].append(to)
+                    else:
+                      re["to"] = [to]
+                    if "status" in re:
+                      re["status"].append("0")
+                    else:
+                      re["status"] = ["0"]
+    success = 0
+    failure = 0
+    for key,value in re.items():
+        if key == 'status':
+            for s in value:
+                if s == "1":
+                    success = success+1
+                else:
+                    failure = failure+1
+    re['success'] = success
+    re['failure'] =failure
+    re['total'] = total
+    print(re)
+    return JsonResponse(re)
 
 @api_view(['POST'])
 def csvdraft(request):
@@ -163,8 +193,11 @@ def csvdraft(request):
     with open(file_path,'r') as csvinput:
         r = csv.reader(csvinput)
         res = {}
+        re = {}
+        total = 0
         for row in r:
             if row[0] in request.data.get('list')  :
+                total =total+1
                 to=row[0]
                 cc = row[1]
                 bcc = row[2]
@@ -236,12 +269,39 @@ def csvdraft(request):
                     message = CreateMessageHtml(EMAIL_HOST_USER, to, cc, bcc, subject, body)
                 result = CreateDraft(service,"me",message)
                 if result :
-                    res['msg'] = "saved to draft"
-                    res['status'] = "1"
-                else :
-                    res['msg'] = "failed to save to draft"
-                    res['status'] = "0"
-    return JsonResponse(res)
+                    if "to" in re:
+                      re["to"].append(to)
+                    else:
+                      re["to"] = [to]
+                    if "status" in re:
+                      re["status"].append("1")
+                    else:
+                      re["status"] = ["1"]
+                    # res['msg'] = "mail sent successfully"
+                else:
+                    # res['msg'] = "failed to send mail"
+                    if "to" in re:
+                      re["to"].append(to)
+                    else:
+                      re["to"] = [to]
+                    if "status" in re:
+                      re["status"].append("0")
+                    else:
+                      re["status"] = ["0"]
+    success = 0
+    failure = 0
+    for key,value in re.items():
+        if key == 'status':
+            for s in value:
+                if s == "1":
+                    success = success+1
+                else:
+                    failure = failure+1
+    re['success'] = success
+    re['failure'] =failure
+    re['total'] = total
+    print(re)
+    return JsonResponse(re)
 
 @api_view(['POST'])
 def idrequest(request):
@@ -489,27 +549,48 @@ def awssubmit(request):
             var = JSONParser().parse(request)
             dict={}
             clist=[]
+            hcn = var.get('hcn')
+            getdet = ElsiCollegeDtls.objects.filter(college_name = hcn)
+            startdate = var.get('startdate')
+            enddate = var.get('enddate')
+            startdate = datetime.strptime(startdate, '%Y-%m-%d')
+            day1 = startdate.strftime("%A")
+            startdate = datetime.strftime(startdate,'%b %d, %Y')
+            enddate = datetime.strptime(enddate, '%Y-%m-%d')
+            day2 = enddate.strftime("%A")
+            enddate = datetime.strftime(enddate,'%b %d, %Y')
+            venueadd = var.get('venueadd')
+            cooname = var.get('cooname')
+            cooemail = var.get('cooemail')
+            coono = var.get('coono')
             state = var.get('state')
             districts = var.get('district')
-            print(districts)
-            obj1 = locData.objects.filter(locstate = state)
+            c = ElsiCollegeDtls.objects.all()
+            count=0
+            for c in c.values('lab_inaugurated'):
+                if c.get('lab_inaugurated') == 1:
+                    count=count+1
+            obj1 = ElsiCollegeDtls.objects.filter(state = state)
             if obj1.count() >= 1:
                 for district in districts:
-                    obj2 = locData.objects.filter(locdistrict = district)
+                    obj2 = ElsiCollegeDtls.objects.filter(district = district)
                     if obj2.count() >= 1:
                         for rows in list(obj2.values()) :
-                            clist = clist + [(rows['locemail'])]
+                            clist = clist + [(rows['college_name'])]
                 if len(clist) == 0:
                     return JsonResponse({'key':'nodata'})
                 else:
-                    dict['remail'] = clist
+                    dict['bcc'] = clist
                     print(dict)
-                    subject = "Send workshop Mail"
-                    body = "heyyyyy"
+                    subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): +\
+                     Invitation to Attend the Two Day Workshop at " + hcn +", " + getdet[0].district +", " + getdet[0].state
+                    body = render_to_string(os.path.join(SCRIPTS_DIR,'announce_workshop.html'),
+                    {'venueadd':venueadd,'cooname': cooname,'cooemail':cooemail, 'coono':coono, 'hcn':hcn ,'hcnstate':getdet[0].state,
+                        'hcndistrict':getdet[0].district,'count':count,'startdate':startdate,'enddate':enddate,'day1':day1,'day2':day2})
                     dict['subject']=subject
                     dict['body']=body
+                    dict['attachments'] = {'pamp':'Pamphlet2020.pdf','LoI':'letter-of-intent.docx'}
                     return JsonResponse(dict)
-                #var['attachments'] = None
             else:
                 return JsonResponse({'key':'nodata'})
         except ValueError as e:

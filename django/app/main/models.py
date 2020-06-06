@@ -110,13 +110,20 @@ class TbtCollegeDtls(models.Model):
     def __str__(self):
         return str(self.id)
 
-class locData(models.Model):
-    locstate = models.CharField(max_length=50,blank=False,default='')
-    locdistrict = models.CharField(max_length=50,blank=False,default='')
-    locemail = models.CharField(max_length=50,blank=False,default='')
+class AICTE_list(models.Model):
+    institute_name = models.TextField()
+    state = models.TextField()
+    district = models.TextField()
+    city = models.TextField()
+    full_address = models.TextField()
+    latitude = models.TextField()
+    longitude = models.TextField()
 
+    class Meta:
+        managed = False
+        db_table = 'aicte_list'
     def __str__(self):
-        return self.locstate
+        return self.institute_name
 
 class ElsiTeacherDtls(models.Model):
     id = models.IntegerField(blank=True, null=False,primary_key=True)
