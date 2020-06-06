@@ -12,14 +12,10 @@ urlpatterns = [
     url(r'^api/main/csv/approve', views.csvapprove),
     url(r'^api/main/csv/gsave', views.csvdraft),
     url(r'^api/main/awssubmit', views.awssubmit),
-<<<<<<< HEAD
     url(r'^api/main/sendmail',views.sendmail),
     url(r'^api/main/getfile',views.getfile),
     url(r'^api/main/formdata',views.formdata),
-    url(r'^api/main/form/(?P<uid>[^/]+)/$',views.form) 
+    url(r'^api/main/form/(?P<uid>[^/]+)/$',views.form),
+    url(r'^api/main/store',views.store),
+    url(r'^api/main/mailids',views.mailids)
 ]
-=======
-    url(r'^api/main/clgdtl',views.collegedetail),
-    url(r'^api/main/getfile',views.getfile),
-]
->>>>>>> 8b6f71bb6d6a5578eb3191606907e5a696298777

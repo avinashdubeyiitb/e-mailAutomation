@@ -5,15 +5,20 @@
     <button id="butt" type="button" name="button"><router-link to="/">Home</router-link></button>
   <div id="col1inner" >
     <div>
-      <button id="sub" @click="submit">Submit</button>
+      <button id="sub1" @click="getmailids">Get Mail ids</button>
     </div>
   <div>
-    <button id="sub" @click="send">Send</button>
+    <button id="sub2" @click="send" v-if="isget">Send</button>
   </div>
   </div>
   <div id="col2inner">
-  <div>
-
+  <div v-if="isget">
+    <div v-for="id in output.mailids" v-bind:key="id">
+      {{id}}
+    </div>
+  </div>
+  <div v-else>
+    {{output}}
   </div>
   </div>
   </div>
@@ -29,22 +34,36 @@ export default {
   data () {
     return {
       output: '',
-      data: '',
-      issub: false,
-      issnd: false
+      isget: false
     }
   },
   methods: {
-    submit (e) {
+    getmailids (e) {
       e.preventDefault()
       const currentObj = this
+      this.isget = true
+      this.axios.post('http://localhost:8081/api/main/mailids', {
+      })
+        .then(function (response) {
+          currentObj.output = response.data
+          console.log(response)
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    },
+    send (e) {
+      e.preventDefault()
+      const currentObj = this
+      this.isget = false
+      this.output = "sending mails"
       this.axios.post('http://localhost:8081/api/main/sendmail', {
       })
         .then(function (response) {
-          this.data = response.data
+          currentObj.output = response.data
         })
         .catch(function (error) {
-          currentObj.output = error
+          console.log(error)
         })
     }
   }
@@ -82,9 +101,25 @@ border: 1px solid #000000;
 box-sizing: border-box;
 border-radius: 10px;
 }
-#sub{
+#col2inner{
+position: absolute;
+width: 48%;
+height: 90%;
+right: 1%;
+top: 15%;
+background: #6EA5F7;
+border: 1px solid #000000;
+box-sizing: border-box;
+border-radius: 10px;
+}
+#sub1{
 position: absolute;
 right:10%;
+top: 60%;
+}
+#sub2{
+position: absolute;
+right:40%;
 top: 60%;
 }
 </style>

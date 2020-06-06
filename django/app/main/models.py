@@ -126,14 +126,6 @@ class TbtCollegeDtls(models.Model):
     def __str__(self):
         return str(self.id)
 
-class locData(models.Model):
-    locstate = models.CharField(max_length=50,blank=False,default='')
-    locdistrict = models.CharField(max_length=50,blank=False,default='')
-    locemail = models.CharField(max_length=50,blank=False,default='')
-
-    def __str__(self):
-        return self.locstate
-
 class ElsiTeacherDtls(models.Model):
     id = models.IntegerField(blank=True, null=False,primary_key=True)
     user_id = models.IntegerField(blank=True, null=True)
@@ -168,67 +160,4 @@ class ElsiTeacherDtls(models.Model):
     class Meta:
         managed = False
         db_table = 'elsi_teacher_dtls'
-<<<<<<< HEAD
 
-
-class TbtCollegeDtls(models.Model):
-    id = models.IntegerField(blank=True, null=False,primary_key=True)
-    elsi_clg_id = models.IntegerField(blank=True, null=True)
-    region_id = models.TextField(blank=True, null=True)
-    college_name = models.TextField(blank=True, null=True)
-    abbreviation = models.TextField(blank=True, null=True)
-    district = models.TextField(blank=True, null=True)
-    address = models.TextField(blank=True, null=True)
-    state = models.TextField(blank=True, null=True)
-    pincode = models.TextField(blank=True, null=True)
-    college_type = models.TextField(blank=True, null=True)
-    principal_meet = models.IntegerField(blank=True, null=True)
-    robots_given = models.IntegerField(blank=True, null=True)
-    tbt_allowed = models.IntegerField(blank=True, null=True)
-    tbt_count = models.IntegerField(blank=True, null=True)
-    completed = models.IntegerField(blank=True, null=True)
-    legal_docs = models.IntegerField(blank=True, null=True)
-    legal_docs_remarks = models.TextField(blank=True, null=True)
-    loi_status = models.IntegerField(blank=True, null=True)
-    po_status = models.TextField(blank=True, null=True)
-    po_remark = models.TextField(blank=True, null=True)
-    wo_reg = models.TextField(blank=True, null=True)
-    wo_invite = models.TextField(blank=True, null=True)
-    wo_confirm = models.TextField(blank=True, null=True)
-    wo_attend = models.IntegerField(blank=True, null=True)
-    phase = models.TextField(blank=True, null=True)
-    lab_inaugrated = models.IntegerField(blank=True, null=True)
-    created_at = models.TextField(blank=True, null=True)
-    updated_at = models.TextField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'tbt_college_dtls'
-
-
-class WorkshopDtls(models.Model):
-    id = models.IntegerField(blank=True, null=False,primary_key=True)
-    region_id = models.IntegerField(blank=True, null=True)
-    clg_id = models.IntegerField(blank=True, null=True)
-    active = models.TextField(blank=True, null=True)
-    workshop_team = models.TextField(blank=True, null=True)
-    start_date = models.TextField(blank=True, null=True)
-    end_date = models.TextField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'workshop_dtls'
-
-
-class WorkshopParticipants(models.Model):
-    id = models.IntegerField(blank=True, null=False,primary_key=True)
-    workshop_id = models.IntegerField(blank=True, null=True)
-    clg_id = models.IntegerField(blank=True, null=True)
-    tch_id = models.IntegerField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'workshop_participants'
-
-=======
->>>>>>> 8b6f71bb6d6a5578eb3191606907e5a696298777

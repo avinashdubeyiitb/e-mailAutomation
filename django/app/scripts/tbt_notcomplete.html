@@ -25,18 +25,18 @@
         workshop conducted at {{host_college}}, {{host_District}}, {{host_State}} on {{start_date}} to {{end_date}}:</p>
           <table>
             <thead>
-              <th>Sr. No.</th>
-              <th>Teacher Name</th>
-              <th>Department</th>
-              <th>Teacher Role</th>
+              {% for dtl in lst%}
+              <th>{{dtl}}</th>
+              {%endfor%}
             </thead>
             <tbody>
               <tr>
-                {%for data in datas %}
-                <td>{{data.id}}</td>
-                <td>{{data.name}}</td>
-                <td>{{data.department}}</td>
-                <td>{{data.designation}}</td>
+                {%for var in datas.data %}
+                {% for dtl in var.value%}
+                <td>
+                  {{dtl}}
+                </td>
+                {%endfor%}
               </tr>
               {%endfor%}
             </tbody>

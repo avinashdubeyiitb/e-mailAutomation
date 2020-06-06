@@ -162,72 +162,55 @@
    @blur= "key3 = false; $emit('update')"
    @keyup.enter = "key3=false; $emit('update')" id="isrsubject">
          <div v-else>
-     <label @click = "key3 = true;"> {{output.subject}} </label>
+     <label @click = "key3 = true;"> {{output.subject}}</label>
    </div>
    </label><br>
-  <!--
-   <label id="srbody"><strong>body:</strong>
-   <input v-if = "key4" v-model = "output.body"
-   @blur= "key4 = false; $emit('update')"
-   @keyup.enter = "key4=false; $emit('update')" id="isrbody">
-    <div v-else>
-     <label @click = "key4 = true;"> {{output.body}} </label>
-   </div>
-  </label><br>
-  -->
-      <b-button v-b-modal.modal-2 id="srbody">body</b-button>
+  <div v-if="output.subdiv === 'B'">
+    {{output.subdiv}}{{detail}}
+    <b-dropdown  v-bind:text="detailprop" >
+          <div v-for="(dtl,i) in output.tchdtl" v-bind:key='i'>
+              <b-dropdown-item @click="chooseDetails(dtl,i)">{{dtl}}</b-dropdown-item>
+            </div>
+    </b-dropdown>
+  </div>
+  <div v-else-if="output.subdiv === 'C'">
+    {{output.subdiv}}{{detail}}
+    <b-dropdown  v-bind:text="detailprop" >
+          <div v-for="(dtl,i) in output.tchdtl" v-bind:key='i'>
+              <b-dropdown-item @click="chooseDetails(dtl,i)">{{dtl}}</b-dropdown-item>
+            </div>
+    </b-dropdown>
+  </div>
+  <div v-else-if="output.subdiv === 'D'">
+    {{output.subdiv}}{{detail}}
+    <b-dropdown  v-bind:text="detailprop" >
+          <div v-for="(dtl,i) in output.tchdtl" v-bind:key='i'>
+              <b-dropdown-item @click="chooseDetails(dtl,i)">{{dtl}}</b-dropdown-item>
+            </div>
+    </b-dropdown>
+  </div>
+  <div v-else-if="output.subdiv === 'E'">
+    {{output.subdiv}}{{detail}}
+    <b-dropdown  v-bind:text="detailprop" >
+          <div v-for="(dtl,i) in output.tchdtl" v-bind:key='i'>
+              <b-dropdown-item @click="chooseDetails(dtl,i)">{{dtl}}</b-dropdown-item>
+            </div>
+    </b-dropdown>
+  </div>
+    <b-button v-b-modal.modal-2 id="srbody">body</b-button>
     <b-modal id="modal-2" size="lg" title="Body" hide-footer v-on:keyup.enter = "NoEnter" >
     <b-container class="px-2" >
     <span v-html="output.body"></span>
     </b-container>
     <b-button @click="$bvModal.hide('modal-2')">OK</b-button>
     </b-modal><br>
-
   <label id="srattach"><strong>Attachment:</strong>
       <div v-for="(value,key) in output.attachments" v-bind:key="key">
       <b-button size="sm" @click='getfile(value)'  >{{value}}</b-button>
        </div>
        <input type="file" id="upfile1" ref="upfile1" v-on:change="handleattachUpload"/>
        <input type="file" id="upfile2" ref="upfile2" v-on:change="handleattachUpload"/>
-
  </label><br>
-
-    <!-- <h2>Extra details:</h2>
-   <p>name:</p>
-   <input v-if = "key5" v-model = "output.name"
-   @blur= "key5 = false; $emit('update')"
-   @keyup.enter = "key5=false; $emit('update')">
-         <div v-else>
-     <label @click = "key5 = true;">{{output.name}} </label>
-   </div>
-   <p>Designation:</p>
-   <input v-if = "key6" v-model = "output.designation"
-   @blur= "key6 = false; $emit('update')"
-   @keyup.enter = "key6=false; $emit('update')">
-         <div v-else>
-     <label @click = "key6 = true;">{{output.designation}} </label>
-   </div>
- <p>Department:</p>
- <input v-if = "key7" v-model = "output.department"
- @blur= "key7 = false; $emit('update')"
- @keyup.enter = "key7=false; $emit('update')">
-       <div v-else>
-   <label @click = "key7 = true;">{{output.department}} </label>
- </div>
- <p>College name:</p>
- <input v-if = "key8" v-model = "output.cname"
- @blur= "key8 = false; $emit('update')"
- @keyup.enter = "key8=false; $emit('update')">
-       <div v-else>
-   <label @click = "key8 = true;">{{output.cname}} </label>
- </div>
- <p>Contact number:</p>
- <input v-if = "key9" v-model = "output.cno"
- @blur= "key9 = false; $emit('update')"
- @keyup.enter = "key9=false; $emit('update')">
-<div v-else>
-   <label @click = "key9 = true;">{{output.cno}} </label>
- </div> -->
  </form>
  </div>
 <div v-show="!isNight1">
@@ -271,6 +254,7 @@
           <b-button id="bdiscard" @click="discard" size="sm" variant="danger">Discard</b-button>
         </div>
       </b-popover>
+      <b-button id="save" @click="saveDetail"> store changes</b-button>
   <!-- </div> -->
   <!-- Output from the popover interaction -->
 </div>
@@ -392,7 +376,10 @@ export default {
       aprovselected: [],
       gsvselected: [],
       dscrdselected: [],
-      sfile: ''
+      sfile: '',
+      detailprop: 'Teacher Details',
+      detail: [],
+      issaved: false
     }
   },
   watch: {
@@ -461,6 +448,7 @@ export default {
       this.output.district = ''
       this.upfile1 = ''
       this.upfile2 = ''
+      this.detail = ''
     },
     handleFileUpload () {
       this.file = this.$refs.file.files[0]
@@ -558,6 +546,12 @@ export default {
       console.log(diss)
       console.log(this.district)
     },
+    chooseDetails (dtl, i) {
+      if (this.detail.indexOf('default') !== -1 && (dtl === 'id' || dtl === 'name' || dtl === 'department')) {
+        this.detail.splice(this.detail.indexOf('default'), 1)
+      }
+      this.detail.push(dtl)
+    },
     discardselected () {
       this.popoverShow3 = false
       this.popoverShow4 = false
@@ -624,6 +618,28 @@ export default {
           currentObj.saveoutput = error
         })
     },
+    saveDetail (e) {
+      e.preventDefault()
+      const currentObj = this
+      this.axios.post('http://localhost:8081/api/main/store', {
+        tchdtl: this.detail,
+        remail: this.output.remail,
+        cc: this.output.cc,
+        bcc: this.output.bcc,
+        cname: this.output.cname,
+        state: this.output.state,
+        district: this.output.district,
+        subdiv: this.output.subdiv
+      })
+        .then(output => {
+          this.output = output.data
+          console.log(output)
+        })
+        .catch(function (error) {
+          currentObj.output = error
+          console.log(error)
+        })
+    },
     clickList: function (pk, i) {
       console.log('clickList fired with ' + pk)
       const currentObj = this
@@ -675,6 +691,7 @@ export default {
       formData.append('subject', this.output.subject)
       e.preventDefault()
       const currentObj = this
+      this.detail = ''
       this.axios.post('http://localhost:8081/api/main/approve', formData,
         {
           headers: {
@@ -702,6 +719,7 @@ export default {
       formData.append('subject', this.output.subject)
       e.preventDefault()
       const currentObj = this
+      this.detail = ''
       this.axios.post('http://localhost:8081/api/main/gsave', formData,
         {
           headers: {

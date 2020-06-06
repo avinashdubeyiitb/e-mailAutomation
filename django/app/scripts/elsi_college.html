@@ -34,20 +34,20 @@
         been trained by e-Yantra:</p>
         <table>
           <thead>
-            <th>Sr. No.</th>
-            <th>Teacher Name</th>
-            <th>Department</th>
-            <th>Teacher Role</th>
+            {% for dtl in lst%}
+            <th>{{dtl}}</th>
+            {%endfor%}
           </thead>
           <tbody>
             <tr>
-    					{%for data in datas %}
-    	        <td>{{data.id}}</td>
-    	        <td>{{data.name}}</td>
-              <td>{{data.department}}</td>
-              <td>{{data.designation}}</td>
-    	      </tr>
-    				{%endfor%}
+              {%for var in datas.data %}
+              {% for dtl in var.value%}
+              <td>
+                {{dtl}}
+              </td>
+              {%endfor%}
+            </tr>
+            {%endfor%}
           </tbody>
         </table>
     <p>We request you to contact them for more information on e-Yantra lab in your college.</p>
