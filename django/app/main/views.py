@@ -114,14 +114,14 @@ def getbody(clg,obj,sta,dis):
                             if fields.name in tchdtl2:
                                 l.append(fields.name)
                     det = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id)
-                    print(det) 
+                    print(det)
                     d= {'data':[]}
                     for idx in range(det.count()):
                         d['data'].append({'id':det[idx].id,'value':[idx+1]})
                         for field in ElsiTeacherDtls._meta.fields:
                             if field.name in tchdtl2:
                                 d['data'][idx]['value'].append(det.values()[idx][field.name])
-                    print(d) 
+                    print(d)
                     body = render_to_string(os.path.join(SCRIPTS_DIR,'elsi_college.html'),
                     {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
                     'count':count,"datas":d,'lst':l})
@@ -140,14 +140,14 @@ def getbody(clg,obj,sta,dis):
                         workshop_id = workshop[0].workshop_id
                         temp = ElsiCollegeDtls.objects.filter(id = det[0].clg_id)
                         details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
-                        print(details) 
+                        print(details)
                         d= {'data':[]}
                         for idx in range(details.count()):
                             d['data'].append({'id':details[idx].id,'value':[idx+1]})
                             for field in ElsiTeacherDtls._meta.fields:
                                 if field.name in tchdtl2:
                                     d['data'][idx]['value'].append(details.values()[idx][field.name])
-                        print(d) 
+                        print(d)
                         start_date = det[0].start_date
                         start_date = datetime.strptime(start_date, '%d-%m-%Y')
                         start_date = datetime.strftime(start_date,'%b %d, %Y')
@@ -171,14 +171,14 @@ def getbody(clg,obj,sta,dis):
                         workshop_id = workshop[0].workshop_id
                         temp = ElsiCollegeDtls.objects.filter(id = det[0].clg_id)
                         details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
-                        print(details) 
+                        print(details)
                         d= {'data':[]}
                         for idx in range(details.count()):
                             d['data'].append({'id':details[idx].id,'value':[idx+1]})
                             for field in ElsiTeacherDtls._meta.fields:
                                 if field.name in tchdtl2:
                                     d['data'][idx]['value'].append(details.values()[idx][field.name])
-                        print(d) 
+                        print(d)
                         start_date = det[0].start_date
                         start_date = datetime.strptime(start_date, '%d-%m-%Y')
                         start_date = datetime.strftime(start_date,'%b %d, %Y')
@@ -198,31 +198,31 @@ def getbody(clg,obj,sta,dis):
                         tchdtl.append(fields.name)
                         if fields.name in tchdtl2:
                             l.append(fields.name)
-                    print(tchdtl)    
+                    print(tchdtl)
                     print(workshop.values())
                     workshop_id = workshop[0].workshop_id
                     workshop_dtl = WorkshopDtls.objects.filter(id = workshop_id)
                     print(workshop_dtl.values())
                     datas = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
-                    print(datas.values()) 
+                    print(datas.values())
                     d= {'data':[]}
                     for idx in range(datas.count()):
                         d['data'].append({'id':datas[idx].id,'value':[idx+1]})
                         for field in ElsiTeacherDtls._meta.fields:
                             if field.name in tchdtl2:
                                 d['data'][idx]['value'].append(datas.values()[idx][field.name])
-                    print(d) 
+                    print(d)
                     clg_id = workshop_dtl[0].clg_id
                     temp = ElsiCollegeDtls.objects.filter(id = clg_id)
                     print(temp.values())
                     body = render_to_string(os.path.join(SCRIPTS_DIR,'b.html'),
                     {'CollegeName':college_name,'State': state,'District':district,
                         'count':count,'host_college':temp[0].college_name,'host_State':temp[0].state,'host_District':temp[0].district,
-                        "datas":d,'lst':l})  
+                        "datas":d,'lst':l})
                 else :
                     print('A')
                     subdiv = 'A'
-                    body = render_to_string(os.path.join(SCRIPTS_DIR,'a.html'),{'count':count}) 
+                    body = render_to_string(os.path.join(SCRIPTS_DIR,'a.html'),{'count':count})
             return {'subject':subject,'body':body,'subdiv':subdiv,'tchdtl':tchdtl}
         except ValueError as e:
             return {'status':'failed','info':e.args[0]}
@@ -373,10 +373,19 @@ def getname(name):
     url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
     input=name
     input.replace(" ", "%")
-    other='&inputtype=textquery&fields=name,formatted_address'
+    other='&inputtype=textquery&fields=name'
     result = requests.get(url+'input='+input+other+'&key='+API_KEY)
     collx = result.json()
     return collx['candidates'][0]['name']
+def getloc(name):
+    API_KEY = 'AIzaSyD9qTJmiFUe3FQWlo5Z-A3l6pigxA3s8U8'
+    url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
+    input=name
+    input.replace(" ", "%")
+    other='&inputtype=textquery&fields=formatted_address'
+    result = requests.get(url+'input='+input+other+'&key='+API_KEY)
+    collx = result.json()
+    return collx
 ################################
 
 ################################
@@ -404,6 +413,7 @@ def store(request):
                 dis = getname(str(var.get('district')))
                 sta = getname(str(var.get('state')))
             else:
+                collx = getloc(coll)
                 data = collx['candidates'][0]['formatted_address']
                 data.replace(" ", "")
                 data = data.split(",")
@@ -441,14 +451,14 @@ def store(request):
                             if fields.name in tchdtl2:
                                 l.append(fields.name)
                     det = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id )
-                    print(det) 
+                    print(det)
                     d= {'data':[]}
                     for idx in range(det.count()):
                         d['data'].append({'id':det[idx].id,'value':[idx+1]})
                         for field in ElsiTeacherDtls._meta.fields:
                             if field.name in tchdtl2:
                                 d['data'][idx]['value'].append(det.values()[idx][field.name])
-                    print(d) 
+                    print(d)
                     body = render_to_string(os.path.join(SCRIPTS_DIR,'elsi_college.html'),
                     {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
                     'count':count,"datas":d,'lst':l})
@@ -465,7 +475,7 @@ def store(request):
                         workshop_id = workshop[0].workshop_id
                         temp = ElsiCollegeDtls.objects.filter(id = det[0].clg_id)
                         details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
-                        print(details) 
+                        print(details)
                         d= {'data':[]}
                         for idx in range(details.count()):
                             d['data'].append({'id':details[idx].id,'value':[idx+1]})
@@ -494,7 +504,7 @@ def store(request):
                         workshop_id = workshop[0].workshop_id
                         temp = ElsiCollegeDtls.objects.filter(id = det[0].clg_id)
                         details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
-                        print(details) 
+                        print(details)
                         d= {'data':[]}
                         for idx in range(details.count()):
                             d['data'].append({'id':details[idx].id,'value':[idx+1]})
@@ -513,7 +523,7 @@ def store(request):
                         'count':count,'start_date':start_date,'end_date':end_date,'host_college':temp[0].college_name,'host_State':temp[0].state,
                         'host_District':temp[0].district,"datas":d,'lst':l})
                 elif obj[0].wo_attend :
-                    print('B') 
+                    print('B')
                     l = ['sno.']
                     for fields in ElsiTeacherDtls._meta.fields:
                             tchdtl.append(fields.name)
@@ -523,15 +533,15 @@ def store(request):
                     workshop_id = workshop[0].workshop_id
                     workshop_dtl = WorkshopDtls.objects.filter(id = workshop_id)
                     print(workshop_dtl.values())
-                    datas = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)    
-                    print(datas) 
+                    datas = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
+                    print(datas)
                     d= {'data':[]}
                     for idx in range(datas.count()):
                         d['data'].append({'id':datas[idx].id,'value':[idx+1]})
                         for field in ElsiTeacherDtls._meta.fields:
                             if field.name in tchdtl2:
                                 d['data'][idx]['value'].append(datas.values()[idx][field.name])
-                    print(d)        
+                    print(d)
                     clg_id = workshop_dtl[0].clg_id
                     temp = ElsiCollegeDtls.objects.filter(id = clg_id)
                     print(temp.values())
@@ -775,6 +785,7 @@ def idrequest(request):
         dis=getname(district)
         sta=getname(state)
     else:
+        collx = getloc(coll)
         data = collx['candidates'][0]['formatted_address']
         data.replace(" ", "")
         data = data.split(",")
@@ -787,12 +798,13 @@ def idrequest(request):
     d['subject'] = res['subject']
     d['body'] = res['body']
     d['attachments'] = {'pamp':'Pamphlet2020.pdf','LoI':'letter-of-intent.docx'}
+    d['attachmentlinks'] = {'pamp':'https://www.e-yantra.org/img/Pamphlet2020.pdf','LoI':'http://elsi.e-yantra.org/eyrtc/downloads/loi'}
     return JsonResponse(d)
 
 @api_view(['POST'])
 def save(request):
     var = JSONParser().parse(request)
-    
+
     with open('scripts/info.json','r') as read:
         obj = json.load(read)
     file_path = obj['file_path']
@@ -844,6 +856,7 @@ def submit(request):
                 dis=getname(str(var.get('district')))
                 sta=getname(str(var.get('state')))
             else:
+                collx = getloc(coll)
                 data = collx['candidates'][0]['formatted_address']
                 data.replace(" ", "")
                 data = data.split(",")
@@ -856,6 +869,7 @@ def submit(request):
             var['subject']=res['subject']
             var['body']=res['body']
             var['attachments'] = {'pamp':'Pamphlet2020.pdf','LoI':'letter-of-intent.docx'}
+            var['attachmentlinks'] = {'pamp':'https://www.e-yantra.org/img/Pamphlet2020.pdf','LoI':'http://elsi.e-yantra.org/eyrtc/downloads/loi'}
             var['subdiv'] = res['subdiv']
             var['tchdtl'] = res['tchdtl']
             return JsonResponse(var)
@@ -999,6 +1013,7 @@ def awssubmit(request):
                     dict['subject']=subject
                     dict['body']=body
                     dict['attachments'] = {'pamp':'Pamphlet2020.pdf','LoI':'letter-of-intent.docx'}
+                    dict['attachmentlinks'] = {'pamp':'https://www.e-yantra.org/img/Pamphlet2020.pdf','LoI':'http://elsi.e-yantra.org/eyrtc/downloads/loi'}
                     return JsonResponse(dict)
             else:
                 return JsonResponse({'key':'nodata'})
@@ -1006,15 +1021,16 @@ def awssubmit(request):
             return JsonResponse({'status':'failed','info':e.args[0]})
 ######################
 
-######################  
-# workshop team algo 
+######################
+# workshop team algo
 @api_view(['POST'])
 def mailids(request):
     objs = userdetail.objects.all()
+    print(objs)
     l = []
     for idx in range(objs.count()):
         l.append(objs[idx].emailid)
-    print(l)    
+    print(l)
     return JsonResponse({'mailids':l})
 
 def form(request,uid):
@@ -1033,7 +1049,7 @@ def sendmail(request):
         to = objs[idx].emailid
         uuid = objs[idx].id
         cc = ''
-        bcc = '' 
+        bcc = ''
         subject = 'Workshop Team Selection Form'
         body = render_to_string(os.path.join(SCRIPTS_DIR,'link.html'),{'uid':uuid})
         sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body)

@@ -7,8 +7,9 @@ class userdetail(models.Model):
     emailid = models.EmailField(blank=False,null=False)
 
     def __str__(self):
-        return self.emailid   
-
+        return self.emailid
+    class Meta:
+        db_table = 'userdetail'
 class ElsiCollegeDtls(models.Model):
     id = models.IntegerField(blank=True, null=False, primary_key=True)
     clg_code = models.TextField(blank=True, null=True)
@@ -167,4 +168,3 @@ class ElsiTeacherDtls(models.Model):
     class Meta:
         managed = False
         db_table = 'elsi_teacher_dtls'
-

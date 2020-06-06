@@ -7,6 +7,7 @@
     <style>
           table, th, td {
             border: 1px solid black;
+            border-collapse: collapse;
           }
     </style>
 </head>
@@ -33,8 +34,8 @@
             {%endfor%}
           </thead>
           <tbody>
+            {%for var in datas.data %}
             <tr>
-              {%for var in datas.data %}
               {% for dtl in var.value%}
               <td>
                 {{dtl}}
@@ -45,7 +46,7 @@
           </tbody>
         </table>
     <p>We request you to contact them for more information on e-Yantra lab in your college.</p>
-    <p>Feel free to contact us on <span class="clr">support@e-yantra.org</span> or call us on 022-2576-4986 in case of any query.<br>
+    <p>Feel free to contact us on <span class="clr"><u>support@e-yantra.org</u></span> or call us on 022-2576-4986 in case of any query.<br>
     --<br>
     Thanks and Regards<br>
     e-Yantra Team<br>
