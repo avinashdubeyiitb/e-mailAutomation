@@ -184,7 +184,7 @@
     </b-modal><br>
   <label id="srattach"><strong>Attachment:</strong>
       <div v-for="(value,key) in output.attachments" v-bind:key="key">
-      <b-button size="sm" @click='getfile(value)'  >{{value}}</b-button>
+      <b-button size="sm" @click='getfile(value)' >{{value}}</b-button>
        </div>
        <input type="file" id="upfile1" ref="upfile1" v-on:change="handleattachUpload"/>
        <input type="file" id="upfile2" ref="upfile2" v-on:change="handleattachUpload"/>
@@ -294,8 +294,7 @@
 </template>
 <script>
 import statedisdata from '../assets/states-and-districts.json'
-const FileDownload = require('js-file-download')
-
+const { shell } = require('electron')
 export default {
   mounted () {
     console.log('Component mounted.')
@@ -368,19 +367,11 @@ export default {
   methods: {
     getfile (value) {
       console.log(value)
-      let x = ''
-      this.axios.post('http://localhost:8081/api/main/getfile', { responseType: 'blob' }, {
-        value: this.value
+      if (value === 'Pamphlet2020.pdf') {
+        shell.openExternal(this.output.attachmentlinks.pamp)
+      } else {
+        shell.openExternal(this.output.attachmentlinks.LoI)
       }
-      )
-        .then(sfile => {
-          x = FileDownload(sfile.data, 'hey.docx')
-          console.log(x)
-          this.sfile = sfile.data
-        })
-        .catch(function (error) {
-          this.sfile = error
-        })
     },
     getClass (pk) {
       if (this.aprovselected.indexOf(pk) !== -1) {
