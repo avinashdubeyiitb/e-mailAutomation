@@ -1013,9 +1013,9 @@ def mailids(request):
     objs = userdetail.objects.all()
     l = []
     for idx in range(objs.count()):
-        l.append(objs[idx].emailid)
-    print(l)    
-    return JsonResponse({'mailids':l})
+        l.append({'mailid':objs[idx].emailid,'name':objs[idx].name})
+    #print(l)    
+    return JsonResponse({'data':l})
 
 def form(request,uid):
     return render(request,'form.html',context={'uuid':uid})
@@ -1028,14 +1028,28 @@ def formdata(request):
 
 @api_view(['POST'])
 def sendmail(request):
+    var = JSONParser().parse(request)
+    selected = var.get('selected')
+    #print(selected)
+    d = {'sent':[],'success':'','failure':'','total':len(selected)}
+    sucs = flr = 0
     objs = userdetail.objects.all()
     for idx in range(objs.count()):
         to = objs[idx].emailid
-        uuid = objs[idx].id
-        cc = ''
-        bcc = '' 
-        subject = 'Workshop Team Selection Form'
-        body = render_to_string(os.path.join(SCRIPTS_DIR,'link.html'),{'uid':uuid})
-        sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body)
-    return JsonResponse({'status':'success'})
+        if to in selected:
+            uuid = objs[idx].id
+            cc = ''
+            bcc = '' 
+            subject = 'Workshop Team Selection Form'
+            body = render_to_string(os.path.join(SCRIPTS_DIR,'link.html'),{'uid':uuid})
+            #sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body)
+            sent = True
+            if sent:
+                sucs+=1
+                d['sent'].append(to)
+            else:
+                flr+=1    
+    d['success'] = sucs
+    d['failure'] = flr           
+    return JsonResponse(d)
 ######################
