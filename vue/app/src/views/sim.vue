@@ -182,12 +182,12 @@
     </b-container>
     <b-button @click="$bvModal.hide('modal-2')">OK</b-button>
     </b-modal><br>
-  <label id="srattach"><strong>Attachment:</strong>
+  <label id="srattach"><strong>Attachment:</strong>{{upfile1}}hello
       <div v-for="(value,key) in output.attachments" v-bind:key="key">
       <b-button size="sm" @click='getfile(value)' >{{value}}</b-button>
        </div>
-       <input type="file" id="upfile1" ref="upfile1" v-on:change="handleattachUpload"/>
-       <input type="file" id="upfile2" ref="upfile2" v-on:change="handleattachUpload"/>
+       <input type="file" id="upfile1" ref="upfile1" v-on:change="handleattachUpload()"/>
+       <input type="file" id="upfile2" ref="upfile2" v-on:change="handleattachUpload()"/>
  </label><br>
  </form>
  </div>
@@ -283,8 +283,10 @@
       <div v-for="(value,key) in reqdata.attachments" v-bind:key="key">
       <b-button v-b-modal.modal-4 size="sm" @click='getfile(value)'>{{value}}</b-button>
     </div>
-    <input type="file" id="upfile1" ref="upfile1" v-on:change="handleattachUpload"/>
-    <input type="file" id="upfile2" ref="upfile2" v-on:change="handleattachUpload"/>
+    <!--
+    <input type="file" id="upfile1" ref="upfile1" v-on:change="handleattachUpload()"/>
+    <input type="file" id="upfile2" ref="upfile2" v-on:change="handleattachUpload()"/>
+    -->
    </label><br>
       <b-button id="save" @click="save"> Save </b-button>
  </form>
