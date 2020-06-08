@@ -141,8 +141,7 @@
 </template>
 <script>
 import statedisdata from '../assets/states-and-districts.json'
-const FileDownload = require('js-file-download')
-
+const { shell } = require('electron')
 export default {
   mounted () {
     console.log('Component mounted.')
@@ -216,19 +215,11 @@ export default {
     },
     getfile (value) {
       console.log(value)
-      let x = ''
-      this.axios.post('http://localhost:8081/api/main/getfile', { responseType: 'blob' }, {
-        value: this.value
+      if (value === 'Pamphlet2020.pdf') {
+        shell.openExternal(this.output.attachmentlinks.pamp)
+      } else {
+        shell.openExternal(this.output.attachmentlinks.LoI)
       }
-      )
-        .then(sfile => {
-          x = FileDownload(sfile.data, 'hey.docx')
-          console.log(x)
-          this.sfile = sfile.data
-        })
-        .catch(function (error) {
-          this.sfile = error
-        })
     },
     handleattachUpload () {
       this.upfile1 = this.$refs.upfile1.files[0]

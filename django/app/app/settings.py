@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'main',
+    'easyaudit',
 ]
 
 MIDDLEWARE = [
@@ -50,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'easyaudit.middleware.easyaudit.EasyAuditMiddleware',
 ]
 
 ROOT_URLCONF = 'app.urls'
@@ -79,7 +81,7 @@ WSGI_APPLICATION = 'app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'elsi',
+        'NAME': 'eLSI',
         'USER':'postgres',
         'PASSWORD':'1234',
         'HOST':'localhost'
@@ -119,17 +121,17 @@ USE_L10N = True
 
 USE_TZ = True
 
-
+DJANGO_EASY_AUDIT_WATCH_MODEL_EVENTS = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
 SCRIPTS_DIR = os.path.join(BASE_DIR,'scripts')
 CORS_ORIGIN_ALLOW_ALL = True
-EMAIL_HOST_USER = 'intrnaakash@gmail.com'
+EMAIL_HOST_USER = '5a.eysip2020@gmail.com'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_PASSWORD = 'intrn@aakash1'
+EMAIL_HOST_PASSWORD = 'eysip@5a'
 EMAIL_USE_SSL = False

@@ -56,7 +56,7 @@ export default {
       e.preventDefault()
       const currentObj = this
       this.isget = false
-      this.output = "sending mails"
+      this.output = 'sending mails'
       this.axios.post('http://localhost:8081/api/main/sendmail', {
       })
         .then(function (response) {
