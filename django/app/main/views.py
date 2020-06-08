@@ -284,7 +284,6 @@ def get_credentials():
             pickle.dump(creds, token)
     return creds
 
-
 def CreateMessageHtml(sender, to, cc, bcc, subject, body, msgHtml=None):
     msg = MIMEMultipart('alternative')
     msg['Subject'] = subject
@@ -892,9 +891,7 @@ def approve(request):
             subject = request.data.get('subject')
             body = request.data.get('body')
             sent = None
-            print(request.FILES['file1'])
             if 'file1' in request.FILES and 'file2' in request.FILES:
-                print('1')
                 file1=request.FILES['file1']
                 file2=request.FILES['file2']
                 #  Saving POST'ed file to storage
@@ -902,19 +899,16 @@ def approve(request):
                 file_name2 = default_storage.save(file2.name, file2)
                 attachments = [os.path.join(BASE_DIR,file_name1),os.path.join(BASE_DIR,file_name2)]
             elif 'file1' in request.FILES :
-                print('2')
                 file=request.FILES['file1']
                 #  Saving POST'ed file to storage
                 file_name = default_storage.save(file.name, file)
                 attachments = [os.path.join(BASE_DIR,file_name),os.path.join(SCRIPTS_DIR,'letter-of-intent.docx')]
             elif 'file2' in request.FILES :
-                print('3')
                 file=request.FILES['file2']
                 #  Saving POST'ed file to storage
                 file_name = default_storage.save(file.name, file)
                 attachments = [os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'),os.path.join(BASE_DIR,file_name)]
             else:
-                print('4')
                 attachments = [os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'),
                 os.path.join(SCRIPTS_DIR,'letter-of-intent.docx')]
             sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,attachments)
@@ -1035,9 +1029,9 @@ def mailids(request):
     print(objs)
     l = []
     for idx in range(objs.count()):
-        l.append(objs[idx].emailid)
-    print(l)
-    return JsonResponse({'mailids':l})
+        l.append({'mailid':objs[idx].emailid,'name':objs[idx].name})
+    #print(l)    
+    return JsonResponse({'data':l})
 
 def form(request,uid):
     return render(request,'form.html',context={'uuid':uid})
@@ -1050,14 +1044,28 @@ def formdata(request):
 
 @api_view(['POST'])
 def sendmail(request):
+    var = JSONParser().parse(request)
+    selected = var.get('selected')
+    #print(selected)
+    d = {'sent':[],'success':'','failure':'','total':len(selected)}
+    sucs = flr = 0
     objs = userdetail.objects.all()
     for idx in range(objs.count()):
         to = objs[idx].emailid
-        uuid = objs[idx].id
-        cc = ''
-        bcc = ''
-        subject = 'Workshop Team Selection Form'
-        body = render_to_string(os.path.join(SCRIPTS_DIR,'link.html'),{'uid':uuid})
-        sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body)
-    return JsonResponse({'status':'success'})
+        if to in selected:
+            uuid = objs[idx].id
+            cc = ''
+            bcc = '' 
+            subject = 'Workshop Team Selection Form'
+            body = render_to_string(os.path.join(SCRIPTS_DIR,'link.html'),{'uid':uuid})
+            #sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body)
+            sent = True
+            if sent:
+                sucs+=1
+                d['sent'].append(to)
+            else:
+                flr+=1    
+    d['success'] = sucs
+    d['failure'] = flr           
+    return JsonResponse(d)
 ######################
