@@ -1029,15 +1029,9 @@ def mailids(request):
     print(objs)
     l = []
     for idx in range(objs.count()):
-<<<<<<< HEAD
         l.append({'mailid':objs[idx].emailid,'name':objs[idx].name})
     #print(l)    
     return JsonResponse({'data':l})
-=======
-        l.append(objs[idx].emailid)
-    print(l)
-    return JsonResponse({'mailids':l})
->>>>>>> b3fcf9214cf05d60281c15379571b34867e3c046
 
 def form(request,uid):
     return render(request,'form.html',context={'uuid':uid})
@@ -1058,7 +1052,6 @@ def sendmail(request):
     objs = userdetail.objects.all()
     for idx in range(objs.count()):
         to = objs[idx].emailid
-<<<<<<< HEAD
         if to in selected:
             uuid = objs[idx].id
             cc = ''
@@ -1076,13 +1069,3 @@ def sendmail(request):
     d['failure'] = flr           
     return JsonResponse(d)
 ######################
-=======
-        uuid = objs[idx].id
-        cc = ''
-        bcc = ''
-        subject = 'Workshop Team Selection Form'
-        body = render_to_string(os.path.join(SCRIPTS_DIR,'link.html'),{'uid':uuid})
-        sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body)
-    return JsonResponse({'status':'success'})
-######################
->>>>>>> b3fcf9214cf05d60281c15379571b34867e3c046

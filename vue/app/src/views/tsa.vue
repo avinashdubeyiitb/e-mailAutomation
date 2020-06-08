@@ -84,13 +84,8 @@ export default {
     send (e) {
       e.preventDefault()
       const currentObj = this
-<<<<<<< HEAD
       this.result = 'sending mails'
       this.issend = true
-=======
-      this.isget = false
-      this.output = 'sending mails'
->>>>>>> b3fcf9214cf05d60281c15379571b34867e3c046
       this.axios.post('http://localhost:8081/api/main/sendmail', {
         selected: this.selected
       })
