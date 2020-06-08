@@ -283,7 +283,7 @@ def get_credentials():
         with open(file_path, 'wb') as token:
             pickle.dump(creds, token)
     return creds
-get_credentials()
+
 def CreateMessageHtml(sender, to, cc, bcc, subject, body, msgHtml=None):
     msg = MIMEMultipart('alternative')
     msg['Subject'] = subject
