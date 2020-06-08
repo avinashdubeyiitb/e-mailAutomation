@@ -186,8 +186,8 @@
       <div v-for="(value,key) in output.attachments" v-bind:key="key">
       <b-button size="sm" @click='getfile(value)' >{{value}}</b-button>
        </div>
-       <input type="file" id="upfile1" ref="upfile1" v-on:change="handleattachUpload"/>
-       <input type="file" id="upfile2" ref="upfile2" v-on:change="handleattachUpload"/>
+       <input type="file" id="upfile1" ref="upfile1" v-on:change="handleattachUpload()"/>
+       <input type="file" id="upfile2" ref="upfile2" v-on:change="handleattachUpload()"/>
  </label><br>
  </form>
  </div>
@@ -283,8 +283,8 @@
       <div v-for="(value,key) in reqdata.attachments" v-bind:key="key">
       <b-button v-b-modal.modal-4 size="sm" @click='getfile(value)'>{{value}}</b-button>
     </div>
-    <input type="file" id="upfile1" ref="upfile1" v-on:change="handleattachUpload"/>
-    <input type="file" id="upfile2" ref="upfile2" v-on:change="handleattachUpload"/>
+    <!-- <input type="file" id="upfile1" ref="upfile1" v-on:change="handleattachUpload"/> -->
+    <!-- <input type="file" id="upfile2" ref="upfile2" v-on:change="handleattachUpload"/> -->
    </label><br>
       <b-button id="save" @click="save"> Save </b-button>
  </form>
@@ -658,7 +658,7 @@ export default {
           currentObj.output = error
         })
     },
-    approve (e) {
+    approve () {
       const formData = new FormData()
       formData.append('file1', this.upfile1)
       formData.append('file2', this.upfile2)
@@ -667,8 +667,6 @@ export default {
       formData.append('bcc', this.output.bcc)
       formData.append('body', this.output.body)
       formData.append('subject', this.output.subject)
-      e.preventDefault()
-      const currentObj = this
       this.detail = ''
       this.axios.post('http://localhost:8081/api/main/approve', formData,
         {
@@ -677,12 +675,12 @@ export default {
           }
         })
         .then(function (response) {
-          currentObj.output = response.data
-          console.log(currentObj.output)
+          this.output = response.data
+          console.log(this.output)
         })
         .catch(function (error) {
-          currentObj.output = error
-          console.log(currentObj.output)
+          this.output = error
+          console.log(this.output)
         })
       this.popoverShow1 = false
     },

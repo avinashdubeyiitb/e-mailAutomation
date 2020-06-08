@@ -283,7 +283,8 @@ def get_credentials():
         with open(file_path, 'wb') as token:
             pickle.dump(creds, token)
     return creds
-get_credentials()
+
+
 def CreateMessageHtml(sender, to, cc, bcc, subject, body, msgHtml=None):
     msg = MIMEMultipart('alternative')
     msg['Subject'] = subject
@@ -891,7 +892,9 @@ def approve(request):
             subject = request.data.get('subject')
             body = request.data.get('body')
             sent = None
+            print(request.FILES['file1'])
             if 'file1' in request.FILES and 'file2' in request.FILES:
+                print('1')
                 file1=request.FILES['file1']
                 file2=request.FILES['file2']
                 #  Saving POST'ed file to storage
@@ -899,16 +902,19 @@ def approve(request):
                 file_name2 = default_storage.save(file2.name, file2)
                 attachments = [os.path.join(BASE_DIR,file_name1),os.path.join(BASE_DIR,file_name2)]
             elif 'file1' in request.FILES :
+                print('2')
                 file=request.FILES['file1']
                 #  Saving POST'ed file to storage
                 file_name = default_storage.save(file.name, file)
                 attachments = [os.path.join(BASE_DIR,file_name),os.path.join(SCRIPTS_DIR,'letter-of-intent.docx')]
             elif 'file2' in request.FILES :
+                print('3')
                 file=request.FILES['file2']
                 #  Saving POST'ed file to storage
                 file_name = default_storage.save(file.name, file)
                 attachments = [os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'),os.path.join(BASE_DIR,file_name)]
             else:
+                print('4')
                 attachments = [os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'),
                 os.path.join(SCRIPTS_DIR,'letter-of-intent.docx')]
             sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,attachments)
