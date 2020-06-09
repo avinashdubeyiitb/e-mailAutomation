@@ -2,6 +2,49 @@ from django.db import models
 import uuid
 # Create your models here.
 
+class DemoDtls(models.Model):
+    name = models.CharField(max_length=50,blank=False,null=False)
+    intro_demo = models.IntegerField(blank=False,null=False)
+    i_o_demo = models.IntegerField(blank=False,null=False)
+    motor_demo = models.IntegerField(blank=False,null=False)
+    pwm_demo = models.IntegerField(blank=False,null=False)
+    lcd_demo = models.IntegerField(blank=False,null=False)
+    adc_demo = models.IntegerField(blank=False,null=False)
+    interrupt_demo = models.IntegerField(blank=False,null=False)
+    total_count_demo = models.IntegerField(blank=False,null=False)
+
+    def __str__(self):
+        return self.name
+    class Meta:
+        db_table = 'demo_dtls'
+
+class WorkshopTeamStatus(models.Model):
+    workshop_venue = models.CharField(max_length=50,blank=False,null=False)
+    date = models.TextField(blank=False,null=False)
+    district = models.CharField(max_length=50,blank=False,null=False)
+    responder = models.CharField(max_length=50,blank=False,null=False)
+    willingness_or_unavailability = models.CharField(max_length=20,blank=True,null=True)
+    reason = models.CharField(max_length=50,blank=True,null=True)
+    eYRC = models.BooleanField(blank=False,null=False,default='False')
+    eYIC = models.BooleanField(blank=False,null=False,default='False')
+    eYRDC = models.BooleanField(blank=False,null=False,default='False')
+    eLSI = models.BooleanField(blank=False,null=False,default='False')
+    web = models.BooleanField(blank=False,null=False,default='False')
+    course_or_other_eyantra_work = models.TextField(blank=False,null=False,default='False')
+    personal_or_any_other = models.TextField(blank=False,null=False,default='False')
+    approval_eYRC = models.CharField(max_length=20,blank=False,null=False,default='None')
+    approval_eYIC = models.CharField(max_length=20,blank=False,null=False,default='None')
+    approval_eYRDC = models.CharField(max_length=20,blank=False,null=False,default='None')
+    approval_eLSI = models.CharField(max_length=20,blank=False,null=False,default='None')
+    approval_web = models.CharField(max_length=20,blank=False,null=False,default='None')
+    approval_course_or_other_eyantra_work = models.CharField(max_length=20,blank=False,null=False,default='None')
+    approval_personal_or_any_other = models.CharField(max_length=20,blank=False,null=False,default='None')
+
+    def __str__(self):
+        return self.workshop_venue
+    class Meta:
+        db_table = 'workshop_team_status'
+
 class create_workshop(models.Model):
     id = models.AutoField(primary_key=True)
     hcn = models.TextField(blank=True, null=True)
@@ -27,22 +70,24 @@ class userdetail(models.Model):
     class Meta:
         db_table = 'user_details'
 
-class WorkshopTeamDtls(models.Model):
+class WorkshopsTakenCount(models.Model):
     name = models.CharField(max_length=50,blank=False,null=False)
-    workshop_id = models.TextField(blank=False,null=False)
-    options = models.CharField(max_length=50,blank=False,null=False)
-    category_eyic = models.CharField(max_length=50,blank=False,null=False,default='None')
-    category_eyrc = models.CharField(max_length=50,blank=False,null=False,default='None')
-    category_eyrdc = models.CharField(max_length=50,blank=False,null=False,default='None')
-    category_elsi = models.CharField(max_length=50,blank=False,null=False,default='None')
-    category_web = models.CharField(max_length=50,blank=False,null=False,default='None')
-    category_others = models.CharField(max_length=50,blank=False,null=False,default='None')
+    active_member = models.IntegerField(blank=False,null=False)
+    preparation_status = models.IntegerField(blank=False,null=False)
+    willingness_shown = models.IntegerField(blank=False,null=False)
+    total_count = models.IntegerField(blank=False,null=False)
+    mumbai_workshop = models.IntegerField(blank=False,null=False)
+    non_mumbai_workshop = models.IntegerField(blank=False,null=False)
+    total_till_date = models.IntegerField(blank=False,null=False)
+    past_year = models.IntegerField(blank=False,null=False)
+    past_year_mumbai = models.IntegerField(blank=False,null=False)
+    past_year_non_mumbai = models.IntegerField(blank=False,null=False)
 
     def __str__(self):
         return self.name
 
     class Meta:
-        db_table = 'workshop_team_dtls'
+        db_table = 'workshops_taken_count'
 
 class ElsiCollegeDtls(models.Model):
     id = models.IntegerField(blank=True, null=False, primary_key=True)
