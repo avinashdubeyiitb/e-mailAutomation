@@ -1,8 +1,15 @@
 from rest_framework import serializers
-from main.models import locData
+from main.models import create_workshop
 
-class LocDataSerializer(serializers.ModelSerializer):
+class CreateWorkshop(serializers.ModelSerializer):
 
     class Meta:
-        model = locData
-        fields = ('locstate','locdistrict','locemail',)      
+        model = create_workshop
+        fields = (
+        'hcn',
+        'startdate',
+        'enddate',
+        'venueadd',
+        'cooname',
+        'cooemail',
+        'coono',)

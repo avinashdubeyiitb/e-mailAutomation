@@ -30,7 +30,8 @@ import base64
 import mimetypes
 import email.encoders
 import csv
-from .models import userdetail,ElsiCollegeDtls,ElsiTeacherDtls,TbtCollegeDtls,WorkshopDtls,WorkshopParticipants,AICTE_list
+from .serializers import CreateWorkshop
+from .models import userdetail,ElsiCollegeDtls,ElsiTeacherDtls,TbtCollegeDtls,WorkshopDtls,WorkshopParticipants,AICTE_list,create_workshop
 from app.settings import EMAIL_HOST_USER,BASE_DIR,SCRIPTS_DIR
 ############################################################################################################################
 import googlemaps
@@ -150,10 +151,10 @@ def getbody(clg,obj,sta,dis):
                         print(d)
                         start_date = det[0].start_date
                         start_date = datetime.strptime(start_date, '%d-%m-%Y')
-                        start_date = datetime.strftime(start_date,'%b %d, %Y')
+                        start_date = datetime.strftime(start_date,'%B %d, %Y')
                         end_date = det[0].end_date
                         end_date = datetime.strptime(end_date, '%d-%m-%Y')
-                        end_date = datetime.strftime(end_date,'%b %d, %Y')
+                        end_date = datetime.strftime(end_date,'%B %d, %Y')
                         body = render_to_string(os.path.join(SCRIPTS_DIR,'tbt_complete.html'),
                         {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
                         'count':count,'start_date':start_date,'end_date':end_date,'host_college':temp[0].college_name,'host_State':temp[0].state,
@@ -181,10 +182,10 @@ def getbody(clg,obj,sta,dis):
                         print(d)
                         start_date = det[0].start_date
                         start_date = datetime.strptime(start_date, '%d-%m-%Y')
-                        start_date = datetime.strftime(start_date,'%b %d, %Y')
+                        start_date = datetime.strftime(start_date,'%B %d, %Y')
                         end_date = det[0].end_date
                         end_date = datetime.strptime(end_date, '%d-%m-%Y')
-                        end_date = datetime.strftime(end_date,'%b %d, %Y')
+                        end_date = datetime.strftime(end_date,'%B %d, %Y')
                         body = render_to_string(os.path.join(SCRIPTS_DIR,'tbt_notcomplete.html'),
                         {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
                         'count':count,'start_date':start_date,'end_date':end_date,'host_college':temp[0].college_name,'host_State':temp[0].state,
@@ -599,29 +600,23 @@ def csvapprove(request):
                         print(dis)
                         sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
                         print(sta)
-                    res = getbody(clg,obj,sta,dis)
-                    subject = res['subject']
-                    body = res['body']
-                if 'file1' in request.FILES and 'file2' in request.FILES:
-                    file1=request.FILES['file1']
-                    file2=request.FILES['file2']
-                    #  Saving POST'ed file to storage
-                    file_name1 = default_storage.save(file1.name, file1)
-                    file_name2 = default_storage.save(file2.name, file2)
-                    attachments = [os.path.join(BASE_DIR,file_name1),os.path.join(BASE_DIR,file_name2)]
-                elif 'file1' in request.FILES :
-                    file=request.FILES['file1']
-                    #  Saving POST'ed file to storage
-                    file_name = default_storage.save(file.name, file)
-                    attachments = [os.path.join(BASE_DIR,file_name),os.path.join(SCRIPTS_DIR,'letter-of-intent.docx')]
-                elif 'file2' in request.FILES :
-                    file=request.FILES['file2']
-                    #  Saving POST'ed file to storage
-                    file_name = default_storage.save(file.name, file)
-                    attachments = [os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'),os.path.join(BASE_DIR,file_name)]
-                else:
-                    attachments = [os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'),
-                    os.path.join(SCRIPTS_DIR,'letter-of-intent.docx')]
+                        res = getbody(clg,obj,sta,dis)
+                        subject = res['subject']
+                        body = res['body']
+                        files2send2 = list(request.data.get('files2send2').split(","))
+                        print(files2send2)
+                        attachments = []
+                        for f in files2send2:
+                            if f == 'Pamphlet2020.pdf':
+                                attachments.append(os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'))
+                            elif f == 'letter-of-intent.docx':
+                                attachments.append(os.path.join(SCRIPTS_DIR,'letter-of-intent.docx'))
+                        if 'file2' in request.FILES :
+                            file=request.FILES['file2']
+                            #  Saving POST'ed file to storage
+                            file_name = default_storage.save(file.name, file)
+                            attachments.append(os.path.join(BASE_DIR,file_name))
+                            print(attachments)
                 sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,attachments)
                 if sent :
                     if "to" in re:
@@ -656,6 +651,8 @@ def csvapprove(request):
     re['failure'] =failure
     re['total'] = total
     print(re)
+    if 'file2' in request.FILES :
+        os.remove(os.path.join(BASE_DIR,file_name))
     return JsonResponse(re)
 
 @api_view(['POST'])
@@ -702,26 +699,20 @@ def csvdraft(request):
                     res = getbody(clg,obj,sta,dis)
                     subject = res['subject']
                     body = res['body']
-                if 'file1' in request.FILES and 'file2' in request.FILES:
-                    file1=request.FILES['file1']
-                    file2=request.FILES['file2']
-                    #  Saving POST'ed file to storage
-                    file_name1 = default_storage.save(file1.name, file1)
-                    file_name2 = default_storage.save(file2.name, file2)
-                    attachments = [os.path.join(BASE_DIR,file_name1),os.path.join(BASE_DIR,file_name2)]
-                elif 'file1' in request.FILES :
-                    file=request.FILES['file1']
-                    #  Saving POST'ed file to storage
-                    file_name = default_storage.save(file.name, file)
-                    attachments = [os.path.join(BASE_DIR,file_name),os.path.join(SCRIPTS_DIR,'letter-of-intent.docx')]
-                elif 'file2' in request.FILES :
-                    file=request.FILES['file2']
-                    #  Saving POST'ed file to storage
-                    file_name = default_storage.save(file.name, file)
-                    attachments = [os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'),os.path.join(BASE_DIR,file_name)]
-                else:
-                    attachments = [os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'),
-                    os.path.join(SCRIPTS_DIR,'letter-of-intent.docx')]
+                    files2send2 = list(request.data.get('files2send2').split(","))
+                    print(files2send2)
+                    attachments = []
+                    for f in files2send2:
+                        if f == 'Pamphlet2020.pdf':
+                            attachments.append(os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'))
+                        elif f == 'letter-of-intent.docx':
+                            attachments.append(os.path.join(SCRIPTS_DIR,'letter-of-intent.docx'))
+                    if 'file2' in request.FILES :
+                        file=request.FILES['file2']
+                        #  Saving POST'ed file to storage
+                        file_name = default_storage.save(file.name, file)
+                        attachments.append(os.path.join(BASE_DIR,file_name))
+                        print(attachments)
                 attachmentFile = attachments
                 if attachmentFile:
                     message = createMessageWithAttachment(EMAIL_HOST_USER, to,cc,bcc, subject,body, attachmentFile)
@@ -762,6 +753,8 @@ def csvdraft(request):
     re['failure'] =failure
     re['total'] = total
     print(re)
+    if 'file2' in request.FILES :
+        os.remove(os.path.join(BASE_DIR,file_name))
     return JsonResponse(re)
 
 @api_view(['POST'])
@@ -891,27 +884,23 @@ def approve(request):
             subject = request.data.get('subject')
             body = request.data.get('body')
             sent = None
-            if 'file1' in request.FILES and 'file2' in request.FILES:
-                file1=request.FILES['file1']
-                file2=request.FILES['file2']
-                #  Saving POST'ed file to storage
-                file_name1 = default_storage.save(file1.name, file1)
-                file_name2 = default_storage.save(file2.name, file2)
-                attachments = [os.path.join(BASE_DIR,file_name1),os.path.join(BASE_DIR,file_name2)]
-            elif 'file1' in request.FILES :
+            files2send1 = list(request.data.get('files2send1').split(","))
+            print(files2send1)
+            attachments = []
+            for f in files2send1:
+                if f == 'Pamphlet2020.pdf':
+                    attachments.append(os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'))
+                elif f == 'letter-of-intent.docx':
+                    attachments.append(os.path.join(SCRIPTS_DIR,'letter-of-intent.docx'))
+            if 'file1' in request.FILES :
                 file=request.FILES['file1']
                 #  Saving POST'ed file to storage
                 file_name = default_storage.save(file.name, file)
-                attachments = [os.path.join(BASE_DIR,file_name),os.path.join(SCRIPTS_DIR,'letter-of-intent.docx')]
-            elif 'file2' in request.FILES :
-                file=request.FILES['file2']
-                #  Saving POST'ed file to storage
-                file_name = default_storage.save(file.name, file)
-                attachments = [os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'),os.path.join(BASE_DIR,file_name)]
-            else:
-                attachments = [os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'),
-                os.path.join(SCRIPTS_DIR,'letter-of-intent.docx')]
+                attachments.append(os.path.join(BASE_DIR,file_name))
+            print(attachments)
             sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,attachments)
+            if 'file1' in request.FILES :
+                os.remove(os.path.join(BASE_DIR,file_name))
             if sent :
                 return JsonResponse({'status':'success','info':'mail sent successfully'})
             else :
@@ -933,25 +922,20 @@ def gsave(request):
     subject = request.data.get('subject')
     body = request.data.get('body')
     sent = None
-    if 'file1' in request.FILES and 'file2' in request.FILES:
-        file1=request.FILES['file1']
-        file2=request.FILES['file2']
-        #  Saving POST'ed file to storage
-        file_name1 = default_storage.save(file1.name, file1)
-        file_name2 = default_storage.save(file2.name, file2)
-        attachments = [os.path.join(BASE_DIR,file_name1),os.path.join(BASE_DIR,file_name2)]
-    elif 'file1' in request.FILES :
-        file=request.FILES['file1']
-        #  Saving POST'ed file to storage
-        file_name = default_storage.save(file.name, file)
-        attachments = [os.path.join(BASE_DIR,file_name),os.path.join(SCRIPTS_DIR,'letter-of-intent.docx')]
-    elif 'file2' in request.FILES :
-        file=request.FILES['file2']
-        #  Saving POST'ed file to storage
-        file_name = default_storage.save(file.name, file)
-        attachments = [os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'),os.path.join(BASE_DIR,file_name)]
-    else:
-        attachments = [os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'),os.path.join(SCRIPTS_DIR,'letter-of-intent.docx')]
+    files2send1 = list(request.data.get('files2send1').split(","))
+    print(files2send1)
+    attachments = []
+    for f in files2send1:
+        if f == 'Pamphlet2020.pdf':
+            attachments.append(os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'))
+        elif f == 'letter-of-intent.docx':
+            attachments.append(os.path.join(SCRIPTS_DIR,'letter-of-intent.docx'))
+        if 'file1' in request.FILES :
+            file=request.FILES['file1']
+            #  Saving POST'ed file to storage
+            file_name = default_storage.save(file.name, file)
+            attachments.append(os.path.join(BASE_DIR,file_name))
+        print(attachments)
     credentials = get_credentials()
     attachmentFile=attachments
     result = None
@@ -961,31 +945,67 @@ def gsave(request):
     else:
         message = CreateMessageHtml(EMAIL_HOST_USER, to, cc, bcc, subject, body)
     result = CreateDraft(service,"me",message)
+    if 'file1' in request.FILES :
+        os.remove(os.path.join(BASE_DIR,file_name))
     return JsonResponse({'status':'saved to draft'})
 ######################
 
 ######################
 #workshop announcement
 @api_view(['POST'])
+def cwssubmit(request):
+        try:
+            var = JSONParser().parse(request)
+            serializer = CreateWorkshop(data=var)
+            print(serializer)
+            if serializer.is_valid():
+                serializer.save()
+                return JsonResponse({'status': 'Created Successfully'})
+            else:
+                return JsonResponse({'status': 'Problem in Serializing'})
+        except ValueError as e:
+            return JsonResponse({'status':'failed','info':e.args[0]})
+
+@api_view(['POST'])
+def getwrklist(request):
+        try:
+            obj = create_workshop.objects.all()
+            wrklist = {}
+            for i in range(obj.count()):
+                if "list" in wrklist:
+                    wrklist["list"].append(obj[i].hcn)
+                else:
+                    wrklist["list"] = [obj[i].hcn]
+            print(wrklist)
+            return JsonResponse(wrklist)
+        except ValueError as e:
+            return JsonResponse({'status':'failed','info':e.args[0]})
+
+@api_view(['POST'])
 def awssubmit(request):
         try:
             var = JSONParser().parse(request)
+            selectedworkshop = var.get('selectedworkshop')
+            wrkdet = create_workshop.objects.filter(hcn = selectedworkshop)
             dict={}
             clist=[]
-            hcn = var.get('hcn')
+            hcn = wrkdet[0].hcn
             getdet = ElsiCollegeDtls.objects.filter(college_name = hcn)
-            startdate = var.get('startdate')
-            enddate = var.get('enddate')
+            startdate = wrkdet[0].startdate
+            enddate = wrkdet[0].enddate
+            filldate = var.get('filldate')
             startdate = datetime.strptime(startdate, '%Y-%m-%d')
             day1 = startdate.strftime("%A")
-            startdate = datetime.strftime(startdate,'%b %d, %Y')
+            startdate = datetime.strftime(startdate,'%B %d, %Y')
             enddate = datetime.strptime(enddate, '%Y-%m-%d')
             day2 = enddate.strftime("%A")
-            enddate = datetime.strftime(enddate,'%b %d, %Y')
-            venueadd = var.get('venueadd')
-            cooname = var.get('cooname')
-            cooemail = var.get('cooemail')
-            coono = var.get('coono')
+            enddate = datetime.strftime(enddate,'%B %d, %Y')
+            filldate = datetime.strptime(filldate, '%Y-%m-%d')
+            filldate = datetime.strftime(filldate,'%B %d, %Y')
+            venueadd = wrkdet[0].venueadd
+            cooname = wrkdet[0].cooname
+            cooemail = wrkdet[0].cooemail
+            coono = wrkdet[0].coono
             state = var.get('state')
             districts = var.get('district')
             c = ElsiCollegeDtls.objects.all()
@@ -1009,7 +1029,7 @@ def awssubmit(request):
                      Invitation to Attend the Two Day Workshop at " + hcn +", " + getdet[0].district +", " + getdet[0].state
                     body = render_to_string(os.path.join(SCRIPTS_DIR,'announce_workshop.html'),
                     {'venueadd':venueadd,'cooname': cooname,'cooemail':cooemail, 'coono':coono, 'hcn':hcn ,'hcnstate':getdet[0].state,
-                        'hcndistrict':getdet[0].district,'count':count,'startdate':startdate,'enddate':enddate,'day1':day1,'day2':day2})
+                        'hcndistrict':getdet[0].district,'count':count,'startdate':startdate,'enddate':enddate,'day1':day1,'day2':day2,'filldate':filldate})
                     dict['subject']=subject
                     dict['body']=body
                     dict['attachments'] = {'pamp':'Pamphlet2020.pdf','LoI':'letter-of-intent.docx'}
@@ -1030,7 +1050,7 @@ def mailids(request):
     l = []
     for idx in range(objs.count()):
         l.append({'mailid':objs[idx].emailid,'name':objs[idx].name})
-    #print(l)    
+    #print(l)
     return JsonResponse({'data':l})
 
 def form(request,uid):
@@ -1055,7 +1075,7 @@ def sendmail(request):
         if to in selected:
             uuid = objs[idx].id
             cc = ''
-            bcc = '' 
+            bcc = ''
             subject = 'Workshop Team Selection Form'
             body = render_to_string(os.path.join(SCRIPTS_DIR,'link.html'),{'uid':uuid})
             #sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body)
@@ -1064,8 +1084,21 @@ def sendmail(request):
                 sucs+=1
                 d['sent'].append(to)
             else:
-                flr+=1    
+                flr+=1
     d['success'] = sucs
-    d['failure'] = flr           
+    d['failure'] = flr
     return JsonResponse(d)
 ######################
+@api_view(['POST'])
+def gethcn(request):
+    var = JSONParser().parse(request)
+    state=getname(str(var.get('state')))
+    getdet = ElsiCollegeDtls.objects.filter(state = state).order_by('college_name')
+    hcn = {}
+    for i in range(getdet.count()):
+        if "host" in hcn:
+            hcn["host"].append(getdet[i].college_name)
+        else:
+            hcn["host"] = [getdet[i].college_name]
+    print(hcn)
+    return JsonResponse(hcn)

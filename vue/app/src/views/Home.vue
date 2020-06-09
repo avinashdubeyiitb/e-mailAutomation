@@ -9,8 +9,11 @@
        <div id="b">
        <button id="but2" type="button" name="button"><router-link to="/aws">Announce Workshop</router-link></button>
        </div>
+       <div id="c">
+       <button id="but3" type="button" name="button"><router-link to="/cws">Create Workshop</router-link></button>
+       </div>
        <div>
-       <button id="but3" type="button" name="button"><router-link to="/tsa">Coming soon :(</router-link></button>
+       <button id="but4" type="button" name="button"><router-link to="/tsa">Coming soon :(</router-link></button>
        </div>
     <router-view/>
   </div>
@@ -46,6 +49,17 @@ box-shadow: 4px 6px 4px rgba(0, 0, 0, 0.25);
   height: 40px;
   left: 15%;
   top: 69%;
+
+  background: #F5C8C8;
+  box-shadow: 4px 6px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 19px;
+}
+#but4{
+  position: absolute;
+  width: 200px;
+  height: 40px;
+  left: 15%;
+  top: 81%;
 
   background: #F5C8C8;
   box-shadow: 4px 6px 4px rgba(0, 0, 0, 0.25);

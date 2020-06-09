@@ -1,25 +1,24 @@
 <template>
   <div id="app">
-    <h1>Send Workshop Mail</h1>
+    <h1>Announce Workshop </h1>
     <button id="butt" type="button" name="button"><router-link to="/">Home</router-link></button>
   <div id="col1inner" >
     <div v-show="isNight3" >
     <strong><p id="fd">Fill details:</p></strong>
     <form @submit="formSubmit">
-    <strong id="hcn" >Host College Name:</strong>
-    <input id="hcni" type="text" v-model="hcn"><br>
-    <strong id="startdate">Start Date:</strong>
-    <input id="startdatei" type="date" v-model="startdate"><br>
-    <strong id="enddate">End Date:</strong>
-    <input id="enddatei" type="date" v-model="enddate"><br>
-    <strong id="venueadd">Venue Address:</strong>
-    <input id="venueaddi" type="text" v-model="venueadd"><br>
-    <strong id="cooname">Coordinator Name:</strong>
-    <input id="coonamei" type="text" v-model="cooname"><br>
-    <strong id="cooemail">Coordinator Email:</strong>
-    <input id="cooemaili" type="email" v-model="cooemail"><br>
-    <strong id="coono">Coordinator Cont.:</strong>
-    <input id="coonoi" type="tel" v-model="coono"><br>
+      <strong id="wrk" >Select Workshop:</strong>
+      <div class="dropdown" id="wrki">
+    <input v-model="selectedworkshop" class="dropdown-input" type="text" placeholder="Select"  />
+      <div  v-show="selectedworkshop" class="dropdown-list" style="z-index:100; position: fixed;background: #FFFFFF">
+        <div v-for="(p,i) in wrklist" v-bind:key='i' v-show="showing">
+          <div  v-for="(host,index) in p" v-bind:key='index' v-show="itemVisible(host)" @click="savehcn(host,index)" class="dropdown-item">
+            {{host}}
+          </div>
+        </div>
+        </div>
+    </div>
+    <strong id="filldate">Last date to Fill:</strong>
+    <input id="filldatei" type="date" v-model="filldate"><br>
     <strong id="recipientstate">Recipient State:</strong>
     <div id="recipientstatei">
         <b-dropdown  v-bind:text="state" >
@@ -46,7 +45,7 @@
     <!-- <strong>Response:</strong> -->
     <!-- <pre>
     </pre> -->
-    <p id="rmsg">{{output}}</p>
+    <!-- <p id="rmsg">{{output}}</p> -->
   </div>
 </div>
 <div id="col2inner">
@@ -82,12 +81,12 @@
  </b-modal><br>
 
    <label id="srattach"><strong>Attachment:</strong>
-       <div v-for="(value,key) in output.attachments" v-bind:key="key">
-       <b-button size="sm" @click='getfile(value)'  >{{value}}</b-button>
-        </div>
+        <div v-for="(value,key) in output.attachments" v-bind:key="key">
+        <b-button >
+        <b-button size="sm" @click='getfile(value)' >{{value}}</b-button>
+        <b-button @click="disc1(value,key)" class="close" aria-label="Close"><span class="d-inline-block" aria-hidden="true">&times;</span></b-button></b-button>
+         </div>
         <input type="file" id="upfile1" ref="upfile1" v-on:change="handleattachUpload"/>
-        <input type="file" id="upfile2" ref="upfile2" v-on:change="handleattachUpload"/>
-
   </label><br>
  </form>
  </div>
@@ -145,6 +144,7 @@ const { shell } = require('electron')
 export default {
   mounted () {
     console.log('Component mounted.')
+    this.workshoplist()
   },
   computed: {
   },
@@ -154,6 +154,8 @@ export default {
       state: 'State',
       index: '',
       in: '',
+      wrklist: [],
+      showing: 'false',
       districts: [],
       d: 'District',
       district: [],
@@ -161,17 +163,13 @@ export default {
       isNight1: true,
       isNight2: true,
       isNight3: true,
+      selectedworkshop: '',
       popoverShow1: false,
       popoverShow2: false,
       popoverShow3: false,
       popoverShow4: false,
       hcn: '',
-      startdate: '',
-      enddate: '',
-      venueadd: '',
-      cooname: '',
-      cooemail: '',
-      coono: '',
+      filldate: '',
       output: '',
       items: [],
       selected: [],
@@ -194,6 +192,27 @@ export default {
   watch: {
   },
   methods: {
+    savehcn (host, index) {
+      console.log(host, index)
+      this.selectedworkshop = host
+      this.showing = !this.showing
+    },
+    itemVisible (item) {
+      const currentName = item.toLowerCase()
+      const currentInput = this.selectedworkshop.toLowerCase()
+      return currentName.includes(currentInput)
+    },
+    workshoplist () {
+      this.axios.post('http://localhost:8081/api/main/getwrklist', {
+      })
+        .then(wrklist => {
+          this.wrklist = wrklist.data
+          console.log(this.wrklist)
+        })
+        .catch(function (error) {
+          this.wrklist = error
+        })
+    },
     discard () {
       this.popoverShow1 = false
       this.popoverShow2 = false
@@ -223,7 +242,6 @@ export default {
     },
     handleattachUpload () {
       this.upfile1 = this.$refs.upfile1.files[0]
-      this.upfile2 = this.$refs.upfile2.files[0]
     },
     selectedstate (state, index) {
       console.log(state, index)
@@ -235,6 +253,11 @@ export default {
     disc (p, inn) {
       console.log(p, inn)
       this.$delete(this.output.bcc, inn)
+    },
+    disc1 (value, key) {
+      console.log(value, key)
+      this.$delete(this.output.attachments, key)
+      console.log(Object.values(this.output.attachments))
     },
     selecteddistrict (diss) {
       this.district.push(diss)
@@ -261,13 +284,9 @@ export default {
       this.isNight2 = true
       this.isNight3 = true
       this.axios.post('http://localhost:8081/api/main/awssubmit', {
-        hcn: this.hcn,
-        startdate: this.startdate,
+        selectedworkshop: this.selectedworkshop,
+        filldate: this.filldate,
         enddate: this.enddate,
-        venueadd: this.venueadd,
-        cooname: this.cooname,
-        cooemail: this.cooemail,
-        coono: this.coono,
         state: this.state,
         district: this.district
       })
@@ -279,13 +298,20 @@ export default {
         })
     },
     approve (e) {
-      e.preventDefault()
+      const formData = new FormData()
+      formData.append('file1', this.upfile1)
+      formData.append('files2send1', Object.values(this.output.attachments))
+      formData.append('bcc', this.output.bcc)
+      formData.append('body', this.output.body)
+      formData.append('subject', this.output.subject)
       const currentObj = this
-      this.axios.post('http://localhost:8081/api/main/approve', {
-        bcc: this.output.bcc,
-        body: this.output.body,
-        subject: this.output.subject
-      })
+      e.preventDefault()
+      this.axios.post('http://localhost:8081/api/main/approve', formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
         .then(function (response) {
           currentObj.output = response.data
           console.log(currentObj.output)
@@ -297,13 +323,20 @@ export default {
       this.popoverShow1 = false
     },
     gsave (e) {
+      const formData = new FormData()
+      formData.append('file1', this.upfile1)
+      formData.append('files2send1', Object.values(this.output.attachments))
+      formData.append('bcc', this.output.bcc)
+      formData.append('body', this.output.body)
+      formData.append('subject', this.output.subject)
       e.preventDefault()
       const currentObj = this
-      this.axios.post('http://localhost:8081/api/main/gsave', {
-        bcc: this.output.bcc,
-        body: this.output.body,
-        subject: this.output.subject
-      })
+      this.axios.post('http://localhost:8081/api/main/gsave', formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
         .then(function (response) {
           currentObj.output = response.data
           console.log(currentObj.output)
@@ -415,7 +448,7 @@ line-height: 30px;
 text-align: center;
 color: #000000;
 }
-#hcn{
+#wrk{
   position: absolute;
 width: 154px;
 height: 25px;
@@ -432,13 +465,13 @@ text-align: center;
 color: #000000;
 
 }
-#hcni{
+#wrki{
   position: absolute;
 left: 36%;
 top: 8.5%;
 
 }
-#startdate{
+#filldate{
 position: absolute;
 width: 154px;
 height: 25px;
@@ -455,128 +488,17 @@ text-align: center;
 color: #000000;
 
 }
-#startdatei{
+#filldatei{
 position: absolute;
 left: 36%;
 top: 15%;
-}
-#enddate{
-position: absolute;
-width: 154px;
-height: 25px;
-left: 4%;
-top: 20.5%;
-
-font-family: Radley;
-font-size: 17px;
-line-height: 30px;
-display: flex;
-align-items: center;
-text-align: center;
-
-color: #000000;
-
-}
-#enddatei{
-position: absolute;
-left: 36%;
-top: 21%;
-}
-#venueadd{
-position: absolute;
-width: 154px;
-height: 25px;
-left: 4%;
-top: 27%;
-
-font-family: Radley;
-font-size: 17px;
-line-height: 30px;
-display: flex;
-align-items: center;
-text-align: center;
-
-color: #000000;
-
-}
-#venueaddi{
-position: absolute;
-left: 36%;
-top: 27%;
-
-}
-#cooname{
-position: absolute;
-width: 154px;
-height: 25px;
-left: 4%;
-top: 33.5%;
-
-font-family: Radley;
-font-size: 17px;
-line-height: 30px;
-display: flex;
-align-items: center;
-text-align: center;
-
-color: #000000;
-
-}
-#coonamei{
-position: absolute;
-left: 36%;
-top: 33%;
-}
-#cooemail{
-position: absolute;
-width: 154px;
-height: 25px;
-left: 4%;
-top: 39.5%;
-
-font-family: Radley;
-font-size: 17px;
-line-height: 30px;
-display: flex;
-align-items: center;
-text-align: center;
-
-color: #000000;
-
-}
-#cooemaili{
-position: absolute;
-left: 36%;
-top: 39%;
-}
-#coono{
-position: absolute;
-width: 154px;
-height: 25px;
-left: 4%;
-top: 45.5%;
-
-font-family: Radley;
-font-size: 17px;
-line-height: 30px;
-display: flex;
-align-items: center;
-text-align: center;
-
-color: #000000;
-
-}
-#coonoi{
-position: absolute;
-left: 36%;
-top: 45%;
 }
 #recipientstate{
 position: absolute;
 width: 154px;
 height: 25px;
 left: 4%;
-top: 51%;
+top: 20%;
 
 font-family: Radley;
 font-size: 17px;
@@ -591,14 +513,14 @@ color: #000000;
 #recipientstatei{
 position: absolute;
 left: 36%;
-top: 51%;
+top: 20%;
 }
 #recipientdis{
 position: absolute;
 width: 154px;
 height: 25px;
 left: 4%;
-top: 57%;
+top: 27%;
 
 font-family: Radley;
 font-size: 17px;
@@ -613,7 +535,7 @@ color: #000000;
 #recipientdisi{
 position: absolute;
 left: 36%;
-top: 57%;
+top: 27%;
 }
 #msub{
 position: absolute;

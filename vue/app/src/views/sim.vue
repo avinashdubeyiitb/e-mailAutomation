@@ -184,10 +184,13 @@
     </b-modal><br>
   <label id="srattach"><strong>Attachment:</strong>{{upfile1}}hello
       <div v-for="(value,key) in output.attachments" v-bind:key="key">
+      <b-button >
       <b-button size="sm" @click='getfile(value)' >{{value}}</b-button>
+      <b-button @click="disc1(value,key)" class="close" aria-label="Close"><span class="d-inline-block" aria-hidden="true">&times;</span></b-button></b-button>
        </div>
-       <input type="file" id="upfile1" ref="upfile1" v-on:change="handleattachUpload()"/>
-       <input type="file" id="upfile2" ref="upfile2" v-on:change="handleattachUpload()"/>
+
+       <input type="file" id="upfile1" ref="upfile1" v-on:change="handleattachUpload1()"/>
+
  </label><br>
  </form>
  </div>
@@ -281,12 +284,14 @@
 
     <label id="srattach"><strong>Attachment:</strong>
       <div v-for="(value,key) in reqdata.attachments" v-bind:key="key">
-      <b-button v-b-modal.modal-4 size="sm" @click='getfile(value)'>{{value}}</b-button>
+      <b-button>
+      <b-button size="sm" @click='getfile(value)'>{{value}}</b-button>
+      <b-button @click="disc2(value,key)" class="close" aria-label="Close"><span class="d-inline-block" aria-hidden="true">&times;</span></b-button>
+      </b-button>
     </div>
-    <!--
-    <input type="file" id="upfile1" ref="upfile1" v-on:change="handleattachUpload()"/>
-    <input type="file" id="upfile2" ref="upfile2" v-on:change="handleattachUpload()"/>
-    -->
+
+    <input type="file" id="upfile2" ref="upfile2" v-on:change="handleattachUpload2()"/>
+
    </label><br>
       <b-button id="save" @click="save"> Save </b-button>
  </form>
@@ -339,8 +344,8 @@ export default {
       selectAll: false,
       file: '',
       upfile: '',
-      upfile1: '',
-      upfile2: '',
+      upfile1: [],
+      upfile2: [],
       key1: '',
       key2: '',
       key3: '',
@@ -427,9 +432,11 @@ export default {
     handleFileUpload () {
       this.file = this.$refs.file.files[0]
     },
-    handleattachUpload () {
-      this.upfile1 = this.$refs.upfile1.files[0]
-      this.upfile2 = this.$refs.upfile2.files[0]
+    handleattachUpload1 () {
+      this.upfile1 = (this.$refs.upfile1.files[0])
+    },
+    handleattachUpload2 () {
+      this.upfile2 = (this.$refs.upfile2.files[0])
     },
     gobacktoform () {
       this.isNight = true
@@ -482,8 +489,8 @@ export default {
     approveselect () {
       this.csvapp = true
       const formData = new FormData()
-      formData.append('file1', this.upfile1)
       formData.append('file2', this.upfile2)
+      formData.append('file2send2', Object.values(this.reqdata.attachments))
       formData.append('list', this.selected)
       const currentObj = this
       this.axios.post('http://localhost:8081/api/main/csv/approve', formData,
@@ -554,8 +561,8 @@ export default {
     gsaveselected () {
       this.csvgsave = true
       const formData = new FormData()
-      formData.append('file1', this.upfile1)
       formData.append('file2', this.upfile2)
+      formData.append('file2send2', Object.values(this.reqdata.attachments))
       formData.append('list', this.selected)
       const currentObj = this
       this.axios.post('http://localhost:8081/api/main/csv/gsave', formData,
@@ -663,7 +670,7 @@ export default {
     approve (e) {
       const formData = new FormData()
       formData.append('file1', this.upfile1)
-      formData.append('file2', this.upfile2)
+      formData.append('files2send1', Object.values(this.output.attachments))
       formData.append('remail', this.output.remail)
       formData.append('cc', this.output.cc)
       formData.append('bcc', this.output.bcc)
@@ -688,10 +695,20 @@ export default {
         })
       this.popoverShow1 = false
     },
+    disc1 (value, key) {
+      console.log(value, key)
+      this.$delete(this.output.attachments, key)
+      console.log(Object.values(this.output.attachments))
+    },
+    disc2 (value, key) {
+      console.log(value, key)
+      this.$delete(this.output.attachments, key)
+      console.log(Object.values(this.output.attachments))
+    },
     gsave (e) {
       const formData = new FormData()
       formData.append('file1', this.upfile1)
-      formData.append('file2', this.upfile2)
+      formData.append('files2send1', Object.values(this.output.attachments))
       formData.append('remail', this.output.remail)
       formData.append('cc', this.output.cc)
       formData.append('bcc', this.output.bcc)

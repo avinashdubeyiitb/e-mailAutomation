@@ -2,6 +2,21 @@ from django.db import models
 import uuid
 # Create your models here.
 
+class create_workshop(models.Model):
+    id = models.AutoField(primary_key=True)
+    hcn = models.TextField(blank=True, null=True)
+    startdate = models.TextField(blank=True, null=True)
+    enddate = models.TextField(blank=True, null=True)
+    venueadd = models.TextField(blank=True, null=True)
+    cooname = models.TextField(blank=True, null=True)
+    cooemail = models.EmailField(blank=False,null=False)
+    coono = models.IntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return self.id
+    class Meta:
+        db_table = 'create_workshop'
+
 class userdetail(models.Model):
     id = models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
     emailid = models.EmailField(blank=False,null=False)
@@ -10,7 +25,7 @@ class userdetail(models.Model):
         return self.emailid
 
     class Meta:
-        db_table = 'user_details'   
+        db_table = 'user_details'
 
 class WorkshopTeamDtls(models.Model):
     name = models.CharField(max_length=50,blank=False,null=False)
