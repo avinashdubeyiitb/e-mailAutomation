@@ -30,8 +30,8 @@ import base64
 import mimetypes
 import email.encoders
 import csv
-from .serializers import CreateWorkshop
-from .models import userdetail,ElsiCollegeDtls,ElsiTeacherDtls,TbtCollegeDtls,WorkshopDtls,WorkshopParticipants,AICTE_list,create_workshop
+from .serializers import *
+from .models import *
 from app.settings import EMAIL_HOST_USER,BASE_DIR,SCRIPTS_DIR
 ############################################################################################################################
 import googlemaps
@@ -960,8 +960,10 @@ def cwssubmit(request):
             print(serializer)
             if serializer.is_valid():
                 serializer.save()
+                print('done')
                 return JsonResponse({'status': 'Created Successfully'})
             else:
+                print('failure')
                 return JsonResponse({'status': 'Problem in Serializing'})
         except ValueError as e:
             return JsonResponse({'status':'failed','info':e.args[0]})
@@ -1053,33 +1055,151 @@ def mailids(request):
     #print(l)
     return JsonResponse({'data':l})
 
-def form(request,uid):
-    return render(request,'form.html',context={'uuid':uid})
+def form(request,uid,wid):
+    return render(request,'form.html',context={'uuid':uid,'wid':wid})
+
+def headapproval(request,uid,wid):
+    head = headdetail.objects.filter(id = uid)
+    wrkshp = create_workshop.objects.filter(id = wid)
+    if head[0].name == 'disha':
+        data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYRC = True)
+    elif head[0].name == 'dini':
+        data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYIC = True)
+    return render(request,'headapproval.html',context={'uuid':uid,'wid':wid,'datas':data})
+
+@api_view(['POST'])
+def headresults(request):
+    var = JSONParser().parse(request)
+    print(var.get('uuid'),var.get('wid'),var.get('values'))
+    values = var.get('values')
+    wrkshp = create_workshop.objects.filter(id = var.get('wid'))
+    nms = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn)
+    '''
+    eYRC,eYIC,eYRDC,eLSI,web,Course/Other e-Yantra Work,Personal/Any Other
+    '''
+    for idx in range(nms.count()):
+        WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn).update(approval_eYRC = values)
+    return Response('success')
 
 @api_view(['POST'])
 def formdata(request):
     var = JSONParser().parse(request)
-    print(var.get('name'),var.get('cname'),var.get('designation'),var.get('uuid'))
+    print(var.get('uuid'),var.get('wid'))
+    wrkshp = create_workshop.objects.filter(id = var.get('wid'))
+    reasonlist = var.get('reason').split(',')
+    print(reasonlist)
+    feedreason = ['False','False','False','False','False','False','False']
+    '''
+    eYRC,eYIC,eYRDC,eLSI,web,Course/Other e-Yantra Work,Personal/Any Other
+    '''
+    if 'eYRC' in reasonlist:
+        feedreason[0] = 'True'
+    if 'eYIC' in reasonlist:
+        feedreason[1] = 'True'
+    if 'eYRDC' in reasonlist:
+        feedreason[2] = 'True'
+    if 'eLSI' in reasonlist:
+        feedreason[3] = 'True'
+    if 'web' in reasonlist:
+        feedreason[4] = 'True'
+    if 'Course/Other e-Yantra Work' in reasonlist:
+        feedreason[5] = 'True'
+    if 'Personal/Any Other' in reasonlist :
+        feedreason[6] = 'True'
+    print(feedreason)
+    name = userdetail.objects.filter(id = var.get('uuid'))[0].name
+    if var.get('option') == 'unavailability':
+        WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,
+        responder = name).update(willingness_or_unavailability = var.get('option'),
+        reason = var.get('reason'),eYRC = feedreason[0],eYIC = feedreason[1],
+        eYRDC = feedreason[2],eLSI = feedreason[3],web = feedreason[4],
+        course_or_other_eyantra_work = feedreason[5],personal_or_any_other = feedreason[6])
+    else:
+        WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,responder = name).update(willingness_or_unavailability = var.get('option'))
+
     return Response('success')
 
 @api_view(['POST'])
 def sendmail(request):
     var = JSONParser().parse(request)
-    selected = var.get('selected')
+    selectedworkshop = var.get('selectedworkshop')
+    wrkshp = create_workshop.objects.filter(hcn = selectedworkshop)
+    #selected = var.get('selected')
     #print(selected)
-    d = {'sent':[],'success':'','failure':'','total':len(selected)}
+    objs = userdetail.objects.all()
+    d = {'sent':[],'success':'','failure':'','total':objs.count()}
     sucs = flr = 0
     objs = userdetail.objects.all()
     for idx in range(objs.count()):
-        to = objs[idx].emailid
-        if to in selected:
+            dte = wrkshp[0].startdate + ' & ' + wrkshp[0].enddate
+            serializer = WorkshopTeamSerializer(data = {'workshop_venue' : selectedworkshop,
+                'date' : dte,'district' : wrkshp[0].venueadd,'responder' : objs[idx].name})
+            print(serializer)
+            if serializer.is_valid():
+                serializer.save()
+            to = objs[idx].emailid
+            #if to in selected:
             uuid = objs[idx].id
             cc = ''
             bcc = ''
             subject = 'Workshop Team Selection Form'
-            body = render_to_string(os.path.join(SCRIPTS_DIR,'link.html'),{'uid':uuid})
-            #sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body)
+            body = render_to_string(os.path.join(SCRIPTS_DIR,'link.html'),
+                {'uid':uuid,'wid':wrkshp[0].id,'workshop_name':wrkshp[0].hcn,
+                'venue_address':wrkshp[0].venueadd,'start_date':wrkshp[0].startdate,
+                'end_date':wrkshp[0].enddate})
+            sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body)
             sent = True
+            if sent:
+                sucs+=1
+                #d['sent'].append(to)
+            else:
+                flr+=1
+    d['success'] = sucs
+    d['failure'] = flr
+    return JsonResponse(d)
+
+@api_view(['POST'])
+def headmail(request):
+    var = JSONParser().parse(request)
+    selectedworkshop = var.get('selectedworkshop')
+    wrkshp = create_workshop.objects.filter(hcn = selectedworkshop)
+    objs = headdetail.objects.all()
+    d = {'sent':[],'success':'','failure':'','total':objs.count()}
+    sucs = flr = 0
+    #eYRC,eYIC,eYRDC,eLSI,web,Course/Other e-Yantra Work,Personal/Any Other
+    rsnd = [{'eYRC':[]},{'eYIC':[]},{'eYRDC':[]},{'eLSI':[]},{'web':[]},
+        {'course_or_other_eyantra_work':[]},{'personal_or_any_other':[]}]
+    team = WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop)
+    for idx in range(team.count()):
+        if team[idx].eYRC:
+            rsnd[0]['eYRC'].append(team[idx].responder)
+        elif team[idx].eYIC:
+            rsnd[1]['eYIC'].append(team[idx].responder)
+        elif team[idx].eYRDC:
+            rsnd[2]['eYRDC'].append(team[idx].responder)
+        elif team[idx].eLSI:
+            rsnd[3]['eLSI'].append(team[idx].responder)
+        elif team[idx].web:
+            rsnd[4]['web'].append(team[idx].responder)
+        elif team[idx].course_or_other_eyantra_work:
+            rsnd[5]['course_or_other_eyantra_work'].append(team[idx].responder)
+        elif team[idx].personal_or_any_other:
+            rsnd[6]['personal_or_any_other'].append(team[idx].responder)
+    print(rsnd)
+    for idx in range(objs.count()):
+        to = objs[idx].emailid
+        print(len(list(rsnd[idx].values())[0]))
+        if len(list(rsnd[idx].values())[0]):
+            uuid = objs[idx].id
+            cc = ''
+            bcc = ''
+            subject = 'Workshop Team Selection approval'
+            body = render_to_string(os.path.join(SCRIPTS_DIR,'headlink.html'),
+                {'uid':uuid,'wid':wrkshp[0].id,'workshop_name':wrkshp[0].hcn,
+                'venue_address':wrkshp[0].venueadd,'start_date':wrkshp[0].startdate,
+                'end_date':wrkshp[0].enddate})
+            sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body)
+            #sent = True
             if sent:
                 sucs+=1
                 d['sent'].append(to)
@@ -1088,6 +1208,7 @@ def sendmail(request):
     d['success'] = sucs
     d['failure'] = flr
     return JsonResponse(d)
+
 ######################
 @api_view(['POST'])
 def gethcn(request):

@@ -16,8 +16,11 @@ urlpatterns = [
     url(r'^api/main/sendmail',views.sendmail),
     url(r'^api/main/getfile',views.getfile),
     url(r'^api/main/formdata',views.formdata),
-    url(r'^api/main/form/(?P<uid>[^/]+)/$',views.form),
+    url(r'^api/main/headresults',views.headresults),
+    url(r'^api/main/form/(?P<uid>[^/]+)/(?P<wid>\w+)/$',views.form),
+    url(r'^api/main/headapproval/(?P<uid>[^/]+)/(?P<wid>\w+)/$',views.headapproval),
     url(r'^api/main/store',views.store),
     url(r'^api/main/mailids',views.mailids),
-    url(r'^api/main/gethcn',views.gethcn)
+    url(r'^api/main/gethcn',views.gethcn),
+    url(r'^api/main/headmail',views.headmail)
 ]

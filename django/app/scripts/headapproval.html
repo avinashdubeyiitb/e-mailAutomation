@@ -7,31 +7,24 @@
 </head>
 <body>
     <div>
-        <!--
-          Willingness,
-          Unavailability  <br>
-            eYRC,
-            eYIC,
-            eYRDC,
-            eLSI,
-            web,
-            Course/Other e-Yantra Work,
-            Personal/Any Other <br>-->
-        Willingness/Unavailability : <input type="text" id="option" >        
-        Reason : <input type="text" id="reason" >        
-        Language Preference : <input type="text" id="lang" >        
-        <button  onclick="myFunction()">submit</button>
+       {% for data in datas%}
+       {{data.responder}} <input type = 'text' id="choosen" onclick="save(id)"><br>
+       {% endfor%}       
     </div>    
+    <button  onclick="myFunction()">submit</button>
     <script>
+        var list = []
+        function save(id) {
+            list.push(document.getElementById(id).value)
+        }
         //document.getElementById("btn").onclick = function() {myFunction()};
         function myFunction() {
             axios({
                 method: 'POST',
-                url: 'http://localhost:8081/api/main/formdata',
+                url: 'http://localhost:8081/api/main/headresults',
                 data: {
-                    option: document.getElementById('option').value,
-                    reason: document.getElementById('reason').value,
-                    language: document.getElementById('lang').value,
+                    //values: list,
+                    values: document.getElementById('choosen').value ,
                     uuid: `{{uuid}}`,
                     wid: `{{wid}}`
                 }

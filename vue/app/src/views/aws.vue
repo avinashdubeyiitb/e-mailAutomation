@@ -41,6 +41,9 @@
         </b-dropdown></p>
     </div>
     <button id="msub" v-b-modal.modal-1>Submit</button>
+    <button id="sub1" @click="sendmail">Send Mail to Team</button>
+    <button id="sub2" @click="headmail">Send Approval Mails</button>
+    <div id="result">{{result}}</div>
     </form>
     <!-- <strong>Response:</strong> -->
     <!-- <pre>
@@ -134,7 +137,6 @@
   <!-- </div> -->
   <!-- Output from the popover interaction -->
 </div>
-
 </div>
   </div>
 </template>
@@ -186,12 +188,41 @@ export default {
       reqdata: '',
       editedTodo: null,
       upfile1: '',
-      upfile2: ''
+      upfile2: '',
+      result: ''
     }
   },
   watch: {
   },
   methods: {
+    headmail (e) {
+      e.preventDefault()
+      const currentObj = this
+      this.result = 'sending mails'
+      this.axios.post('http://localhost:8081/api/main/headmail', {
+        selectedworkshop: this.selectedworkshop
+      })
+        .then(function (response) {
+          currentObj.result = response.data
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    },
+    sendmail (e) {
+      e.preventDefault()
+      const currentObj = this
+      this.result = 'sending mails'
+      this.axios.post('http://localhost:8081/api/main/sendmail', {
+        selectedworkshop: this.selectedworkshop
+      })
+        .then(function (response) {
+          currentObj.result = response.data
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    },
     savehcn (host, index) {
       console.log(host, index)
       this.selectedworkshop = host
@@ -541,6 +572,21 @@ top: 27%;
 position: absolute;
 right:10%;
 top: 53%;
+}
+#sub1{
+position: absolute;
+right:10%;
+top: 63%;
+}
+#sub2{
+position: absolute;
+right:10%;
+top: 73%;
+}
+#result{
+position: absolute;
+right:20%;
+top: 83%;
 }
 #rmsg{
   position: absolute;

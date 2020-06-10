@@ -70,6 +70,16 @@ class userdetail(models.Model):
     class Meta:
         db_table = 'user_details'
 
+class headdetail(models.Model):
+    id = models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
+    emailid = models.EmailField(blank=False,null=False)
+    name = models.CharField(max_length=50,blank=False,null=True)
+    def __str__(self):
+        return self.emailid
+
+    class Meta:
+        db_table = 'head_details'
+
 class WorkshopsTakenCount(models.Model):
     name = models.CharField(max_length=50,blank=False,null=False)
     active_member = models.IntegerField(blank=False,null=False)
