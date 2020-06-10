@@ -81,7 +81,7 @@ class headdetail(models.Model):
         db_table = 'head_details'
 
 class WorkshopsTakenCount(models.Model):
-    name = models.CharField(max_length=50,blank=False,null=False)
+    name = models.TextField(max_length=50,blank=False,null=False)
     active_member = models.IntegerField(blank=False,null=False)
     preparation_status = models.IntegerField(blank=False,null=False)
     willingness_shown = models.IntegerField(blank=False,null=False)

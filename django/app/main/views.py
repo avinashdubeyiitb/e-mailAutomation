@@ -36,17 +36,17 @@ from app.settings import EMAIL_HOST_USER,BASE_DIR,SCRIPTS_DIR
 ############################################################################################################################
 import googlemaps
 import requests
-'''
-API_KEY = 'AIzaSyD9qTJmiFUe3FQWlo5Z-A3l6pigxA3s8U8'
-gmaps = googlemaps.Client(key = API_KEY)
-print(gmaps)
-url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
-input='mbm Raj.'
-other='&inputtype=textquery&fields=name'
-result = requests.get(url+'input='+input+other+'&key='+API_KEY)
-x = result.json()
-print(x)
-'''
+#
+# API_KEY = 'AIzaSyD9qTJmiFUe3FQWlo5Z-A3l6pigxA3s8U8'
+# gmaps = googlemaps.Client(key = API_KEY)
+# print(gmaps)
+# url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
+# input='mbm Raj.'
+# other='&inputtype=textquery&fields=name'
+# result = requests.get(url+'input='+input+other+'&key='+API_KEY)
+# x = result.json()
+# print(x)
+#
 
 # zero_results
 # input='manganiram banghar memorial'
@@ -377,7 +377,11 @@ def getname(name):
     other='&inputtype=textquery&fields=name'
     result = requests.get(url+'input='+input+other+'&key='+API_KEY)
     collx = result.json()
-    return collx['candidates'][0]['name']
+    print(collx)
+    if collx['status'] == 'REQUEST_DENIED':
+        return name
+    else:
+        return collx['candidates'][0]['name']
 def getloc(name):
     API_KEY = 'AIzaSyD9qTJmiFUe3FQWlo5Z-A3l6pigxA3s8U8'
     url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
@@ -386,7 +390,11 @@ def getloc(name):
     other='&inputtype=textquery&fields=formatted_address'
     result = requests.get(url+'input='+input+other+'&key='+API_KEY)
     collx = result.json()
-    return collx
+    print(collx)
+    if collx.status == 'REQUEST_DENIED':
+        return name
+    else:
+        return collx
 ################################
 
 ################################
