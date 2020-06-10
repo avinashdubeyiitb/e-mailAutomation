@@ -8,23 +8,28 @@
 <body>
     <div>
        {% for data in datas%}
-       {{data.responder}} <input type = 'text' id="choosen" onclick="save(id)"><br>
+       {{data.responder}} <input type = 'text' id= "{{ data.responder }}" onclick="save( '{{ data.responder }}' )" ><br>
        {% endfor%}       
     </div>    
     <button  onclick="myFunction()">submit</button>
     <script>
         var list = []
+        var val = []
         function save(id) {
-            list.push(document.getElementById(id).value)
+            console.log(id)
+            list.push(id)
         }
         //document.getElementById("btn").onclick = function() {myFunction()};
         function myFunction() {
+            for (var idx in list) {
+                val.push(document.getElementById(list[idx]).value)
+            }
             axios({
                 method: 'POST',
                 url: 'http://localhost:8081/api/main/headresults',
                 data: {
-                    //values: list,
-                    values: document.getElementById('choosen').value ,
+                    values: val,
+                    names: list,
                     uuid: `{{uuid}}`,
                     wid: `{{wid}}`
                 }

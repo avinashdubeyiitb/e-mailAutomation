@@ -137,7 +137,7 @@ def getbody(clg,obj,sta,dis):
                             tchdtl.append(fields.name)
                             if fields.name in tchdtl2:
                                 l.append(fields.name)
-                        det = WorkshopDtls.objects.filter(clg_id = workshop[0].workshop_id )
+                        det = WorkshopDtls.objects.filter(id = workshop[0].workshop_id )
                         workshop_id = workshop[0].workshop_id
                         temp = ElsiCollegeDtls.objects.filter(id = det[0].clg_id)
                         details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
@@ -168,7 +168,8 @@ def getbody(clg,obj,sta,dis):
                             tchdtl.append(fields.name)
                             if fields.name in tchdtl2:
                                 l.append(fields.name)
-                        det = WorkshopDtls.objects.filter(clg_id = workshop[0].workshop_id )
+                        det = WorkshopDtls.objects.filter(id = workshop[0].workshop_id )
+                        print(det.values())
                         workshop_id = workshop[0].workshop_id
                         temp = ElsiCollegeDtls.objects.filter(id = det[0].clg_id)
                         details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
@@ -377,9 +378,10 @@ def getname(name):
     other='&inputtype=textquery&fields=name'
     result = requests.get(url+'input='+input+other+'&key='+API_KEY)
     collx = result.json()
+    print(collx)
     return collx['candidates'][0]['name']
 def getloc(name):
-    API_KEY = 'AIzaSyD9qTJmiFUe3FQWlo5Z-A3l6pigxA3s8U8'
+    API_KEY = 'AIzaSyBE-9YyXHa6tXkOFmZpNS3fdXkSwU2bMk8'
     url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
     input=name
     input.replace(" ", "%")
@@ -472,7 +474,7 @@ def store(request):
                             tchdtl.append(fields.name)
                             if fields.name in tchdtl2:
                                 l.append(fields.name)
-                        det = WorkshopDtls.objects.filter(clg_id = workshop[0].workshop_id )
+                        det = WorkshopDtls.objects.filter(id = workshop[0].workshop_id )
                         workshop_id = workshop[0].workshop_id
                         temp = ElsiCollegeDtls.objects.filter(id = det[0].clg_id)
                         details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
@@ -501,7 +503,7 @@ def store(request):
                             tchdtl.append(fields.name)
                             if fields.name in tchdtl2:
                                 l.append(fields.name)
-                        det = WorkshopDtls.objects.filter(clg_id = workshop[0].workshop_id )
+                        det = WorkshopDtls.objects.filter(id = workshop[0].workshop_id )
                         workshop_id = workshop[0].workshop_id
                         temp = ElsiCollegeDtls.objects.filter(id = det[0].clg_id)
                         details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
@@ -1061,24 +1063,50 @@ def form(request,uid,wid):
 def headapproval(request,uid,wid):
     head = headdetail.objects.filter(id = uid)
     wrkshp = create_workshop.objects.filter(id = wid)
-    if head[0].name == 'disha':
+    if head[0].name == 'Aditya':
         data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYRC = True)
-    elif head[0].name == 'dini':
+    elif head[0].name == 'Lohit':
         data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYIC = True)
+    elif head[0].name == 'Rutuja':
+        data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYRDC = True)    
+    elif head[0].name == 'Avinash':
+        data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eLSI = True)    
+    elif head[0].name == 'Sachin':
+        data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,web = True)    
+    elif head[0].name == 'Ajit':
+        data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,course_or_other_eyantra_work = 'True')    
+    else:
+        data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,personal_or_any_other = 'True')    
     return render(request,'headapproval.html',context={'uuid':uid,'wid':wid,'datas':data})
 
 @api_view(['POST'])
 def headresults(request):
     var = JSONParser().parse(request)
-    print(var.get('uuid'),var.get('wid'),var.get('values'))
+    print(var.get('uuid'),var.get('wid'),var.get('values'),var.get('names'))
     values = var.get('values')
+    nms = var.get('names')
     wrkshp = create_workshop.objects.filter(id = var.get('wid'))
-    nms = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn)
+    head = headdetail.objects.filter(id = var.get('uuid'))
     '''
     eYRC,eYIC,eYRDC,eLSI,web,Course/Other e-Yantra Work,Personal/Any Other
     '''
-    for idx in range(nms.count()):
-        WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn).update(approval_eYRC = values)
+    for idx in range(len(nms)):
+        obj = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,
+                responder = nms[idx])
+        if head[0].name == 'Aditya':
+            obj.update(approval_eYRC = values[idx])
+        elif head[0].name == 'Lohit':
+            obj.update(approval_eYIC = values[idx])
+        elif head[0].name == 'Rutuja':
+            obj.update(approval_eYRDC = values[idx])
+        elif head[0].name == 'Avinash':
+            obj.update(approval_eLSI = values[idx])
+        elif head[0].name == 'Sachin':
+            obj.update(approval_web = values[idx])
+        elif head[0].name == 'Ajit':
+            obj.update(approval_course_or_other_eyantra_work = values[idx])
+        elif head[0].name == 'Kavi Sir':
+            obj.update(approval_personal_or_any_other = values[idx])
     return Response('success')
 
 @api_view(['POST'])
@@ -1088,20 +1116,20 @@ def formdata(request):
     wrkshp = create_workshop.objects.filter(id = var.get('wid'))
     reasonlist = var.get('reason').split(',')
     print(reasonlist)
-    feedreason = ['False','False','False','False','False','False','False']
+    feedreason = [0,0,0,0,0,'False','False']
     '''
     eYRC,eYIC,eYRDC,eLSI,web,Course/Other e-Yantra Work,Personal/Any Other
     '''
     if 'eYRC' in reasonlist:
-        feedreason[0] = 'True'
+        feedreason[0] = 1
     if 'eYIC' in reasonlist:
-        feedreason[1] = 'True'
+        feedreason[1] = 1
     if 'eYRDC' in reasonlist:
-        feedreason[2] = 'True'
+        feedreason[2] = 1
     if 'eLSI' in reasonlist:
-        feedreason[3] = 'True'
+        feedreason[3] = 1
     if 'web' in reasonlist:
-        feedreason[4] = 'True'
+        feedreason[4] = 1
     if 'Course/Other e-Yantra Work' in reasonlist:
         feedreason[5] = 'True'
     if 'Personal/Any Other' in reasonlist :
@@ -1181,9 +1209,9 @@ def headmail(request):
             rsnd[3]['eLSI'].append(team[idx].responder)
         elif team[idx].web:
             rsnd[4]['web'].append(team[idx].responder)
-        elif team[idx].course_or_other_eyantra_work:
+        elif team[idx].course_or_other_eyantra_work != 'False':
             rsnd[5]['course_or_other_eyantra_work'].append(team[idx].responder)
-        elif team[idx].personal_or_any_other:
+        elif team[idx].personal_or_any_other != 'False':
             rsnd[6]['personal_or_any_other'].append(team[idx].responder)
     print(rsnd)
     for idx in range(objs.count()):
