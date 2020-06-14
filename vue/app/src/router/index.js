@@ -41,11 +41,19 @@ const routes = [
   },
   {
     path: '/tsa',
-    name: 'ALGO',
+    name: 'other',
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/tsa.vue')
+  },
+  {
+    path: '/algo',
+    name: 'ALGO',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "about" */ '../views/algo.vue')
   }
 ]
 

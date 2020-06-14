@@ -19,8 +19,9 @@ class WorkshopTeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkshopTeamStatus
         fields = (
+            'workshop_id',
             'workshop_venue',
             'date',
             'district',
             'responder',
-        )        
+        )

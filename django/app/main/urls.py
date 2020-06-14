@@ -23,10 +23,14 @@ urlpatterns = [
     url(r'^api/main/mailids',views.mailids),
     url(r'^api/main/gethcn',views.gethcn),
     url(r'^api/main/headmail',views.headmail),
+<<<<<<< HEAD
     url(r'^api/main/awsedit',views.awsedit),
     url(r'^api/main/awssave',views.awssave),
     url(r'^api/public/', views.public),
     url(r'^api/private/', views.private)
+=======
+    url(r'^api/main/algo',views.algo_for_willing_mem)
+>>>>>>> e1f3f47e92808fa6dd0ccdc05e4dd7c2de0a8921
 ]
 '''
     url(r'^$', views.home, name='home'),
