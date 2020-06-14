@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <h1>Send Information Mail</h1>
-    <button id="butt" type="button" name="button"><router-link to="/">Home</router-link></button>
+    <button id="butt" type="button" name="button"><router-link to="/home">Home</router-link></button>
     <button id="goback" v-show="iscsvtrue" type="button" name="button" @click="gobacktoform">!form</button>
   <div id="col1inner" >
     <div v-show="isNight3" >
@@ -182,7 +182,7 @@
     </b-container>
     <b-button @click="$bvModal.hide('modal-2')">OK</b-button>
     </b-modal><br>
-  <label id="srattach"><strong>Attachment:</strong>{{upfile1}}hello
+  <label id="srattach"><strong>Attachment:</strong>
       <div v-for="(value,key) in output.attachments" v-bind:key="key">
       <b-button >
       <b-button size="sm" @click='getfile(value)' >{{value}}</b-button>

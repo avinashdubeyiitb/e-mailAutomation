@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <h1>Create Workshop </h1>
-    <button id="butt" type="button" name="button"><router-link to="/">Home</router-link></button>
+    <button id="butt" type="button" name="button"><router-link to="/home">Home</router-link></button>
   <div id="col1inner" >
     <div v-show="isNight3" >
     <strong><p id="fd">Fill details:</p></strong>

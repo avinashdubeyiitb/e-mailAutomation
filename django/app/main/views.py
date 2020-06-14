@@ -33,6 +33,28 @@ import csv
 from .serializers import *
 from .models import *
 from app.settings import EMAIL_HOST_USER,BASE_DIR,SCRIPTS_DIR
+######################
+
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def home(request):
+    return render(request, os.path.join(SCRIPTS_DIR,'home.html'))
+
+def login(request):
+    return render(request, os.path.join(SCRIPTS_DIR,'login.html'))
+
+def logout(request):
+    return render(request, os.path.join(SCRIPTS_DIR,'logout.html'))    
+
+def public(request):
+    return HttpResponse("You don't need to be authenticated to see this")
+
+
+@api_view(['GET'])
+def private(request):
+    return HttpResponse("You should not see this message if not authenticated!")
+#####################
 ############################################################################################################################
 import googlemaps
 import requests
@@ -874,6 +896,8 @@ def submit(request):
 @api_view(['POST'])
 def approve(request):
         try:
+            #print(request.data.get('file1'))
+            #print(request.data.get('file2'))
             to = request.data.get('remail')
             if type(request.data.get('cc')) == list:
                 cc = ','.join(map(str,request.data.get('cc') ))
@@ -907,6 +931,7 @@ def approve(request):
                 return JsonResponse({'status':'success','info':'mail sent successfully'})
             else :
                 return JsonResponse({'status':'failure','info':'mail was not sent'})
+            #return JsonResponse({'status':'success'})
         except ValueError as e:
             return Response(e.args[0],status.HTTP_400_BAD_REQUEST)
 
@@ -1043,6 +1068,32 @@ def awssubmit(request):
                 return JsonResponse({'key':'nodata'})
         except ValueError as e:
             return JsonResponse({'status':'failed','info':e.args[0]})
+
+@api_view(['POST'])
+def awsedit(request):
+    var = JSONParser().parse(request)
+    sw = var.get('selectedworkshop')
+    wrkshp = create_workshop.objects.filter(hcn = sw)
+    data = {
+        'hcn':sw,'startdate':wrkshp[0].startdate,
+        'enddate':wrkshp[0].enddate,'venueadd':wrkshp[0].venueadd,
+        'cooname':wrkshp[0].cooname,'cooemail':wrkshp[0].cooemail,
+        'coono':wrkshp[0].coono,'wid':wrkshp[0].id
+    }
+    return JsonResponse(data)
+
+@api_view(['POST'])
+def awssave(request):
+    var = JSONParser().parse(request)
+    data = create_workshop.objects.filter(id = var.get('wid'))
+    print(data.values())
+    data.update(hcn = var.get('hcn'),startdate = var.get('startdate'),
+        enddate = var.get('enddate'),venueadd = var.get('venueadd'),
+        cooname = var.get('cooname'),cooemail = var.get('cooemail'),
+        coono = var.get('coono'))
+    print(data.values())
+    return JsonResponse({'status':'saved'})
+
 ######################
 
 ######################
