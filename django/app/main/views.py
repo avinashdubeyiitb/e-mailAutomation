@@ -23,6 +23,7 @@ from datetime import datetime
 from django.utils.encoding import escape_uri_path
 import smtplib
 import json
+import operator
 import pickle
 import os.path
 import httplib2
@@ -51,6 +52,15 @@ import requests
 # zero_results
 # input='manganiram banghar memorial'
 ############################################################################################################################
+
+# result = requests.get('https://api.foursquare.com/v2/venues/search'+'&client_id='+'JXAUNDUQSLCQVQRJER3CHDXY2SYR3EVCB5UT3D3Q340JWJJI'
+#  + '&client_secret=' + '4SCOWU5XHQIG2RYIDEI1HRBV32A11EJ4YFQKCJO2G4DZISRF')
+# x = result.json()
+# print(x)
+
+
+
+###########################################################################################################################
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = [
     'https://www.googleapis.com/auth/gmail.readonly',
@@ -137,7 +147,7 @@ def getbody(clg,obj,sta,dis):
                             tchdtl.append(fields.name)
                             if fields.name in tchdtl2:
                                 l.append(fields.name)
-                        det = WorkshopDtls.objects.filter(clg_id = workshop[0].workshop_id )
+                        det = WorkshopDtls.objects.filter(id = workshop[0].workshop_id )
                         workshop_id = workshop[0].workshop_id
                         temp = ElsiCollegeDtls.objects.filter(id = det[0].clg_id)
                         details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
@@ -168,7 +178,8 @@ def getbody(clg,obj,sta,dis):
                             tchdtl.append(fields.name)
                             if fields.name in tchdtl2:
                                 l.append(fields.name)
-                        det = WorkshopDtls.objects.filter(clg_id = workshop[0].workshop_id )
+                        det = WorkshopDtls.objects.filter(id = workshop[0].workshop_id )
+                        print(det.values())
                         workshop_id = workshop[0].workshop_id
                         temp = ElsiCollegeDtls.objects.filter(id = det[0].clg_id)
                         details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
@@ -383,7 +394,7 @@ def getname(name):
     else:
         return collx['candidates'][0]['name']
 def getloc(name):
-    API_KEY = 'AIzaSyD9qTJmiFUe3FQWlo5Z-A3l6pigxA3s8U8'
+    API_KEY = 'AIzaSyBE-9YyXHa6tXkOFmZpNS3fdXkSwU2bMk8'
     url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
     input=name
     input.replace(" ", "%")
@@ -480,7 +491,7 @@ def store(request):
                             tchdtl.append(fields.name)
                             if fields.name in tchdtl2:
                                 l.append(fields.name)
-                        det = WorkshopDtls.objects.filter(clg_id = workshop[0].workshop_id )
+                        det = WorkshopDtls.objects.filter(id = workshop[0].workshop_id )
                         workshop_id = workshop[0].workshop_id
                         temp = ElsiCollegeDtls.objects.filter(id = det[0].clg_id)
                         details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
@@ -509,7 +520,7 @@ def store(request):
                             tchdtl.append(fields.name)
                             if fields.name in tchdtl2:
                                 l.append(fields.name)
-                        det = WorkshopDtls.objects.filter(clg_id = workshop[0].workshop_id )
+                        det = WorkshopDtls.objects.filter(id = workshop[0].workshop_id )
                         workshop_id = workshop[0].workshop_id
                         temp = ElsiCollegeDtls.objects.filter(id = det[0].clg_id)
                         details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
@@ -1053,6 +1064,200 @@ def awssubmit(request):
 
 ######################
 # workshop team algo
+
+def algo_for_available_mem(spl_mem_available,workshop_lead,ranked_data,availcriteria,lang,tcntt):
+    print('here are available members')
+    msg = 'These people are special cases'
+    availctr = []
+    for i in availcriteria:
+        if i == 'Highest Count of Workshop in Past Running Year':
+            availctr.append(0)
+        elif i == 'Linguistics Criteria':
+            availctr.append(3)
+        elif i == 'Count of Total Workshop':
+            availctr.append(2)
+    print(availctr)
+    p = WorkshopsTakenCount.objects.all()
+    d=[]
+    def sort_table(table, cols):
+        for col in reversed(cols):
+            table = sorted(table, key=operator.itemgetter(col))
+        return table
+    for i in range(p.count()):
+        for j in range(len(spl_mem_available)):
+            if spl_mem_available[j] == p[i].name:
+                d.append([p[i].past_year, p[i].name,p[i].total_count])
+    for i in range(len(d)):
+        lang_data = userdetail.objects.filter(name = d[i][1])
+        if lang_data[0].language is None:
+            d[i].extend('1')
+        else:
+            l = lang_data[0].language.split(',')
+            for j in l :
+                print(j)
+                if j == lang:
+                    d[i].extend('0')
+                else:
+                    d[i].extend('1')
+    print(d,'d')
+    sav = sort_table(d,(availctr[0],availctr[1],availctr[2]))
+    print(sav,'sav1')
+    ranked_avail_data = []
+    for i in range(len(sav)):
+        ranked_avail_data.append(sav[i][1])
+    print(ranked_avail_data,'ranked_avail_data')
+
+    if len(workshop_lead) < 2:
+        workshop_lead_list = ranked_avail_data
+        for i in ranked_avail_data:
+            if (WorkshopsTakenCount.objects.filter(name = i))[0].total_count < tcntt:
+                index = workshop_lead_list.index(i)
+                workshop_lead_list.pop(index)
+        for i in workshop_lead_list:
+            if len(workshop_lead) < 3:
+                workshop_lead.append(i)
+                msg = msg + ' ' + i + '(Lead)'
+        print(workshop_lead,'workshop_lead')
+        for i in workshop_lead:
+            if i in ranked_avail_data:
+                ranked_avail_data.remove(i)
+        print(ranked_avail_data,'ranked_avail_data')
+
+    if len(ranked_data) < 3:
+        for i in ranked_avail_data:
+            if len(ranked_data) < 3:
+                 ranked_data.append(i)
+                 msg = msg + ' ' + i + '(Member)'
+        print(ranked_data,'ranked_data')
+
+    return workshop_lead,ranked_data,msg
+
+@api_view(['POST'])
+def algo_for_willing_mem(request):
+    var = JSONParser().parse(request)
+    lang = var.get('lang')
+    selectedworkshop = var.get('selectedworkshop')
+    if len(selectedworkshop) < 1:
+        return JsonResponse({'workshop_team':'please input workshop'})
+
+    willcriteria = var.get('willcriteria')
+    availcriteria = var.get('availcriteria')
+    print(willcriteria,'willcriteria')
+    willctr = []
+    demo = int(var.get('demo'))
+    tcnt = int(var.get('tcnt'))
+    tcntt = int(var.get('tcntt'))
+    for i in willcriteria:
+        if i == 'Count of Willingness in Past Running Year':
+            willctr.append(2)
+        elif i == 'Highest Count of Workshop in Past Running Year':
+            willctr.append(0)
+        elif i == 'Linguistics Criteria':
+            willctr.append(4)
+        elif i == 'Count of Total Workshop':
+            willctr.append(3)
+    print(willctr)
+    #step 1
+    x = WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop)
+    mem_available = []
+    for i in range(x.count()):
+        if x[i].eYRC == '1':
+            if x[i].approval_eYRC == 'None' or x[i].approval_eYRC == 'no':
+                mem_available.append(x[i].responder )
+        if x[i].eYIC == '1':
+            if x[i].approval_eYIC == 'None' or x[i].approval_eYIC == 'no':
+                mem_available.append(x[i].responder)
+        if x[i].eYRDC == '1':
+            if x[i].approval_eYRDC == 'None' or x[i].approval_eYRDC == 'no':
+                mem_available.append(x[i].responder)
+        if x[i].eLSI == '1':
+            if x[i].approval_eLSI == 'None' or x[i].approval_eLSI == 'no':
+                mem_available.append(x[i].responder)
+        if x[i].web == '1':
+            if x[i].approval_web == 'None' or x[i].approval_web == 'no':
+                mem_available.append(x[i].responder)
+        if x[i].course_or_other_eyantra_work == '1':
+            if x[i].approval_course_or_other_eyantra_work == 'None' or x[i].approval_course_or_other_eyantra_work == 'no':
+                mem_available.append(x[i].responder)
+        if x[i].personal_or_any_other == '1':
+            if x[i].approval_personal_or_any_other == 'None' or x[i].approval_personal_or_any_other == 'no':
+                mem_available.append(x[i].responder)
+    spl_mem_available = []
+    [spl_mem_available.append(x) for x in mem_available if x not in spl_mem_available]
+    print(spl_mem_available,'step1')
+    #step 2
+    y = WorkshopTeamStatus.objects.filter(workshop_id = 2 ,willingness_or_unavailability = 'Willingness')
+    will_mem_available = []
+    for i in range(y.count()):
+        will_mem_available.append(y[i].responder)
+    print(will_mem_available,'step2')
+    #step 3
+    z = DemoDtls.objects.all()
+    for i in range(z.count()):
+        if z[i].total_count_demo < demo:
+            if z[i].name in will_mem_available:
+                index = will_mem_available.index(z[i].name)
+                will_mem_available.pop(index)
+    print(will_mem_available,'step3')
+    #step 4
+    p = WorkshopsTakenCount.objects.all()
+    d=[]
+    def sort_table(table, cols):
+        for col in reversed(cols):
+            table = sorted(table, key=operator.itemgetter(col), reverse=True)
+        return table
+    for i in range(p.count()):
+        for j in range(len(will_mem_available)):
+            if will_mem_available[j] == p[i].name:
+                d.append([p[i].past_year, p[i].name, p[i].willingness_shown,p[i].total_count])
+    for i in range(len(d)):
+        lang_data = userdetail.objects.filter(name = d[i][1])
+        if lang_data[0].language is None:
+            d[i].extend('0')
+        else:
+            l = lang_data[0].language.split(',')
+            for j in l :
+                print(j)
+                if j == lang:
+                    d[i].extend('1')
+                else:
+                    d[i].extend('0')
+    print(d,'d')
+
+    sav = sort_table(d,(willctr[0],willctr[1],willctr[2],willctr[3]))
+    print(sav,'sav1')
+    ranked_data = []
+    for i in range(len(sav)):
+        ranked_data.append(sav[i][1])
+    print(ranked_data,'ranked_data')
+    willing_team_lead = []
+    for i in ranked_data:
+        if (WorkshopsTakenCount.objects.filter(name = i))[0].total_count <= tcnt:
+            willing_team_lead.append(i)
+    print(willing_team_lead,'willing_team_lead')
+    #step 10
+    workshop_lead = willing_team_lead[0:2]
+    print(workshop_lead,'workshop_lead')
+    #step 11
+    for i in workshop_lead:
+        ranked_data.remove(i)
+    print(ranked_data,'ranked_data')
+    #step 12
+    workshop_team  = []
+    if len(workshop_lead) < 2 or len(ranked_data) < 3:
+        workshop_lead,ranked_data,msg = algo_for_available_mem(spl_mem_available,workshop_lead,ranked_data,availcriteria,lang,tcntt)
+        workshop_team = workshop_lead + ranked_data[:3]
+        print(workshop_team,'workshop_team')
+        print(msg)
+        return JsonResponse({'workshop_team':workshop_team,'msg':msg})
+    else:
+        workshop_team = workshop_lead + ranked_data[:3]
+        print(workshop_team,'workshop_team')
+    # if len(will_mem_available) < 5:
+        return JsonResponse({'workshop_team':workshop_team})
+
+
+
 @api_view(['POST'])
 def mailids(request):
     objs = userdetail.objects.all()
@@ -1067,26 +1272,52 @@ def form(request,uid,wid):
     return render(request,'form.html',context={'uuid':uid,'wid':wid})
 
 def headapproval(request,uid,wid):
-    head = headdetail.objects.filter(id = uid)
+    headdet = headdetail.objects.filter(id = uid)
     wrkshp = create_workshop.objects.filter(id = wid)
-    if head[0].name == 'disha':
-        data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYRC = True)
-    elif head[0].name == 'dini':
-        data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYIC = True)
+    if headdet[0].head == 'eYRC':
+        data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYRC = '1')
+    elif headdet[0].head == 'eYIC':
+        data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYIC = '1')
+    elif headdet[0].head == 'eYRDC':
+        data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYRDC = '1')
+    elif headdet[0].head == 'eLSI':
+        data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eLSI = '1')
+    elif headdet[0].head == 'web':
+        data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,web = '1')
+    elif headdet[0].head == 'course_or_other_eyantra_work':
+        data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,course_or_other_eyantra_work = '1')
+    else:
+        data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,personal_or_any_other = '1')
     return render(request,'headapproval.html',context={'uuid':uid,'wid':wid,'datas':data})
 
 @api_view(['POST'])
 def headresults(request):
     var = JSONParser().parse(request)
-    print(var.get('uuid'),var.get('wid'),var.get('values'))
+    print(var.get('uuid'),var.get('wid'),var.get('values'),var.get('names'))
     values = var.get('values')
+    nms = var.get('names')
     wrkshp = create_workshop.objects.filter(id = var.get('wid'))
-    nms = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn)
+    headdet = headdetail.objects.filter(id = var.get('uuid'))
     '''
     eYRC,eYIC,eYRDC,eLSI,web,Course/Other e-Yantra Work,Personal/Any Other
     '''
-    for idx in range(nms.count()):
-        WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn).update(approval_eYRC = values)
+    for idx in range(len(nms)):
+        obj = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,
+                responder = nms[idx])
+        if headdet[0].head == 'eYRC':
+            obj.update(approval_eYRC = values[idx])
+        elif headdet[0].head == 'eYIC':
+            obj.update(approval_eYIC = values[idx])
+        elif headdet[0].head == 'eYRDC':
+            obj.update(approval_eYRDC = values[idx])
+        elif headdet[0].head == 'eLSI':
+            obj.update(approval_eLSI = values[idx])
+        elif headdet[0].head == 'web':
+            obj.update(approval_web = values[idx])
+        elif headdet[0].head == 'course_or_other_eyantra_work':
+            obj.update(approval_course_or_other_eyantra_work = values[idx])
+        elif headdet[0].head == 'personal_or_any_other':
+            obj.update(approval_personal_or_any_other = values[idx])
     return Response('success')
 
 @api_view(['POST'])
@@ -1094,37 +1325,19 @@ def formdata(request):
     var = JSONParser().parse(request)
     print(var.get('uuid'),var.get('wid'))
     wrkshp = create_workshop.objects.filter(id = var.get('wid'))
-    reasonlist = var.get('reason').split(',')
-    print(reasonlist)
-    feedreason = ['False','False','False','False','False','False','False']
-    '''
-    eYRC,eYIC,eYRDC,eLSI,web,Course/Other e-Yantra Work,Personal/Any Other
-    '''
-    if 'eYRC' in reasonlist:
-        feedreason[0] = 'True'
-    if 'eYIC' in reasonlist:
-        feedreason[1] = 'True'
-    if 'eYRDC' in reasonlist:
-        feedreason[2] = 'True'
-    if 'eLSI' in reasonlist:
-        feedreason[3] = 'True'
-    if 'web' in reasonlist:
-        feedreason[4] = 'True'
-    if 'Course/Other e-Yantra Work' in reasonlist:
-        feedreason[5] = 'True'
-    if 'Personal/Any Other' in reasonlist :
-        feedreason[6] = 'True'
-    print(feedreason)
+    category = var.get('category')
+    feedreason = ['0','0','0','0','0','0','0']
+    cat = ['eYRC','eYIC','eYRDC','eLSI','web','course_or_other_eyantra_work','personal_or_any_other']
+    for i in range(len(category)):
+        index = cat.index(category[i])
+        feedreason[index] = '1'
     name = userdetail.objects.filter(id = var.get('uuid'))[0].name
-    if var.get('option') == 'unavailability':
-        WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,
+    WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,
         responder = name).update(willingness_or_unavailability = var.get('option'),
         reason = var.get('reason'),eYRC = feedreason[0],eYIC = feedreason[1],
         eYRDC = feedreason[2],eLSI = feedreason[3],web = feedreason[4],
-        course_or_other_eyantra_work = feedreason[5],personal_or_any_other = feedreason[6])
-    else:
-        WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,responder = name).update(willingness_or_unavailability = var.get('option'))
-
+        course_or_other_eyantra_work = feedreason[5],
+        personal_or_any_other = feedreason[6])
     return Response('success')
 
 @api_view(['POST'])
@@ -1132,16 +1345,17 @@ def sendmail(request):
     var = JSONParser().parse(request)
     selectedworkshop = var.get('selectedworkshop')
     wrkshp = create_workshop.objects.filter(hcn = selectedworkshop)
+    d = ElsiCollegeDtls.objects.filter(college_name = selectedworkshop)
+    district = d[0].district
     #selected = var.get('selected')
     #print(selected)
     objs = userdetail.objects.all()
     d = {'sent':[],'success':'','failure':'','total':objs.count()}
     sucs = flr = 0
-    objs = userdetail.objects.all()
     for idx in range(objs.count()):
             dte = wrkshp[0].startdate + ' & ' + wrkshp[0].enddate
-            serializer = WorkshopTeamSerializer(data = {'workshop_venue' : selectedworkshop,
-                'date' : dte,'district' : wrkshp[0].venueadd,'responder' : objs[idx].name})
+            serializer = WorkshopTeamSerializer(data = {'workshop_id' : wrkshp[0].id,'workshop_venue' : selectedworkshop,
+                'date' : dte,'district' : district,'responder' : objs[idx].name})
             print(serializer)
             if serializer.is_valid():
                 serializer.save()
@@ -1179,26 +1393,29 @@ def headmail(request):
         {'course_or_other_eyantra_work':[]},{'personal_or_any_other':[]}]
     team = WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop)
     for idx in range(team.count()):
-        if team[idx].eYRC:
+        if team[idx].eYRC == '1':
             rsnd[0]['eYRC'].append(team[idx].responder)
-        elif team[idx].eYIC:
+        if team[idx].eYIC == '1':
             rsnd[1]['eYIC'].append(team[idx].responder)
-        elif team[idx].eYRDC:
+        if team[idx].eYRDC == '1':
             rsnd[2]['eYRDC'].append(team[idx].responder)
-        elif team[idx].eLSI:
+        if team[idx].eLSI == '1':
             rsnd[3]['eLSI'].append(team[idx].responder)
-        elif team[idx].web:
+            print(rsnd[3],'hii')
+        if team[idx].web == '1':
             rsnd[4]['web'].append(team[idx].responder)
-        elif team[idx].course_or_other_eyantra_work:
+        if team[idx].course_or_other_eyantra_work == '1':
             rsnd[5]['course_or_other_eyantra_work'].append(team[idx].responder)
-        elif team[idx].personal_or_any_other:
+        if team[idx].personal_or_any_other == '1':
             rsnd[6]['personal_or_any_other'].append(team[idx].responder)
     print(rsnd)
+    print(objs.count())
     for idx in range(objs.count()):
         to = objs[idx].emailid
         print(len(list(rsnd[idx].values())[0]))
         if len(list(rsnd[idx].values())[0]):
             uuid = objs[idx].id
+            print(uuid)
             cc = ''
             bcc = ''
             subject = 'Workshop Team Selection approval'

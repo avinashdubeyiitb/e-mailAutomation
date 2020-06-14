@@ -19,19 +19,20 @@ class DemoDtls(models.Model):
         db_table = 'demo_dtls'
 
 class WorkshopTeamStatus(models.Model):
+    workshop_id = models.IntegerField(blank=False,null=False)
     workshop_venue = models.CharField(max_length=50,blank=False,null=False)
     date = models.TextField(blank=False,null=False)
     district = models.CharField(max_length=50,blank=False,null=False)
     responder = models.CharField(max_length=50,blank=False,null=False)
-    willingness_or_unavailability = models.CharField(max_length=20,blank=True,null=True)
-    reason = models.CharField(max_length=50,blank=True,null=True)
-    eYRC = models.BooleanField(blank=False,null=False,default='False')
-    eYIC = models.BooleanField(blank=False,null=False,default='False')
-    eYRDC = models.BooleanField(blank=False,null=False,default='False')
-    eLSI = models.BooleanField(blank=False,null=False,default='False')
-    web = models.BooleanField(blank=False,null=False,default='False')
-    course_or_other_eyantra_work = models.TextField(blank=False,null=False,default='False')
-    personal_or_any_other = models.TextField(blank=False,null=False,default='False')
+    willingness_or_unavailability = models.CharField(max_length=50,blank=True,null=True,default='None')
+    reason = models.CharField(max_length=100,blank=True,null=True)
+    eYRC = models.CharField(max_length=50,blank=False,null=False,default='0')
+    eYIC = models.CharField(max_length=50,blank=False,null=False,default='0')
+    eYRDC = models.CharField(max_length=50,blank=False,null=False,default='0')
+    eLSI = models.CharField(max_length=50,blank=False,null=False,default='0')
+    web = models.CharField(max_length=50,blank=False,null=False,default='0')
+    course_or_other_eyantra_work = models.CharField(max_length=50,blank=False,null=False,default='0')
+    personal_or_any_other = models.CharField(max_length=50,blank=False,null=False,default='0')
     approval_eYRC = models.CharField(max_length=20,blank=False,null=False,default='None')
     approval_eYIC = models.CharField(max_length=20,blank=False,null=False,default='None')
     approval_eYRDC = models.CharField(max_length=20,blank=False,null=False,default='None')
@@ -64,6 +65,8 @@ class userdetail(models.Model):
     id = models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
     emailid = models.EmailField(blank=False,null=False)
     name = models.CharField(max_length=50,blank=False,null=True)
+    language = models.TextField(blank=True,null=True)
+
     def __str__(self):
         return self.emailid
 
@@ -74,6 +77,7 @@ class headdetail(models.Model):
     id = models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
     emailid = models.EmailField(blank=False,null=False)
     name = models.CharField(max_length=50,blank=False,null=True)
+    head = models.CharField(max_length=50,blank=False,null=True)
     def __str__(self):
         return self.emailid
 

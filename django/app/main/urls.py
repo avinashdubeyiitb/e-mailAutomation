@@ -22,5 +22,6 @@ urlpatterns = [
     url(r'^api/main/store',views.store),
     url(r'^api/main/mailids',views.mailids),
     url(r'^api/main/gethcn',views.gethcn),
-    url(r'^api/main/headmail',views.headmail)
+    url(r'^api/main/headmail',views.headmail),
+    url(r'^api/main/algo',views.algo_for_willing_mem)
 ]

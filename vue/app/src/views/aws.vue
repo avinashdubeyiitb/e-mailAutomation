@@ -407,7 +407,7 @@ img{
 h1{
 position: absolute;
 left: 40%;
-top: 0%;
+top: 5%;
 margin:0px;
 font-style: normal;
 font-weight: normal;

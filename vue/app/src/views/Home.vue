@@ -3,24 +3,27 @@
       <div id="app2">
         <h1>Welcome to our App :)</h1>
           <h3>Available features:</h3>
-        <div id="a">
+        <div >
           <button id="but1" type="button" name="button"><router-link to="/sim">Send information mail</router-link></button>
        </div>
-       <div id="b">
+       <div >
        <button id="but2" type="button" name="button"><router-link to="/aws">Announce Workshop</router-link></button>
        </div>
-       <div id="c">
+       <div >
        <button id="but3" type="button" name="button"><router-link to="/cws">Create Workshop</router-link></button>
        </div>
        <div>
        <button id="but4" type="button" name="button"><router-link to="/tsa">Coming soon :(</router-link></button>
+       </div>
+       <div>
+       <button id="but5" type="button" name="button"><router-link to="/algo">Run Algorithm</router-link></button>
        </div>
     <router-view/>
   </div>
   </div>
 </template>
 
-<style>
+<style scoped>
 #but1{
   position: absolute;
   width: 200px;
@@ -60,6 +63,17 @@ box-shadow: 4px 6px 4px rgba(0, 0, 0, 0.25);
   height: 40px;
   left: 15%;
   top: 81%;
+
+  background: #F5C8C8;
+  box-shadow: 4px 6px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 19px;
+}
+#but5{
+  position: absolute;
+  width: 200px;
+  height: 40px;
+  left: 55%;
+  top: 45%;
 
   background: #F5C8C8;
   box-shadow: 4px 6px 4px rgba(0, 0, 0, 0.25);
