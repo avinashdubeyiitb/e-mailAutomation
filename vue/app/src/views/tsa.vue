@@ -2,7 +2,7 @@
   <div id="app">
     <div id="leftbar">
       <div id="baritem0" class="baritems">
-          <router-link to="/" style="text-decoration: none; color: inherit;" >Home</router-link>
+          <router-link to="/home" style="text-decoration: none; color: inherit;" >Home</router-link>
         </div>
       <div id="baritem1" class="baritems">
         <router-link style="text-decoration: none; color: inherit;" to="/sim">Send info. mail</router-link>
@@ -21,6 +21,9 @@
       </div>
     </div>
     <h1>Send Mail To Team</h1>
+    <button id="butt" type="button" name="button"><router-link to="/home">Home</router-link></button>
+    <button @click="makecall">login</button>
+    <!--
   <div id="col1inner" >
       <button id="sub1" @click="getmailids">Get Mail ids</button>
     <button id="sub2" @click="send" v-if="isget">Send</button>
@@ -55,7 +58,7 @@
   </div>
   </div>
   <div id="col2inner">
-  </div>
+  </div-->
   </div>
 </template>
 
@@ -77,6 +80,9 @@ export default {
     }
   },
   methods: {
+    makecall () {
+      require('electron').shell.openExternal('http://127.0.0.1:8081/login')
+    },
     getstate (mailid) {
       if (this.issend === true && this.selected.indexOf(mailid) !== -1) {
         if (this.result.success > 0 && this.sent.indexOf(mailid) !== -1) {

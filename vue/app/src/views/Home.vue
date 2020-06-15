@@ -2,7 +2,7 @@
     <div id="app">
   <div id="leftbar">
     <div id="baritem0" class="baritems">
-      <router-link to="/" style="text-decoration: none; color: inherit;position:absolute" >Home</router-link>
+      <router-link to="/home" style="text-decoration: none; color: inherit;position:absolute" >Home</router-link>
       </div>
     <div id="baritem1" class="baritems">
       <router-link style="text-decoration: none; color: inherit; position:absolute" to="/sim">Send info. mail</router-link>
@@ -19,11 +19,37 @@
     <div id="baritem5" class="baritems">
       <router-link style="text-decoration: none; color: inherit;" to="/tsa">Coming soon :(</router-link>
     </div>
-  </div>
+      <button class="btn btn-primary btn-margin" v-if="authenticated" @click="logout()" >Log Out</button>
   <router-view/>
   </div>
+</div>
 </template>
-
-<style >
-
+<script>
+export default {
+  data () {
+    return {
+      authenticated: this.$store.getters.getAuthenticated,
+      auth: this.$store.getters.getAuth
+    }
+  },
+  mounted () {
+    console.log(this.auth)
+    console.log(this.authenticated)
+  },
+  methods: {
+    logout () {
+      this.auth.logout()
+      this.$store.commit('changeAuth', this.auth)
+    }
+  }
+}
+</script>
+<style scoped>
+#but1{
+  position: absolute;
+  width: 200px;
+  height: 40px;
+  left: 15%;
+  top: 45%;
+}
 </style>

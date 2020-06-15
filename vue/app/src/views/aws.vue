@@ -2,7 +2,7 @@
   <div id="app">
     <div id="leftbar">
       <div id="baritem0" class="baritems">
-          <router-link to="/" style="text-decoration: none; color: inherit;" >Home</router-link>
+          <router-link to="/home" style="text-decoration: none; color: inherit;" >Home</router-link>
         </div>
       <div id="baritem1" class="baritems">
         <router-link style="text-decoration: none; color: inherit;" to="/sim">Send info. mail</router-link>
@@ -21,6 +21,8 @@
       </div>
     </div>
     <h1>Announce Workshop </h1>
+    <button id="butt" type="button" name="button"><router-link to="/home">Home</router-link></button>
+    <button class="btn btn-primary btn-margin" v-if="authenticated" @click="logout()">Log Out</button>
   <div id="col1inner" >
     <div v-show="isNight3" >
     <strong><p id="fd">Fill details:</p></strong>
@@ -62,12 +64,76 @@
     <button id="msub" v-b-modal.modal-1>Submit</button>
     <button id="sub1" @click="sendmail">Send Mail to Team</button>
     <button id="sub2" @click="headmail">Send Approval Mails</button>
-    <div id="result">{{result}}</div>
+        <div id="result">{{result}}</div>
+
     </form>
+    <button id="sub3" @click="edtalw">Edit</button>
     <!-- <strong>Response:</strong> -->
     <!-- <pre>
     </pre> -->
     <!-- <p id="rmsg">{{output}}</p> -->
+  </div>
+  <div v-show="!isNight2">
+    <form @submit="sndchngs">
+    <label id="hcn" ><strong>Host College Name:</strong>
+    <input v-if = "key4" v-model = "reqdata.hcn"
+   @blur= "key4 = false; $emit('update')"
+   @keyup.enter = "key4=false; $emit('update')" id="hcni">
+         <div v-else>
+     <label @click = "key4 = true;"> {{reqdata.hcn}} </label>
+   </div>
+   </label><br>
+    <label id="startdate"><strong >Start Date:</strong>
+    <input type="date" v-if = "key5" v-model = "reqdata.startdate"
+   @blur= "key5 = false; $emit('update')"
+   @keyup.enter = "key5=false; $emit('update')" id="startdatei">
+         <div v-else>
+     <label @click = "key5 = true;"> {{reqdata.startdate}} </label>
+   </div>
+    </label><br>
+    <label id="enddate"><strong>End Date:</strong>
+    <input type="date" v-if = "key6" v-model = "reqdata.enddate"
+   @blur= "key6 = false; $emit('update')"
+   @keyup.enter = "key6=false; $emit('update')" id="enddatei">
+         <div v-else>
+     <label @click = "key6 = true;"> {{reqdata.enddate}} </label>
+   </div>
+    </label><br>
+    <label  id="venueadd"><strong>Venue Address:</strong>
+    <input type="text" v-if = "key7" v-model = "reqdata.venueadd"
+   @blur= "key7 = false; $emit('update')"
+   @keyup.enter = "key7=false; $emit('update')" id="venueaddi">
+         <div v-else>
+     <label @click = "key7 = true;"> {{reqdata.venueadd}} </label>
+   </div>
+    </label><br>
+    <label id="cooname"><strong>Coordinator Name:</strong>
+    <input type="text" v-if = "key8" v-model = "reqdata.cooname"
+   @blur= "key8 = false; $emit('update')"
+   @keyup.enter = "key8=false; $emit('update')" id="coonamei">
+         <div v-else>
+     <label @click = "key8 = true;"> {{reqdata.cooname}} </label>
+   </div>
+    </label><br>
+    <label id="cooemail"><strong>Coordinator Email:</strong>
+    <input type="email" v-if = "key9" v-model = "reqdata.cooemail"
+   @blur= "key9 = false; $emit('update')"
+   @keyup.enter = "key9=false; $emit('update')" id="cooemaili">
+         <div v-else>
+     <label @click = "key9 = true;"> {{reqdata.cooemail}} </label>
+   </div>
+    </label><br>
+    <label id="coono"><strong>Coordinator Cont.:</strong>
+    <input type="tel" v-if = "key1" v-model = "reqdata.coono"
+   @blur= "key1 = false; $emit('update')"
+   @keyup.enter = "key1=false; $emit('update')" id="coono">
+         <div v-else>
+     <label @click = "key1 = true;"> {{reqdata.coono}} </label>
+   </div>
+    </label><br>
+
+    <button id="sub1">Feed</button>
+    </form>
   </div>
 </div>
 <div id="col2inner">
@@ -96,10 +162,10 @@
    <strong>Body</strong>
    <b-button v-b-modal.modal-2 id="srbody">body</b-button>
  <b-modal id="modal-2" size="lg" title="Body" hide-footer v-on:keyup.enter = "NoEnter" >
- <b-container class="px-2" >
+ <b-container class="px-2" id="container">
  <span v-html="output.body"></span>
  </b-container>
- <b-button @click="$bvModal.hide('modal-2')">OK</b-button>
+ <b-button @click="onDivInput($event);$bvModal.hide('modal-2');">OK</b-button>
  </b-modal><br>
 
    <label id="srattach"><strong>Attachment:</strong>
@@ -108,7 +174,7 @@
         <b-button size="sm" @click='getfile(value)' >{{value}}</b-button>
         <b-button @click="disc1(value,key)" class="close" aria-label="Close"><span class="d-inline-block" aria-hidden="true">&times;</span></b-button></b-button>
          </div>
-        <input type="file" id="upfile1" ref="upfile1" v-on:change="handleattachUpload"/>
+        <input type="file" id="upfile1" ref="upfile1" multiple v-on:change="handleattachUpload"/>
   </label><br>
  </form>
  </div>
@@ -166,6 +232,8 @@ export default {
   mounted () {
     console.log('Component mounted.')
     this.workshoplist()
+    console.log(this.auth)
+    console.log(this.authenticated)
   },
   computed: {
   },
@@ -206,14 +274,60 @@ export default {
       key9: '',
       reqdata: '',
       editedTodo: null,
-      upfile1: '',
+      upfile1: [],
       upfile2: '',
-      result: ''
+      result: '',
+      authenticated: this.$store.getters.getAuthenticated,
+      auth: this.$store.getters.getAuth
     }
   },
   watch: {
   },
   methods: {
+    logout () {
+      this.auth.logout()
+      this.$store.commit('changeAuth', this.auth)
+    },
+    onDivInput (e) {
+      this.output.body = document.getElementById('container').innerHTML
+    },
+    edtalw (e) {
+      this.isNight2 = false
+      this.isNight3 = false
+      e.preventDefault()
+      const currentObj = this
+      this.axios.post('http://localhost:8081/api/main/awsedit', {
+        selectedworkshop: this.selectedworkshop
+      })
+        .then(function (response) {
+          currentObj.reqdata = response.data
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    },
+    sndchngs (e) {
+      this.isNight2 = true
+      this.isNight3 = true
+      e.preventDefault()
+      const currentObj = this
+      this.axios.post('http://localhost:8081/api/main/awssave', {
+        wid: this.reqdata.wid,
+        hcn: this.reqdata.hcn,
+        startdate: this.reqdata.startdate,
+        enddate: this.reqdata.enddate,
+        venueadd: this.reqdata.venueadd,
+        cooname: this.reqdata.cooname,
+        cooemail: this.reqdata.cooemail,
+        coono: this.reqdata.coono
+      })
+        .then(function (response) {
+          currentObj.result = response.data
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    },
     headmail (e) {
       e.preventDefault()
       const currentObj = this
@@ -281,6 +395,14 @@ export default {
       this.output.district = ''
       this.output.body = ''
       this.output.subject = ''
+      this.reqdata.wid = ''
+      this.reqdata.hcn = ''
+      this.reqdata.startdate = ''
+      this.reqdata.enddate = ''
+      this.reqdata.venueadd = ''
+      this.reqdata.cooname = ''
+      this.reqdata.cooemail = ''
+      this.reqdata.coono = ''
     },
     getfile (value) {
       console.log(value)
@@ -292,6 +414,7 @@ export default {
     },
     handleattachUpload () {
       this.upfile1 = this.$refs.upfile1.files[0]
+      // this.upfile1 = this.$refs.upfile1.files
     },
     selectedstate (state, index) {
       console.log(state, index)
@@ -333,6 +456,7 @@ export default {
       this.isNight1 = false
       this.isNight2 = true
       this.isNight3 = true
+      this.result = ''
       this.axios.post('http://localhost:8081/api/main/awssubmit', {
         selectedworkshop: this.selectedworkshop,
         filldate: this.filldate,
@@ -350,6 +474,7 @@ export default {
     approve (e) {
       const formData = new FormData()
       formData.append('file1', this.upfile1)
+      // formData.append('file2', this.$refs.upfile1.files[1])
       formData.append('files2send1', Object.values(this.output.attachments))
       formData.append('bcc', this.output.bcc)
       formData.append('body', this.output.body)
@@ -585,6 +710,11 @@ position: absolute;
 right:10%;
 top: 53%;
 }
+#sub3{
+position: absolute;
+right:40%;
+top: 53%;
+}
 #sub1{
 position: absolute;
 right:10%;
@@ -707,3 +837,183 @@ tr ,td,thead,table,th{
 
 }
 </style>
+<!--
+#hcnstatel{
+position: absolute;
+width: 154px;
+height: 25px;
+left: 4%;
+top: 9%;
+
+font-family: Radley;
+font-size: 14px;
+line-height: 30px;
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #000000;
+
+}
+#hcnstate{
+position: absolute;
+left: 36%;
+top: 9%;
+}
+#hcn{
+  position: absolute;
+width: 154px;
+height: 25px;
+left: 4%;
+top: 15.5%;
+
+font-family: Radley;
+font-size: 14px;
+line-height: 30px;
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #000000;
+
+}
+#hcni{
+  position: absolute;
+left: 36%;
+top: 15.5%;
+
+}
+#startdate{
+position: absolute;
+width: 154px;
+height: 25px;
+left: 4%;
+top: 20.5%;
+
+font-family: Radley;
+font-size: 14px;
+line-height: 30px;
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #000000;
+
+}
+#startdatei{
+position: absolute;
+left: 36%;
+top: 20.5%;
+}
+#enddate{
+position: absolute;
+width: 154px;
+height: 25px;
+left: 4%;
+top: 27%;
+
+font-family: Radley;
+font-size: 14px;
+line-height: 30px;
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #000000;
+
+}
+#enddatei{
+position: absolute;
+left: 36%;
+top: 27%;
+}
+#venueadd{
+position: absolute;
+width: 154px;
+height: 25px;
+left: 4%;
+top: 33.5%;
+
+font-family: Radley;
+font-size: 14px;
+line-height: 30px;
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #000000;
+
+}
+#venueaddi{
+position: absolute;
+left: 36%;
+top: 33.5%;
+
+}
+#cooname{
+position: absolute;
+width: 154px;
+height: 25px;
+left: 4%;
+top: 39.5%;
+
+font-family: Radley;
+font-size: 14px;
+line-height: 30px;
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #000000;
+
+}
+#coonamei{
+position: absolute;
+left: 36%;
+top: 39.5%;
+}
+#cooemail{
+position: absolute;
+width: 154px;
+height: 25px;
+left: 4%;
+top: 45.5%;
+
+font-family: Radley;
+font-size: 14px;
+line-height: 30px;
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #000000;
+
+}
+#cooemaili{
+position: absolute;
+left: 36%;
+top: 45.5%;
+}
+#coono{
+position: absolute;
+width: 154px;
+height: 25px;
+left: 4%;
+top: 51%;
+
+font-family: Radley;
+font-size: 14px;
+line-height: 30px;
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #000000;
+
+}
+#coonoi{
+position: absolute;
+left: 36%;
+top: 51%;
+}
+-->

@@ -1,6 +1,7 @@
 <template>
   <div id="app">
       <!-- <button id="butt" type="button" name="button"><router-link to="/">Home</router-link></button> -->
+      <!-- <button id="butt" type="button" name="button" ><router-link to="/home">Home</router-link></button> -->
     <!--  <router-link to="/about">About</router-link> -->
     <div id="particles">
     <vue-particles

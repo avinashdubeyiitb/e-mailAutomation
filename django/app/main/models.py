@@ -57,7 +57,7 @@ class create_workshop(models.Model):
     coono = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
-        return self.id
+        return str(self.id)
     class Meta:
         db_table = 'create_workshop'
 

@@ -2,7 +2,7 @@
   <div id="app">
     <div id="leftbar">
       <div id="baritem0" class="baritems">
-          <router-link to="/" style="text-decoration: none; color: inherit;" >Home</router-link>
+          <router-link to="/home" style="text-decoration: none; color: inherit;" >Home</router-link>
         </div>
       <div id="baritem1" class="baritems">
         <router-link style="text-decoration: none; color: inherit;" to="/sim">Send info. mail</router-link>
@@ -22,6 +22,8 @@
     </div>
     <router-view/>
     <h1>Send Information Mail</h1>
+    <button id="butt" type="button" name="button"><router-link to="/home">Home</router-link></button>
+    <button class="btn btn-primary btn-margin" v-if="authenticated" @click="logout()" >Log Out</button>
     <button id="goback" v-show="iscsvtrue" type="button" name="button" @click="gobacktoform">!form</button>
   <div id="col1inner" >
     <div v-show="isNight3" >
@@ -202,7 +204,7 @@
     </b-container>
     <b-button @click="$bvModal.hide('modal-2')">OK</b-button>
     </b-modal><br>
-  <label id="srattach"><strong>Attachment:</strong>{{upfile1}}hello
+  <label id="srattach"><strong>Attachment:</strong>
       <div v-for="(value,key) in output.attachments" v-bind:key="key">
       <b-button >
       <b-button size="sm" @click='getfile(value)' >{{value}}</b-button>
@@ -325,6 +327,8 @@ const { shell } = require('electron')
 export default {
   mounted () {
     console.log('Component mounted.')
+    console.log(this.auth)
+    console.log(this.authenticated)
   },
   computed: {
   },
@@ -386,12 +390,18 @@ export default {
       sfile: '',
       detailprop: 'Teacher Details',
       detail: [],
-      issaved: false
+      issaved: false,
+      authenticated: this.$store.getters.getAuthenticated,
+      auth: this.$store.getters.getAuth
     }
   },
   watch: {
   },
   methods: {
+    logout () {
+      this.auth.logout()
+      this.$store.commit('changeAuth', this.auth)
+    },
     getfile (value) {
       console.log(value)
       if (value === 'Pamphlet2020.pdf') {

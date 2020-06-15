@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.conf.urls import url,include
 from main import views
 from django.contrib import admin
 urlpatterns = [
@@ -23,5 +23,15 @@ urlpatterns = [
     url(r'^api/main/mailids',views.mailids),
     url(r'^api/main/gethcn',views.gethcn),
     url(r'^api/main/headmail',views.headmail),
+    url(r'^api/main/awsedit',views.awsedit),
+    url(r'^api/main/awssave',views.awssave),
+    url(r'^api/public/', views.public),
+    url(r'^api/private/', views.private),
     url(r'^api/main/algo',views.algo_for_willing_mem)
 ]
+'''
+    url(r'^$', views.home, name='home'),
+    url(r'^login/$', views.login, name='login'),
+    url(r'^logout/$', views.logout, name='logout'),
+    url(r'^oauth/', include('social_django.urls', namespace='social')),  # <--
+'''
