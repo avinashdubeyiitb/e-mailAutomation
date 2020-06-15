@@ -61,7 +61,7 @@ export default class AuthService {
     delete this.accessToken
     delete this.idToken
     delete this.expiresAt
-    this.authNotifier.emit('authChange', false)
+    this.authNotifier.emit('authChange', { authenticated: false })
     // navigate to the home route
     router.replace('/')
   }

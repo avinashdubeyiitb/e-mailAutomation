@@ -49,13 +49,16 @@ export default {
     auth.authNotifier.on('authChange', authState => {
       this.authenticated = authState.authenticated
       this.$store.commit('changeState', this.authenticated)
+      if (!this.authenticated && !this.$store.getters.getAuthenticated) {
+        console.log('Logged Out')
+      } else {
+        console.log('Logged In')
+      }
     })
     return {
       authenticated: false,
       message: ''
     }
-  },
-  mounted () {
   },
   methods: {
     // this method calls the AuthService login() method

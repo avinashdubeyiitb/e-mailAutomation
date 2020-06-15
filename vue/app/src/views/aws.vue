@@ -19,7 +19,7 @@
         </div>
     </div>
     <strong id="filldate">Last date to Fill:</strong>
-    <input id="filldatei" type="date" v-model="filldate"><br>
+    <input id="filldatei" type="date" v-model="filldate" @change="$store.commit('filldate', filldate)"><br>
     <strong id="recipientstate">Recipient State:</strong>
     <div id="recipientstatei">
         <b-dropdown  v-bind:text="state" >
@@ -58,7 +58,8 @@
     <label id="hcn" ><strong>Host College Name:</strong>
     <input v-if = "key4" v-model = "reqdata.hcn"
    @blur= "key4 = false; $emit('update')"
-   @keyup.enter = "key4=false; $emit('update')" id="hcni">
+   @keyup.enter = "key4=false; $emit('update')" id="hcni"
+   @change="$store.commit('awsreqdata',reqdata)">
          <div v-else>
      <label @click = "key4 = true;"> {{reqdata.hcn}} </label>
    </div>
@@ -66,7 +67,8 @@
     <label id="startdate"><strong >Start Date:</strong>
     <input type="date" v-if = "key5" v-model = "reqdata.startdate"
    @blur= "key5 = false; $emit('update')"
-   @keyup.enter = "key5=false; $emit('update')" id="startdatei">
+   @keyup.enter = "key5=false; $emit('update')" id="startdatei"
+   @change="$store.commit('awsreqdata',reqdata)">
          <div v-else>
      <label @click = "key5 = true;"> {{reqdata.startdate}} </label>
    </div>
@@ -74,7 +76,8 @@
     <label id="enddate"><strong>End Date:</strong>
     <input type="date" v-if = "key6" v-model = "reqdata.enddate"
    @blur= "key6 = false; $emit('update')"
-   @keyup.enter = "key6=false; $emit('update')" id="enddatei">
+   @keyup.enter = "key6=false; $emit('update')" id="enddatei"
+   @change="$store.commit('awsreqdata',reqdata)">
          <div v-else>
      <label @click = "key6 = true;"> {{reqdata.enddate}} </label>
    </div>
@@ -82,7 +85,8 @@
     <label  id="venueadd"><strong>Venue Address:</strong>
     <input type="text" v-if = "key7" v-model = "reqdata.venueadd"
    @blur= "key7 = false; $emit('update')"
-   @keyup.enter = "key7=false; $emit('update')" id="venueaddi">
+   @keyup.enter = "key7=false; $emit('update')" id="venueaddi"
+   @change="$store.commit('awsreqdata',reqdata)">
          <div v-else>
      <label @click = "key7 = true;"> {{reqdata.venueadd}} </label>
    </div>
@@ -90,7 +94,8 @@
     <label id="cooname"><strong>Coordinator Name:</strong>
     <input type="text" v-if = "key8" v-model = "reqdata.cooname"
    @blur= "key8 = false; $emit('update')"
-   @keyup.enter = "key8=false; $emit('update')" id="coonamei">
+   @keyup.enter = "key8=false; $emit('update')" id="coonamei"
+   @change="$store.commit('awsreqdata',reqdata)">
          <div v-else>
      <label @click = "key8 = true;"> {{reqdata.cooname}} </label>
    </div>
@@ -98,7 +103,8 @@
     <label id="cooemail"><strong>Coordinator Email:</strong>
     <input type="email" v-if = "key9" v-model = "reqdata.cooemail"
    @blur= "key9 = false; $emit('update')"
-   @keyup.enter = "key9=false; $emit('update')" id="cooemaili">
+   @keyup.enter = "key9=false; $emit('update')" id="cooemaili"
+   @change="$store.commit('awsreqdata',reqdata)">
          <div v-else>
      <label @click = "key9 = true;"> {{reqdata.cooemail}} </label>
    </div>
@@ -106,7 +112,8 @@
     <label id="coono"><strong>Coordinator Cont.:</strong>
     <input type="tel" v-if = "key1" v-model = "reqdata.coono"
    @blur= "key1 = false; $emit('update')"
-   @keyup.enter = "key1=false; $emit('update')" id="coono">
+   @keyup.enter = "key1=false; $emit('update')" id="coono"
+   @change="$store.commit('awsreqdata',reqdata)">
          <div v-else>
      <label @click = "key1 = true;"> {{reqdata.coono}} </label>
    </div>
@@ -134,7 +141,8 @@
    <label id="srsubject"><strong>subject:</strong>
    <input v-if = "key3" v-model = "output.subject"
    @blur= "key3 = false; $emit('update')"
-   @keyup.enter = "key3=false; $emit('update')" id="isrsubject">
+   @keyup.enter = "key3=false; $emit('update')" id="isrsubject"
+   @change="$store.commit('awsoutput',output)">
          <div v-else>
      <label @click = "key3 = true;"> {{output.subject}} </label>
    </div>
@@ -206,43 +214,40 @@
   </div>
 </template>
 <script>
-import statedisdata from '../assets/states-and-districts.json'
 const { shell } = require('electron')
 export default {
   mounted () {
     console.log('Component mounted.')
     this.workshoplist()
-    console.log(this.auth)
-    console.log(this.authenticated)
   },
   computed: {
   },
   data () {
     return {
-      statedisdata: statedisdata,
-      state: 'State',
-      index: '',
-      in: '',
-      wrklist: [],
-      showing: 'false',
-      districts: [],
-      d: 'District',
-      district: [],
-      isNight: true,
-      isNight1: true,
-      isNight2: true,
-      isNight3: true,
-      selectedworkshop: '',
+      statedisdata: this.$store.getters.statedisdata,
+      state: this.$store.getters.awsstate,
+      index: this.$store.getters.awsindex,
+      in: this.$store.getters.awsin,
+      wrklist: this.$store.getters.awswrklist,
+      showing: this.$store.getters.awsshowing,
+      districts: this.$store.getters.awsdistricts,
+      d: this.$store.getters.awsd,
+      district: this.$store.getters.awsdistrict,
+      isNight: this.$store.getters.awsisNight,
+      isNight1: this.$store.getters.awsisNight1,
+      isNight2: this.$store.getters.awsisNight2,
+      isNight3: this.$store.getters.awsisNight3,
+      selectedworkshop: this.$store.getters.awsselectedworkshop,
       popoverShow1: false,
       popoverShow2: false,
       popoverShow3: false,
       popoverShow4: false,
-      hcn: '',
-      filldate: '',
-      output: '',
-      items: [],
-      selected: [],
-      selectAll: false,
+      hcn: this.$store.getters.awshcn,
+      filldate: this.$store.getters.filldate,
+      output: this.$store.getters.awsoutput,
+      items: this.$store.getters.awsitems,
+      selected: this.$store.getters.awsselected,
+      selectAll: this.$store.getters.awsselectAll,
       key1: '',
       key2: '',
       key3: '',
@@ -252,11 +257,11 @@ export default {
       key7: '',
       key8: '',
       key9: '',
-      reqdata: '',
-      editedTodo: null,
-      upfile1: [],
-      upfile2: '',
-      result: '',
+      reqdata: this.$store.getters.awsreqdata,
+      editedTodo: this.$store.getters.awseditedTodo,
+      upfile1: this.$store.getters.awsupfile1,
+      upfile2: this.$store.getters.awsupfile2,
+      result: this.$store.getters.result,
       authenticated: this.$store.getters.getAuthenticated,
       auth: this.$store.getters.getAuth
     }
@@ -270,10 +275,13 @@ export default {
     },
     onDivInput (e) {
       this.output.body = document.getElementById('container').innerHTML
+      this.$store.commit('awsoutput', this.output)
     },
     edtalw (e) {
       this.isNight2 = false
+      this.$store.commit('awsisNight2', this.isNight2)
       this.isNight3 = false
+      this.$store.commit('awsisNight3', this.isNight3)
       e.preventDefault()
       const currentObj = this
       this.axios.post('http://localhost:8081/api/main/awsedit', {
@@ -281,6 +289,7 @@ export default {
       })
         .then(function (response) {
           currentObj.reqdata = response.data
+          this.$store.commit('awsreqdata', this.reqdata)
         })
         .catch(function (error) {
           console.log(error)
@@ -288,7 +297,9 @@ export default {
     },
     sndchngs (e) {
       this.isNight2 = true
+      this.$store.commit('awsisNight2', this.isNight2)
       this.isNight3 = true
+      this.$store.commit('awsisNight3', this.isNight3)
       e.preventDefault()
       const currentObj = this
       this.axios.post('http://localhost:8081/api/main/awssave', {
@@ -303,6 +314,7 @@ export default {
       })
         .then(function (response) {
           currentObj.result = response.data
+          this.$store.commit('awsreqdata', this.reqdata)
         })
         .catch(function (error) {
           console.log(error)
@@ -312,11 +324,13 @@ export default {
       e.preventDefault()
       const currentObj = this
       this.result = 'sending mails'
+      this.$store.commit('result', this.result)
       this.axios.post('http://localhost:8081/api/main/headmail', {
         selectedworkshop: this.selectedworkshop
       })
         .then(function (response) {
           currentObj.result = response.data
+          this.$store.commit('result', this.result)
         })
         .catch(function (error) {
           console.log(error)
@@ -326,11 +340,13 @@ export default {
       e.preventDefault()
       const currentObj = this
       this.result = 'sending mails'
+      this.$store.commit('result', this.result)
       this.axios.post('http://localhost:8081/api/main/sendmail', {
         selectedworkshop: this.selectedworkshop
       })
         .then(function (response) {
           currentObj.result = response.data
+          this.$store.commit('result', this.result)
         })
         .catch(function (error) {
           console.log(error)
@@ -339,7 +355,9 @@ export default {
     savehcn (host, index) {
       console.log(host, index)
       this.selectedworkshop = host
+      this.$store.commit('awsselectedworkshop', this.selectedworkshop)
       this.showing = !this.showing
+      this.$store.commit('awsshowing', this.showing)
     },
     itemVisible (item) {
       const currentName = item.toLowerCase()
@@ -352,6 +370,7 @@ export default {
         .then(wrklist => {
           this.wrklist = wrklist.data
           console.log(this.wrklist)
+          this.$store.commit('awswrklist', this.wrklist)
         })
         .catch(function (error) {
           this.wrklist = error
@@ -361,8 +380,11 @@ export default {
       this.popoverShow1 = false
       this.popoverShow2 = false
       this.isNight = true
+      this.$store.commit('awsisNight', this.isNight)
       this.isNight1 = true
+      this.$store.commit('awsisNight1', this.isNight1)
       this.isNight2 = true
+      this.$store.commit('awsisNight2', this.isNight2)
       this.output.hcn = ''
       this.output.bcc = ''
       this.output.startdate = ''
@@ -375,6 +397,7 @@ export default {
       this.output.district = ''
       this.output.body = ''
       this.output.subject = ''
+      this.$store.commit('awsoutput', this.output)
       this.reqdata.wid = ''
       this.reqdata.hcn = ''
       this.reqdata.startdate = ''
@@ -383,6 +406,7 @@ export default {
       this.reqdata.cooname = ''
       this.reqdata.cooemail = ''
       this.reqdata.coono = ''
+      this.$store.commit('awsreqdata', this.reqdata)
     },
     getfile (value) {
       console.log(value)
@@ -394,27 +418,34 @@ export default {
     },
     handleattachUpload () {
       this.upfile1 = this.$refs.upfile1.files[0]
-      // this.upfile1 = this.$refs.upfile1.files
+      this.$store.commit('awsupfile1', this.upfile1)
     },
     selectedstate (state, index) {
       console.log(state, index)
       this.state = state
+      this.$store.commit('awsstate', this.state)
       this.index = index
+      this.$store.commit('awsindex', this.index)
       this.districts = []
       this.districts.push(this.statedisdata.states[index].districts)
+      this.$store.commit('awsdistricts', this.districts)
     },
     disc (p, inn) {
       console.log(p, inn)
       this.$delete(this.output.bcc, inn)
+      this.$store.commit('awsoutput', this.output)
     },
     disc1 (value, key) {
       console.log(value, key)
       this.$delete(this.output.attachments, key)
       console.log(Object.values(this.output.attachments))
+      this.$store.commit('awsoutput', this.output)
     },
     selecteddistrict (diss) {
       this.district.push(diss)
+      this.$store.commit('awsdistrict', this.district)
       this.d = diss
+      this.$store.commit('awsd', this.d)
       console.log(diss)
       console.log(this.district)
     },
@@ -433,10 +464,15 @@ export default {
       e.preventDefault()
       const currentObj = this
       this.isNight = false
+      this.$store.commit('awsisNight', this.isNight)
       this.isNight1 = false
+      this.$store.commit('awsisNight1', this.isNight1)
       this.isNight2 = true
+      this.$store.commit('awsisNight2', this.isNight2)
       this.isNight3 = true
+      this.$store.commit('awsisNight3', this.isNight3)
       this.result = ''
+      this.$store.commit('result', this.result)
       this.axios.post('http://localhost:8081/api/main/awssubmit', {
         selectedworkshop: this.selectedworkshop,
         filldate: this.filldate,
@@ -446,6 +482,7 @@ export default {
       })
         .then(output => {
           this.output = output.data
+          this.$store.commit('awsoutput', this.output)
         })
         .catch(function (error) {
           currentObj.output = error
@@ -470,6 +507,7 @@ export default {
         .then(function (response) {
           currentObj.output = response.data
           console.log(currentObj.output)
+          this.$store.commit('awsoutput', currentObj.output)
         })
         .catch(function (error) {
           currentObj.output = error
@@ -495,6 +533,7 @@ export default {
         .then(function (response) {
           currentObj.output = response.data
           console.log(currentObj.output)
+          this.$store.commit('awsoutput', currentObj.output)
         })
         .catch(function (error) {
           currentObj.output = error

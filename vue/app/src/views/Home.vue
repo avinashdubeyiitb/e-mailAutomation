@@ -33,10 +33,6 @@ export default {
       auth: this.$store.getters.getAuth
     }
   },
-  mounted () {
-    console.log(this.auth)
-    console.log(this.authenticated)
-  },
   methods: {
     logout () {
       this.auth.logout()

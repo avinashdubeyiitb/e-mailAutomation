@@ -32,17 +32,17 @@
   </div>
 
     <strong id="startdate">Start Date:</strong>
-    <input id="startdatei" type="date" v-model="startdate"><br>
+    <input id="startdatei" type="date" v-model="startdate" @change="$store.commit('startdate', startdate)"><br>
     <strong id="enddate">End Date:</strong>
-    <input id="enddatei" type="date" v-model="enddate"><br>
+    <input id="enddatei" type="date" v-model="enddate" @change="$store.commit('enddate', enddate)"><br>
     <strong id="venueadd">Venue Address:</strong>
-    <input id="venueaddi" type="text" v-model="venueadd"><br>
+    <input id="venueaddi" type="text" v-model="venueadd" @change="$store.commit('venueadd', venueadd)"><br>
     <strong id="cooname">Coordinator Name:</strong>
-    <input id="coonamei" type="text" v-model="cooname"><br>
+    <input id="coonamei" type="text" v-model="cooname" @change="$store.commit('cooname', cooname)"><br>
     <strong id="cooemail">Coordinator Email:</strong>
-    <input id="cooemaili" type="email" v-model="cooemail"><br>
+    <input id="cooemaili" type="email" v-model="cooemail" @change="$store.commit('cooemail', cooemail)"><br>
     <strong id="coono">Coordinator Cont.:</strong>
-    <input id="coonoi" type="tel" v-model="coono"><br>
+    <input id="coonoi" type="tel" v-model="coono" @change="$store.commit('coono', coono)"><br>
 
     <button id="msub">Submit</button>
     </form>
@@ -79,43 +79,38 @@
   </div>
 </template>
 <script>
-import statedisdata from '../assets/states-and-districts.json'
 export default {
   mounted () {
     console.log('Component mounted.')
-    console.log(this.auth)
-    console.log(this.authenticated)
   },
   computed: {
   },
   data () {
     return {
-      statedisdata: statedisdata,
-      state: 'State',
-      index: '',
-      in: '',
-      isNight: true,
-      isNight1: true,
-      isNight2: true,
-      isNight3: true,
-      startdate: '',
-      enddate: '',
-      venueadd: '',
-      cooname: '',
-      cooemail: '',
-      coono: '',
-      output: '',
-      selectedhcn: '',
-      hcn: [],
-      success: false,
-      items: [],
+      statedisdata: this.$store.getters.statedisdata,
+      state: this.$store.getters.cwsstate,
+      index: this.$store.getters.cwsindex,
+      in: this.$store.getters.cwsin,
+      isNight: this.$store.getters.cwsisNight,
+      isNight1: this.$store.getters.cwsisNight1,
+      isNight2: this.$store.getters.cwsisNight2,
+      isNight3: this.$store.getters.cwsisNight3,
+      startdate: this.$store.getters.startdate,
+      enddate: this.$store.getters.enddate,
+      venueadd: this.$store.getters.venueadd,
+      cooname: this.$store.getters.cooname,
+      cooemail: this.$store.getters.cooemail,
+      coono: this.$store.getters.coono,
+      output: this.$store.getters.cwsoutput,
+      selectedhcn: this.$store.getters.selectedhcn,
+      hcn: this.$store.getters.hcn,
+      success: this.$store.getters.success,
       key1: '',
       key2: '',
       key3: '',
       key4: '',
       key5: '',
-      showing: 'false',
-      reqdata: '',
+      showing: this.$store.getters.showing,
       authenticated: this.$store.getters.getAuthenticated,
       auth: this.$store.getters.getAuth
     }
@@ -131,42 +126,60 @@ export default {
       this.popoverShow1 = false
       this.popoverShow2 = false
       this.isNight = true
+      this.$store.commit('cwsisNight', this.isNight)
       this.isNight1 = true
+      this.$store.commit('cwsisNight1', this.isNight1)
       this.isNight2 = true
-      this.state = ''
+      this.$store.commit('cwsisNight2', this.isNight2)
+      this.state = 'State'
+      this.$store.commit('cwsstate', this.state)
       this.selectedhcn = ''
+      this.$store.commit('selectedhcn', this.selectedhcn)
       this.startdate = ''
+      this.$store.commit('startdate', this.startdate)
       this.enddate = ''
+      this.$store.commit('enddate', this.enddate)
       this.venueadd = ''
+      this.$store.commit('venueadd', this.venueadd)
       this.cooname = ''
+      this.$store.commit('cooname', this.cooname)
       this.cooemail = ''
+      this.$store.commit('cooemail', this.cooemail)
       this.coono = ''
+      this.$store.commit('coono', this.coono)
       this.success = false
+      this.$store.commit('success', this.success)
     },
     selectedstate (state, index) {
       console.log(state, index)
       this.state = state
+      this.$store.commit('cwsstate', this.state)
       this.index = index
+      this.$store.commit('cwsindex', this.index)
       this.axios.post('http://localhost:8081/api/main/gethcn', {
         state: this.state
       })
         .then(hcn => {
           this.hcn = hcn.data
           console.log(this.hcn)
+          this.$store.commit('hcn', this.hcn)
         })
         .catch(function (error) {
-          this.hcn = error
+          console.log(error)
         })
     },
     disc (value, key) {
       console.log(value, key)
       this.$delete(this.output.attachments, key)
       console.log(Object.values(this.output.attachments))
+      this.$store.commit('cwsoutput', this.output)
     },
     savehcn (host, index) {
       console.log(host, index)
       this.selectedhcn = host
+      this.$store.commit('selectedhcn', this.selectedhcn)
       this.showing = !this.showing
+      this.$store.commit('showing', this.showing)
     },
     itemVisible (item) {
       const currentName = item.toLowerCase()
@@ -177,9 +190,13 @@ export default {
       e.preventDefault()
       const currentObj = this
       this.isNight = false
+      this.$store.commit('cwsisNight', this.isNight)
       this.isNight1 = false
+      this.$store.commit('cwsisNight1', this.isNight1)
       this.isNight2 = true
+      this.$store.commit('cwsisNight2', this.isNight2)
       this.isNight3 = true
+      this.$store.commit('cwsisNight3', this.isNight3)
       this.axios.post('http://localhost:8081/api/main/cwssubmit', {
         hcn: this.selectedhcn,
         startdate: this.startdate,
@@ -193,7 +210,9 @@ export default {
           this.output = output.data
           if (this.output.status === 'Created Successfully') {
             this.success = true
+            this.$store.commit('success', this.success)
           }
+          this.$store.commit('cwsoutput', this.output)
         })
         .catch(function (error) {
           currentObj.output = error
