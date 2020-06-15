@@ -7,7 +7,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
 #app {
   margin: 10px;
   padding: 10px;

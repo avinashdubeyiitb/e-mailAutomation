@@ -1,5 +1,6 @@
 <template>
     <div id="app">
+      <button class="btn btn-primary btn-margin" v-if="authenticated" @click="logout()" >Log Out</button>
       <div id="app2">
         <h1>Welcome to our App :)</h1>
           <h3>Available features:</h3>
@@ -12,17 +13,38 @@
        <div >
        <button id="but3" type="button" name="button"><router-link to="/cws">Create Workshop</router-link></button>
        </div>
+       <!--
        <div>
        <button id="but4" type="button" name="button"><router-link to="/tsa">Coming soon :(</router-link></button>
        </div>
+       -->
        <div>
-       <button id="but5" type="button" name="button"><router-link to="/algo">Run Algorithm</router-link></button>
+       <button id="but4" type="button" name="button"><router-link to="/algo">Run Algorithm</router-link></button>
        </div>
     <router-view/>
   </div>
   </div>
 </template>
-
+<script>
+export default {
+  data () {
+    return {
+      authenticated: this.$store.getters.getAuthenticated,
+      auth: this.$store.getters.getAuth
+    }
+  },
+  mounted () {
+    console.log(this.auth)
+    console.log(this.authenticated)
+  },
+  methods: {
+    logout () {
+      this.auth.logout()
+      this.$store.commit('changeAuth', this.auth)
+    }
+  }
+}
+</script>
 <style scoped>
 #but1{
   position: absolute;

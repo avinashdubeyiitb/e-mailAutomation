@@ -39,31 +39,42 @@ import axios from 'axios'
 const API_URL = 'http://127.0.0.1:8081'
 
 const auth = new AuthService()
+// this.$store.commit('changeAuth', auth)
 export default {
-  name: 'login',
   data () {
+    this.$store.commit('changeAuth', auth)
     this.handleAuthentication()
     this.authenticated = false
 
     auth.authNotifier.on('authChange', authState => {
       this.authenticated = authState.authenticated
+      this.$store.commit('changeState', this.authenticated)
     })
-
     return {
       authenticated: false,
       message: ''
     }
   },
+  mounted () {
+  },
   methods: {
     // this method calls the AuthService login() method
     login () {
       auth.login()
+      this.$store.commit('changeAuth', auth)
+      /*
+      console.log('login')
+      console.log(this.$store.getters.getAuthenticated)
+      console.log(this.$store.getters.getAuth)
+      */
     },
     handleAuthentication () {
       auth.handleAuthentication()
+      this.$store.commit('changeAuth', auth)
     },
     logout () {
       auth.logout()
+      this.$store.commit('changeAuth', auth)
     },
     privateMessage () {
       const url = `${API_URL}/api/private/`

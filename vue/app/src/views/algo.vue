@@ -2,6 +2,7 @@
   <div id="app">
     <h1>Algorithm for Team Selection </h1>
     <button id="butt" type="button" name="button"><router-link to="/">Home</router-link></button>
+    <button class="btn btn-primary btn-margin" v-if="authenticated" @click="logout()">Log Out</button>
   <div id="col1inner" >
     <strong id="wrk" >Select Workshop:</strong>
     <div class="dropdown" id="wrki">
@@ -96,6 +97,8 @@ export default {
   mounted () {
     console.log('Component mounted.')
     this.workshoplist()
+    console.log(this.auth)
+    console.log(this.authenticated)
   },
   computed: {
     dragOptions () {
@@ -121,12 +124,18 @@ export default {
       willcriteria: ['Count of Willingness in Past Running Year', 'Highest Count of Workshop in Past Running Year', 'Linguistics Criteria', 'Count of Total Workshop'],
       availcriteria: ['Highest Count of Workshop in Past Running Year', 'Linguistics Criteria', 'Count of Total Workshop'],
       lang: '',
-      output: ''
+      output: '',
+      authenticated: this.$store.getters.getAuthenticated,
+      auth: this.$store.getters.getAuth
     }
   },
   watch: {
   },
   methods: {
+    logout () {
+      this.auth.logout()
+      this.$store.commit('changeAuth', this.auth)
+    },
     willupdate (event) {
       this.willcriteria.splice(event.newIndex, 0, this.willcriteria.splice(event.oldIndex, 1)[0])
       console.log(this.willcriteria)

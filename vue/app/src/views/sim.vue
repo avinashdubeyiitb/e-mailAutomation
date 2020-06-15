@@ -2,6 +2,7 @@
   <div id="app">
     <h1>Send Information Mail</h1>
     <button id="butt" type="button" name="button"><router-link to="/home">Home</router-link></button>
+    <button class="btn btn-primary btn-margin" v-if="authenticated" @click="logout()" >Log Out</button>
     <button id="goback" v-show="iscsvtrue" type="button" name="button" @click="gobacktoform">!form</button>
   <div id="col1inner" >
     <div v-show="isNight3" >
@@ -305,6 +306,8 @@ const { shell } = require('electron')
 export default {
   mounted () {
     console.log('Component mounted.')
+    console.log(this.auth)
+    console.log(this.authenticated)
   },
   computed: {
   },
@@ -366,12 +369,18 @@ export default {
       sfile: '',
       detailprop: 'Teacher Details',
       detail: [],
-      issaved: false
+      issaved: false,
+      authenticated: this.$store.getters.getAuthenticated,
+      auth: this.$store.getters.getAuth
     }
   },
   watch: {
   },
   methods: {
+    logout () {
+      this.auth.logout()
+      this.$store.commit('changeAuth', this.auth)
+    },
     getfile (value) {
       console.log(value)
       if (value === 'Pamphlet2020.pdf') {
