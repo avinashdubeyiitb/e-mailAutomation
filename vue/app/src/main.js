@@ -9,10 +9,12 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import XLSX from 'xlsx'
 import UUID from 'vue-uuid'
+import VueParticles from 'vue-particles'
 Vue.use(UUID)
 Vue.use(XLSX)
 Vue.use(VueAxios, axios)
 Vue.use(BootstrapVue)
+Vue.use(VueParticles)
 Vue.config.productionTip = false
 new Vue({
   router,

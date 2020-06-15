@@ -1,7 +1,26 @@
 <template>
   <div id="app">
+    <div id="leftbar">
+      <div id="baritem0" class="baritems">
+          <router-link to="/" style="text-decoration: none; color: inherit;" >Home</router-link>
+        </div>
+      <div id="baritem1" class="baritems">
+        <router-link style="text-decoration: none; color: inherit;" to="/sim">Send info. mail</router-link>
+      </div>
+      <div id="baritem2" class="baritems">
+        <router-link style="text-decoration: none; color: inherit;" to="/aws">Announce Workshop</router-link>
+      </div>
+      <div id="baritem3" class="baritems">
+        <router-link style="text-decoration: none; color: inherit;" to="/cws">Create Workshop</router-link>
+      </div>
+      <div id="baritem4" class="baritems">
+        <router-link style="text-decoration: none; color: inherit;" to="/algo">Run Algorithm</router-link>
+      </div>
+      <div id="baritem5" class="baritems">
+        <router-link style="text-decoration: none; color: inherit;" to="/tsa">Coming soon :(</router-link>
+      </div>
+    </div>
     <h1>Send Mail To Team</h1>
-    <button id="butt" type="button" name="button"><router-link to="/">Home</router-link></button>
   <div id="col1inner" >
       <button id="sub1" @click="getmailids">Get Mail ids</button>
     <button id="sub2" @click="send" v-if="isget">Send</button>
@@ -121,21 +140,15 @@ font-size: 2em;
 text-align: center;
 color: #000000;
 }
-#app{
-background: #FFFFFF;
-position: absolute;
-width: 100%;
-height: 100%;
-left: 0px;
-top: 0px;
-}
+
 #col1inner{
 position: absolute;
-width: 48%;
+width: 43%;
 height: 90%;
-left: 1%;
+left: 7%;
 top: 15%;
-background: #6EA5F7;
+z-index:-1;
+background: #4ABDAC;
 border: 1px solid #000000;
 box-sizing: border-box;
 border-radius: 10px;
@@ -146,7 +159,7 @@ width: 48%;
 height: 90%;
 right: 1%;
 top: 15%;
-background: #6EA5F7;
+background: #4ABDAC;
 border: 1px solid #000000;
 box-sizing: border-box;
 border-radius: 10px;

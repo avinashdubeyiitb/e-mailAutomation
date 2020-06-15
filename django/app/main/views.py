@@ -402,7 +402,7 @@ def getloc(name):
     result = requests.get(url+'input='+input+other+'&key='+API_KEY)
     collx = result.json()
     print(collx)
-    if collx.status == 'REQUEST_DENIED':
+    if collx['status'] == 'REQUEST_DENIED':
         return name
     else:
         return collx
@@ -1354,7 +1354,7 @@ def sendmail(request):
     sucs = flr = 0
     for idx in range(objs.count()):
             dte = wrkshp[0].startdate + ' & ' + wrkshp[0].enddate
-            serializer = WorkshopTeamSerializer(data = {'workshop_id' : wrkshp[0].id,'workshop_venue' : selectedworkshop,
+            serializer = WorkshopTeamSerializer(data = {'workshop_venue' : selectedworkshop,
                 'date' : dte,'district' : district,'responder' : objs[idx].name})
             print(serializer)
             if serializer.is_valid():

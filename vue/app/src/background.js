@@ -19,11 +19,13 @@ function createWindow () {
   win = new BrowserWindow({
     width: 1440,
     height: 1024,
+    // frame: false,
     webPreferences: {
       nodeIntegration: true,
       webSecurity: false
     }
   })
+  win.setMenuBarVisibility(false)
   win.webContents.on("new-window", function(event, url) {
     event.preventDefault();
     shell.openExternal(url);
