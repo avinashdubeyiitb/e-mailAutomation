@@ -29,6 +29,7 @@ export default class AuthService {
   // which triggers the Auth0 login page
   login () {
     this.auth0.authorize()
+    console.log(this.auth0.authorize())
   }
 
   // this method calls the parseHash() method of Auth0
@@ -37,6 +38,8 @@ export default class AuthService {
     this.auth0.parseHash((err, authResult) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
         this.setSession(authResult)
+        console.log('hiii')
+        console.log(authResult)
       } else if (err) {
         console.log(err)
         alert(`Error: ${err.error}. Check the console for further details.`)
@@ -63,7 +66,7 @@ export default class AuthService {
     delete this.expiresAt
     this.authNotifier.emit('authChange', false)
     // navigate to the home route
-    router.replace('/')
+    router.replace('/sim')
   }
 
   // checks if the user is authenticated
@@ -75,11 +78,13 @@ export default class AuthService {
 
   // a static method to get the access token
   getAuthToken () {
+    console.log(this.accessToken)
     return this.accessToken
   }
 
   // a method to get the User profile
   getUserProfile (cb) {
+    console.log(this.profile)
     return this.profile
   }
 }

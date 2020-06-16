@@ -2,7 +2,7 @@
 
   <div id="login">
 
-      <button id="butt" type="button" name="button" v-if="authenticated"><router-link to="/home">Home</router-link></button>
+      <!-- <button id="butt" type="button" name="button" v-if="authenticated"><router-link to="/home">Home</router-link></button> -->
 
           <button
       class="btn btn-primary btn-margin"
@@ -90,7 +90,7 @@ export default {
 <!--
 background: linear-gradient(0deg, rgba(37, 48, 51, 0.95), rgba(37, 48, 51, 0.95)), linear-gradient(0deg, rgba(37, 48, 51, 0.95), rgba(37, 48, 51, 0.95)), rgba(37, 48, 51, 0.95);
 -->
-<style>
+<style scoped>
 #login {
   margin: 10px;
   padding: 10px;

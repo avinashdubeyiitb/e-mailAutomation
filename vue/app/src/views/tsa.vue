@@ -2,7 +2,7 @@
   <div id="app">
     <div id="leftbar">
       <div id="baritem0" class="baritems">
-          <router-link to="/home" style="text-decoration: none; color: inherit;" >Home</router-link>
+          <router-link to="/" style="text-decoration: none; color: inherit;" >Home</router-link>
         </div>
       <div id="baritem1" class="baritems">
         <router-link style="text-decoration: none; color: inherit;" to="/sim">Send info. mail</router-link>
@@ -21,7 +21,7 @@
       </div>
     </div>
     <h1>Send Mail To Team</h1>
-    <button id="butt" type="button" name="button"><router-link to="/home">Home</router-link></button>
+    <!-- <button id="butt" type="button" name="button"><router-link to="/home">Home</router-link></button> -->
     <button @click="makecall">login</button>
     <!--
   <div id="col1inner" >

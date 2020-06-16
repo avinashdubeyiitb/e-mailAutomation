@@ -46,7 +46,7 @@ def login(request):
     return render(request, os.path.join(SCRIPTS_DIR,'login.html'))
 
 def logout(request):
-    return render(request, os.path.join(SCRIPTS_DIR,'logout.html'))    
+    return render(request, os.path.join(SCRIPTS_DIR,'logout.html'))
 
 def public(request):
     return HttpResponse("You don't need to be authenticated to see this")
