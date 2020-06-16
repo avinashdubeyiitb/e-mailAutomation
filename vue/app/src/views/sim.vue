@@ -22,27 +22,25 @@
     </div>
     <router-view/>
     <h1>Send Information Mail</h1>
-    <!-- <button id="butt" type="button" name="button"><router-link to="/home">Home</router-link></button> -->
-    <button class="btn btn-primary btn-margin" v-if="authenticated" @click="logout()" >Log Out</button>
     <button id="goback" v-show="iscsvtrue" type="button" name="button" @click="gobacktoform">!form</button>
   <div id="col1inner" >
     <div v-show="isNight3" >
     <strong><p id="fd">Fill details:</p></strong>
     <form @submit="formSubmit">
     <strong id="rid" >Recipient Email ID:</strong>
-    <input id="ridi" type="email" v-model="remail"><br>
+    <input id="ridi" type="email" v-model="remail" @change="$store.commit('remail', remail)"><br>
     <strong id="cc">CC:</strong>
-    <input id="cci" type="email" v-model="cc"><br>
+    <input id="cci" type="email" v-model="cc" @change="$store.commit('cc', cc)"><br>
     <strong id="bcc">BCC:</strong>
-    <input id="bcci" type="email" v-model="bcc"><br>
+    <input id="bcci" type="email" v-model="bcc" @change="$store.commit('bcc', bcc)"><br>
     <strong id="name">Name:</strong>
-    <input id="namei" type="text" v-model="name"><br>
+    <input id="namei" type="text" v-model="name" @change="$store.commit('name', name)"><br>
     <strong id="desig">Designation:</strong>
-    <input id="desigi" type="text" v-model="designation"><br>
+    <input id="desigi" type="text" v-model="designation" @change="$store.commit('designation', designation)"><br>
     <strong id="depart">Department:</strong>
-    <input id="departi" type="text" v-model="department"><br>
+    <input id="departi" type="text" v-model="department" @change="$store.commit('department', department)"><br>
     <strong id="cname">College Name:</strong>
-    <input id="cnamei" type="text" v-model="cname"><br>
+    <input id="cnamei" type="text" v-model="cname" @change="$store.commit('cname', cname)"><br>
     <div id="recipientstatei">
         <b-dropdown  v-bind:text="state" >
           <div v-for="(p,i) in statedisdata" v-bind:key='i' >
@@ -62,7 +60,7 @@
         </b-dropdown>
         </div>
     <strong id="cno">Contact No.:</strong>
-    <input id="cnoi" type="tel" v-model="cno"><br>
+    <input id="cnoi" type="tel" v-model="cno" @change="$store.commit('cno', cno)"><br>
     <button id="msub">Submit</button>
     </form>
     <!-- <strong>Response:</strong> -->
@@ -96,7 +94,7 @@
 <tr v-bind:key="i" v-for="(pk,i) in items" :class="getClass(pk)">
 <td>
 <label class="form-checkbox">
-<input type="checkbox" :value="pk" v-model="selected">
+<input type="checkbox" :value="pk" v-model="selected" @change="$store.commit('selected', selected)">
 </label>
 </td>
 <td v-on:click="clickList(pk,i)">{{i}}</td>
@@ -159,7 +157,8 @@
    <label  id="sremail"><strong >Recipient Id:</strong>
    <input v-if = "key1" v-model = "output.remail"
    @blur= "key1 = false; $emit('update')"
-   @keyup.enter = "key1=false; $emit('update')">
+   @keyup.enter = "key1=false; $emit('update')"
+   @change="$store.commit('output', output)">
    <div v-else>
      <label @click = "key1 = true;"> {{output.remail}} </label>
    </div>
@@ -167,7 +166,8 @@
    <label id="srcc"><strong>CC:</strong>
    <input v-if = "key2" v-model = "output.cc"
    @blur= "key2 = false; $emit('update')"
-   @keyup.enter = "key2=false; $emit('update')" >
+   @keyup.enter = "key2=false; $emit('update')"
+   @change="$store.commit('output', output)" >
          <div v-else>
      <label @click = "key2 = true;">{{output.cc}} </label>
    </div>
@@ -175,7 +175,8 @@
     <label id="srbcc"><strong>Bcc:</strong>
     <input v-if = "key5" v-model = "output.bcc"
     @blur= "key5 = false; $emit('update')"
-    @keyup.enter = "key5=false; $emit('update')" >
+    @keyup.enter = "key5=false; $emit('update')"
+    @change="$store.commit('output', output)">
           <div v-else>
       <label @click = "key5 = true;">{{output.bcc}} </label>
     </div>
@@ -183,7 +184,8 @@
    <label id="srsubject"><strong>subject:</strong>
    <input v-if = "key3" v-model = "output.subject"
    @blur= "key3 = false; $emit('update')"
-   @keyup.enter = "key3=false; $emit('update')" id="isrsubject">
+   @keyup.enter = "key3=false; $emit('update')" id="isrsubject"
+   @change="$store.commit('output', output)">
          <div v-else>
      <label @click = "key3 = true;"> {{output.subject}}</label>
    </div>
@@ -212,7 +214,7 @@
        </div>
 
        <input type="file" id="upfile1" ref="upfile1" v-on:change="handleattachUpload1()"/>
-
+        {{upfile1.name}}
  </label><br>
  </form>
  </div>
@@ -267,7 +269,8 @@
      <label  id="sremail"><strong >Recipient Id:</strong>
      <input v-if = "key1" v-model = "reqdata.to"
      @blur= "key1 = false; $emit('update')"
-     @keyup.enter = "key1=false; $emit('update')">
+     @keyup.enter = "key1=false; $emit('update')"
+     @change="$store.commit('reqdata', reqdata)">
      <div v-else>
        <label @click = "key1 = true;"> {{reqdata.to}} </label>
      </div>
@@ -275,7 +278,8 @@
      <label id="srccbcc"><strong>Cc:</strong>
      <input v-if = "key2" v-model = "reqdata.cc"
      @blur= "key2 = false; $emit('update')"
-     @keyup.enter = "key2=false; $emit('update')" >
+     @keyup.enter = "key2=false; $emit('update')"
+     @change="$store.commit('reqdata', reqdata)">
            <div v-else>
        <label @click = "key2 = true;">{{reqdata.cc}} </label>
      </div>
@@ -283,7 +287,8 @@
      <label id="srccbcc"><strong>Bcc:</strong>
      <input v-if = "key5" v-model = "reqdata.bcc"
      @blur= "key5 = false; $emit('update')"
-     @keyup.enter = "key5=false; $emit('update')" >
+     @keyup.enter = "key5=false; $emit('update')"
+     @change="$store.commit('reqdata', reqdata)">
            <div v-else>
        <label @click = "key5 = true;">{{reqdata.bcc}} </label>
      </div>
@@ -291,7 +296,8 @@
      <label id="srsubject"><strong>subject:</strong>
      <input v-if = "key3" v-model = "reqdata.subject"
      @blur= "key3 = false; $emit('update')"
-     @keyup.enter = "key3=false; $emit('update')" id="isrsubject">
+     @keyup.enter = "key3=false; $emit('update')" id="isrsubject"
+     @change="$store.commit('reqdata', reqdata)">
            <div v-else>
        <label @click = "key3 = true;"> {{reqdata.subject}} </label>
      </div>
@@ -322,54 +328,49 @@
   </div>
 </template>
 <script>
-import statedisdata from '../assets/states-and-districts.json'
 const { shell } = require('electron')
 export default {
   mounted () {
     console.log('Component mounted.')
-    console.log(this.auth)
-    console.log(this.authenticated)
   },
   computed: {
   },
   data () {
     return {
-      csvapp: false,
-      csvgsave: false,
-      isNight: true,
-      isNight1: true,
-      isNight2: true,
-      isNight3: true,
-      iscsvtrue: false,
-      statedisdata: statedisdata,
-      state: 'State',
-      index: '',
-      in: '',
-      value: '',
-      districts: [],
-      d: 'District',
-      district: [],
+      csvapp: this.$store.getters.csvapp,
+      csvgsave: this.$store.getters.csvgsave,
+      isNight: this.$store.getters.simisNight,
+      isNight1: this.$store.getters.simisNight1,
+      isNight2: this.$store.getters.simisNight2,
+      isNight3: this.$store.getters.simisNight3,
+      iscsvtrue: this.$store.getters.iscsvtrue,
+      statedisdata: this.$store.getters.statedisdata,
+      state: this.$store.getters.state,
+      index: this.$store.getters.index,
+      in: this.$store.getters.in,
+      value: this.$store.getters.value,
+      districts: this.$store.getters.districts,
+      d: this.$store.getters.d,
+      district: this.$store.getters.district,
       popoverShow1: false,
       popoverShow2: false,
       popoverShow3: false,
       popoverShow4: false,
-      captureid: '',
-      remail: '',
-      cc: '',
-      bcc: '',
-      name: '',
-      designation: '',
-      department: '',
-      cname: '',
-      cno: '',
-      output: '',
-      items: [],
-      selected: [],
-      selectAll: false,
-      file: '',
-      upfile: '',
-      upfile1: [],
-      upfile2: [],
+      remail: this.$store.getters.remail,
+      cc: this.$store.getters.cc,
+      bcc: this.$store.getters.bcc,
+      name: this.$store.getters.name,
+      designation: this.$store.getters.designation,
+      department: this.$store.getters.department,
+      cname: this.$store.getters.cname,
+      cno: this.$store.getters.cno,
+      output: this.$store.getters.output,
+      items: this.$store.getters.items,
+      selected: this.$store.getters.selected,
+      selectAll: this.$store.getters.selectAll,
+      file: this.$store.getters.file,
+      upfile1: this.$store.getters.upfile1,
+      upfile2: this.$store.getters.upfile2,
       key1: '',
       key2: '',
       key3: '',
@@ -379,29 +380,20 @@ export default {
       key7: '',
       key8: '',
       key9: '',
-      reqdata: '',
-      editedTodo: null,
+      reqdata: this.$store.getters.reqdata,
       saveoutput: '',
-      approvecsv: '',
-      gsavecsv: '',
-      aprovselected: [],
-      gsvselected: [],
-      dscrdselected: [],
-      sfile: '',
+      approvecsv: this.$store.getters.approvecsv,
+      gsavecsv: this.$store.getters.gsavecsv,
+      aprovselected: this.$store.getters.aprovselected,
+      gsvselected: this.$store.getters.gsvselected,
+      dscrdselected: this.$store.getters.dscrdselected,
       detailprop: 'Teacher Details',
-      detail: [],
-      issaved: false,
-      authenticated: this.$store.getters.getAuthenticated,
-      auth: this.$store.getters.getAuth
+      detail: this.$store.getters.detail
     }
   },
   watch: {
   },
   methods: {
-    logout () {
-      this.auth.logout()
-      this.$store.commit('changeAuth', this.auth)
-    },
     getfile (value) {
       console.log(value)
       if (value === 'Pamphlet2020.pdf') {
@@ -428,21 +420,23 @@ export default {
           this.selected.push(this.items[pk])
         }
       }
+      this.$store.commit('selected', this.selected)
     },
     NoEnter (e) {
       e.preventDefault()
       console.log(e)
     },
-    editTodo: output => {
-      this.editedTodo = output
-    },
     discard () {
       this.popoverShow1 = false
       this.popoverShow2 = false
       this.isNight = true
+      this.$store.commit('simisNight', this.isNight)
       this.isNight1 = true
+      this.$store.commit('simisNight1', this.isNight1)
       this.isNight2 = true
+      this.$store.commit('simisNight2', this.isNight2)
       this.iscsvtrue = false
+      this.$store.commit('iscsvtrue', this.iscsvtrue)
       this.output.remail = ''
       this.output.cc = ''
       this.output.bcc = ''
@@ -455,37 +449,56 @@ export default {
       this.output.subject = ''
       this.output.state = ''
       this.output.district = ''
+      this.$store.commit('output', this.output)
       this.upfile1 = ''
+      this.$store.commit('upfile1', this.upfile1)
       this.upfile2 = ''
+      this.$store.commit('upfile2', this.upfile2)
       this.detail = ''
+      this.$store.commit('detail', this.detail)
     },
     handleFileUpload () {
       this.file = this.$refs.file.files[0]
+      this.$store.commit('file', this.file)
     },
     handleattachUpload1 () {
       this.upfile1 = (this.$refs.upfile1.files[0])
+      this.$store.commit('upfile1', this.upfile1)
     },
     handleattachUpload2 () {
       this.upfile2 = (this.$refs.upfile2.files[0])
+      this.$store.commit('upfile2', this.upfile2)
     },
     gobacktoform () {
       this.isNight = true
+      this.$store.commit('simisNight', this.isNight)
       this.isNight1 = true
+      this.$store.commit('simisNight1', this.isNight1)
       this.isNight2 = true
+      this.$store.commit('simisNight2', this.isNight2)
       this.isNight3 = true
+      this.$store.commit('simisNight3', this.isNight3)
       this.iscsvtrue = false
+      this.$store.commit('iscsvtrue', this.iscsvtrue)
     },
     submitFile () {
       const frmData = new FormData()
       // const currentObj = this
       frmData.append('file', this.file)
       this.isNight = false
+      this.$store.commit('simisNight', this.isNight)
       this.upfile1 = ''
+      this.$store.commit('upfile1', this.upfile1)
       this.upfile2 = ''
+      this.$store.commit('upfile2', this.upfile2)
       this.isNight1 = true
+      this.$store.commit('simisNight1', this.isNight1)
       this.isNight2 = false
+      this.$store.commit('simisNight2', this.isNight2)
       this.isNight3 = false
+      this.$store.commit('simisNight3', this.isNight3)
       this.iscsvtrue = true
+      this.$store.commit('iscsvtrue', this.iscsvtrue)
       this.axios.post('http://localhost:8081/api/main/csv/submit',
         frmData,
         {
@@ -497,6 +510,7 @@ export default {
         .then(items => {
           console.log('SUCCESS!!')
           this.items = items.data
+          this.$store.commit('items', this.items)
           console.log(this.items)
         })
         .catch(function () {
@@ -518,6 +532,7 @@ export default {
     },
     approveselect () {
       this.csvapp = true
+      this.$store.commit('csvapp', this.csvapp)
       const formData = new FormData()
       formData.append('file2', this.upfile2)
       formData.append('file2send2', Object.values(this.reqdata.attachments))
@@ -532,9 +547,9 @@ export default {
         .then(function (response) {
           currentObj.approvecsv = response.data
           console.log(currentObj.approvecsv)
+          this.$store.commit('approvecsv', currentObj.approvecsv)
         })
         .catch(function (error) {
-          currentObj.approvecsv = error
           console.log(error)
         })
       this.popoverShow3 = false
@@ -543,19 +558,27 @@ export default {
           this.aprovselected.push(this.selected[i])
         }
       }
+      this.$store.commit('aprovselected', this.aprovselected)
       this.csvgsave = false
+      this.$store.commit('csvgsave', this.csvgsave)
       this.selected = []
+      this.$store.commit('selected', this.selected)
     },
     selectedstate (state, index) {
       console.log(state, index)
       this.state = state
+      this.$store.commit('state', this.state)
       this.index = index
+      this.$store.commit('index', this.index)
       this.districts = []
       this.districts.push(this.statedisdata.states[index].districts)
+      this.$store.commit('districts', this.districts)
     },
     selecteddistrict (diss) {
       this.district = diss
+      this.$store.commit('district', this.district)
       this.d = diss
+      this.$store.commit('d', this.d)
       console.log(diss)
       console.log(this.district)
     },
@@ -564,9 +587,11 @@ export default {
         this.detail.splice(this.detail.indexOf('default'), 1)
       }
       this.detail.push(dtl)
+      this.$store.commit('detail', this.detail)
     },
     refresh () {
       this.detail = ['default']
+      this.$store.commit('detail', this.detail)
     },
     discardselected () {
       this.popoverShow3 = false
@@ -581,15 +606,19 @@ export default {
         this.reqdata.state = ''
         this.reqdata.district = ''
       }
+      this.$store.commit('reqdata', this.reqdata)
       for (var i = 0; i < this.selected.length; i++) {
         if (this.dscrdselected.indexOf(this.selected[i]) === -1) {
           this.dscrdselected.push(this.selected[i])
         }
       }
+      this.$store.commit('dscrdselected', this.dscrdselected)
       this.selected = []
+      this.$store.commit('selected', this.selected)
     },
     gsaveselected () {
       this.csvgsave = true
+      this.$store.commit('csvgsave', this.csvgsave)
       const formData = new FormData()
       formData.append('file2', this.upfile2)
       formData.append('file2send2', Object.values(this.reqdata.attachments))
@@ -603,10 +632,10 @@ export default {
         })
         .then(function (response) {
           currentObj.gsavecsv = response.data
+          this.$store.commit('gsavecsv', currentObj.gsavecsv)
           console.log(currentObj.gsavecsv)
         })
         .catch(function (error) {
-          currentObj.gsavecsv = error
           console.log(error)
         })
       this.popoverShow4 = false
@@ -615,8 +644,11 @@ export default {
           this.gsvselected.push(this.selected[i])
         }
       }
+      this.$store.commit('gsvselected', this.gsvselected)
       this.csvapp = false
+      this.$store.commit('csvapp', this.csvapp)
       this.selected = []
+      this.$store.commit('selected', this.selected)
     },
     save (e) {
       e.preventDefault()
@@ -650,6 +682,7 @@ export default {
       })
         .then(output => {
           this.output = output.data
+          this.$store.commit('output', this.output)
           console.log(output)
         })
         .catch(function (error) {
@@ -666,6 +699,7 @@ export default {
       })
         .then(reqdata => {
           this.reqdata = reqdata.data
+          this.$store.commit('reqdata', this.reqdata)
         })
         .catch(function (error) {
           currentObj.reqdata = error
@@ -675,9 +709,13 @@ export default {
       e.preventDefault()
       const currentObj = this
       this.isNight = false
+      this.$store.commit('simisNight', this.isNight)
       this.isNight1 = false
+      this.$store.commit('simisNight1', this.isNight1)
       this.isNight2 = true
+      this.$store.commit('simisNight2', this.isNight2)
       this.isNight3 = true
+      this.$store.commit('simisNight3', this.isNight3)
       this.axios.post('http://localhost:8081/api/main/submit', {
         remail: this.remail,
         cc: this.cc,
@@ -692,6 +730,7 @@ export default {
       })
         .then(output => {
           this.output = output.data
+          this.$store.commit('output', this.output)
         })
         .catch(function (error) {
           currentObj.output = error
@@ -709,6 +748,7 @@ export default {
       e.preventDefault()
       const currentObj = this
       this.detail = ''
+      this.$store.commit('detail', this.detail)
       this.axios.post('http://localhost:8081/api/main/approve', formData,
         {
           headers: {
@@ -717,6 +757,7 @@ export default {
         })
         .then(function (response) {
           currentObj.output = response.data
+          this.$store.commit('output', currentObj.output)
           console.log(currentObj.output)
         })
         .catch(function (error) {
@@ -729,11 +770,13 @@ export default {
       console.log(value, key)
       this.$delete(this.output.attachments, key)
       console.log(Object.values(this.output.attachments))
+      this.$store.commit('output', this.output)
     },
     disc2 (value, key) {
       console.log(value, key)
       this.$delete(this.output.attachments, key)
       console.log(Object.values(this.output.attachments))
+      this.$store.commit('output', this.output)
     },
     gsave (e) {
       const formData = new FormData()
@@ -747,6 +790,7 @@ export default {
       e.preventDefault()
       const currentObj = this
       this.detail = ''
+      this.$store.commit('detail', this.detail)
       this.axios.post('http://localhost:8081/api/main/gsave', formData,
         {
           headers: {
@@ -755,6 +799,7 @@ export default {
         })
         .then(function (response) {
           currentObj.output = response.data
+          this.$store.commit('output', currentObj.output)
           console.log(currentObj.output)
         })
         .catch(function (error) {

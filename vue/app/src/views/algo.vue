@@ -21,8 +21,6 @@
       </div>
     </div>
     <h1>Algorithm for Team Selection </h1>
-    <!-- <button id="butt" type="button" name="button"><router-link to="/">Home</router-link></button> -->
-    <button class="btn btn-primary btn-margin" v-if="authenticated" @click="logout()">Log Out</button>
   <div id="col1inner" >
     <strong id="wrk" >Select Workshop:</strong>
     <div class="dropdown" id="wrki">
@@ -36,14 +34,15 @@
       </div>
   </div>
   <strong id="lang">Preferred Language:</strong>
-  <input id="langi" type="text" v-model="lang"><br>
+  <input id="langi" type="text" v-model="lang" @change="$store.commit('lang', lang)"><br>
   <strong id="lwilldrag" >Selection of workshop team from willing members : (Ascending order)</strong><br>
 
   <label id="id1"><strong>&#187; Demo is clear for atleast </strong>
     <label>
   <input v-if = "key1" v-model = "demo"
   @blur= "key1 = false; $emit('update')"
-  @keyup.enter = "key1=false; $emit('update')" id="inp">
+  @keyup.enter = "key1=false; $emit('update')" id="inp"
+  @change="$store.commit('demo', demo)">
     <label v-else @click = "key1 = true;"> {{demo}}</label>
     <strong> modules .</strong>
   </label>
@@ -64,7 +63,8 @@
       <label>
     <input v-if = "key2" v-model = "tcnt"
     @blur= "key2 = false; $emit('update')"
-    @keyup.enter = "key2=false; $emit('update')" id="inp">
+    @keyup.enter = "key2=false; $emit('update')" id="inp"
+    @change="$store.commit('tcnt', tcnt)">
       <label v-else @click = "key2 = true;"> {{tcnt}}</label>
       <strong> .</strong>
     </label>
@@ -85,7 +85,8 @@
       <label>
     <input v-if = "key3" v-model = "tcntt"
     @blur= "key3 = false; $emit('update')"
-    @keyup.enter = "key3=false; $emit('update')" id="inp">
+    @keyup.enter = "key3=false; $emit('update')" id="inp"
+    @change="$store.commit('tcntt', tcntt)">
       <label v-else @click = "key3 = true;"> {{tcntt}}</label>
       <strong> .</strong>
     </label>
@@ -117,8 +118,6 @@ export default {
   mounted () {
     console.log('Component mounted.')
     this.workshoplist()
-    console.log(this.auth)
-    console.log(this.authenticated)
   },
   computed: {
     dragOptions () {
@@ -133,41 +132,40 @@ export default {
   data () {
     return {
       key1: '',
-      demo: 4,
+      demo: this.$store.getters.demo,
       key2: '',
-      tcnt: 4,
+      tcnt: this.$store.getters.tcnt,
       key3: '',
-      tcntt: 4,
-      selectedworkshop: '',
-      wrklist: [],
-      showing: 'false',
-      willcriteria: ['Count of Willingness in Past Running Year', 'Highest Count of Workshop in Past Running Year', 'Linguistics Criteria', 'Count of Total Workshop'],
-      availcriteria: ['Highest Count of Workshop in Past Running Year', 'Linguistics Criteria', 'Count of Total Workshop'],
-      lang: '',
-      output: '',
-      authenticated: this.$store.getters.getAuthenticated,
-      auth: this.$store.getters.getAuth
+      tcntt: this.$store.getters.tcntt,
+      selectedworkshop: this.$store.getters.selectedworkshop,
+      wrklist: this.$store.getters.wrklist,
+      showing: this.$store.getters.algoshowing,
+      willcriteria: this.$store.getters.willcriteria,
+      availcriteria: this.$store.getters.availcriteria,
+      lang: this.$store.getters.lang,
+      output: this.$store.getters.algooutput
     }
   },
   watch: {
   },
   methods: {
-    logout () {
-      this.auth.logout()
-      this.$store.commit('changeAuth', this.auth)
-    },
+
     willupdate (event) {
       this.willcriteria.splice(event.newIndex, 0, this.willcriteria.splice(event.oldIndex, 1)[0])
+      this.$store.commit('willcriteria', this.willcriteria)
       console.log(this.willcriteria)
     },
     availupdate (event) {
       this.availcriteria.splice(event.newIndex, 0, this.availcriteria.splice(event.oldIndex, 1)[0])
+      this.$store.commit('availcriteria', this.availcriteria)
       console.log(this.availcriteria)
     },
     savehcn (host, index) {
       console.log(host, index)
       this.selectedworkshop = host
+      this.$store.commit('selectedworkshop', this.selectedworkshop)
       this.showing = !this.showing
+      this.$store.commit('algoshowing', this.showing)
     },
     itemVisible (item) {
       const currentName = item.toLowerCase()
@@ -180,6 +178,7 @@ export default {
         .then(wrklist => {
           this.wrklist = wrklist.data
           console.log(this.wrklist)
+          this.$store.commit('wrklist', this.wrklist)
         })
         .catch(function (error) {
           this.wrklist = error
@@ -188,6 +187,7 @@ export default {
     formSubmit (e) {
       e.preventDefault()
       this.output = []
+      this.$store.commit('algooutput', this.output)
       console.log(this.selectedworkshop)
       this.axios.post('http://localhost:8081/api/main/algo', {
         selectedworkshop: this.selectedworkshop,
@@ -201,6 +201,7 @@ export default {
         .then(output => {
           this.output = output.data
           console.log(this.output)
+          this.$store.commit('algooutput', this.output)
           // if (this.output.status === 'Created Successfully') {
           //   this.success = true
           // }

@@ -21,8 +21,6 @@
       </div>
     </div>
     <h1>Create Workshop </h1>
-    <!-- <button id="butt" type="button" name="button"><router-link to="/home">Home</router-link></button> -->
-    <button class="btn btn-primary btn-margin" v-if="authenticated" @click="logout()">Log Out</button>
   <div id="col1inner" >
     <div v-show="isNight3" >
     <strong><p id="fd">Fill details:</p></strong>
@@ -103,8 +101,6 @@ import statedisdata from '../assets/states-and-districts.json'
 export default {
   mounted () {
     console.log('Component mounted.')
-    console.log(this.auth)
-    console.log(this.authenticated)
   },
   computed: {
   },
@@ -135,18 +131,12 @@ export default {
       key4: '',
       key5: '',
       showing: 'false',
-      reqdata: '',
-      authenticated: this.$store.getters.getAuthenticated,
-      auth: this.$store.getters.getAuth
+      reqdata: ''
     }
   },
   watch: {
   },
   methods: {
-    logout () {
-      this.auth.logout()
-      this.$store.commit('changeAuth', this.auth)
-    },
     discard () {
       this.popoverShow1 = false
       this.popoverShow2 = false
