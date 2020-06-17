@@ -135,10 +135,10 @@
   </div>
 </div>
 <div id="col2inner">
-  <p id="para1" v-show="isNight">" nothing to show right now" </p>
   <img id="img1" v-show="isNight" alt="no-thumbnail" src="../assets/no-thumbnail.jpg">
-<p id="para1" v-show="!isNight1">"show right now"</p>
 <div v-show="!isNight1">
+  <p id="para1" v-show="!isNight1"></p>
+
    <form>
    <label id="srbcc"><strong>Bcc:</strong>
      <b-button v-b-modal.modal-3 >Bcc</b-button>
@@ -256,7 +256,6 @@ export default {
       hcn: '',
       filldate: '',
       output: '',
-      items: [],
       selected: [],
       selectAll: false,
       key1: '',
@@ -541,13 +540,13 @@ img{
 h1{
 position: absolute;
 left: 40%;
-top: 5%;
+top: 2%;
 margin:0px;
 font-style: normal;
 font-weight: normal;
 font-size: 2em;
 text-align: center;
-color: #000000;
+color: #FFFFFF;
 }
 
 #col1inner{
@@ -555,7 +554,7 @@ position: absolute;
 width: 43%;
 height: 90%;
 left: 7%;
-top: 15%;
+top: 10%;
 z-index: -1;
 background: #4ABDAC;
 border: 1px solid #000000;
@@ -567,7 +566,7 @@ position: absolute;
 width: 48%;
 height: 90%;
 right: 1%;
-top: 15%;
+top: 10%;
 
 background: #4ABDAC;
 border: 1px solid #000000;

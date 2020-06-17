@@ -52,6 +52,7 @@ background-repeat: no-repeat;
 background-position: center;
 background-size: contain;
 }
+
 #leftbar{
   width: 65px;
   background: #FC4A1A;

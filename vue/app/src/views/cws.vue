@@ -124,7 +124,6 @@ export default {
       selectedhcn: '',
       hcn: [],
       success: false,
-      items: [],
       key1: '',
       key2: '',
       key3: '',
@@ -238,13 +237,13 @@ img{
 h1{
 position: absolute;
 left: 40%;
-top: 5%;
+top: 2%;
 margin:0px;
 font-style: normal;
 font-weight: normal;
 font-size: 2em;
 text-align: center;
-color: #000000;
+color: #FFFFFF;
 }
 
 #col1inner{
@@ -253,7 +252,7 @@ width: 90%;
 height: 90%;
 left: 7%;
 right:1%;
-top: 15%;
+top: 10%;
 z-index: -1;
 background: #4ABDAC;
 border: 1px solid #000000;

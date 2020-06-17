@@ -238,7 +238,7 @@ font-style: normal;
 font-weight: normal;
 font-size: 2em;
 text-align: center;
-color: #000000;
+color: #FFFFFF;
 }
 
 #col1inner{

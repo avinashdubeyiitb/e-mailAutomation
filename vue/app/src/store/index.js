@@ -201,6 +201,9 @@ export default new Vuex.Store({
     aprovselected: state => {
       return state.user.aprovselected
     },
+    gsvselected: state => {
+      return state.user.gsvselected
+    },
     dscrdselected: state => {
       return state.user.dscrdselected
     },
@@ -463,6 +466,9 @@ export default new Vuex.Store({
     },
     aprovselected (state, payload) {
       state.user.aprovselected = payload
+    },
+    gsvselected (state, payload) {
+      state.user.gsvselected = payload
     },
     dscrdselected (state, payload) {
       state.user.dscrdselected = payload

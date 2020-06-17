@@ -149,9 +149,8 @@
   </div>
 </div>
 <div id="col2inner">
-  <p id="para1" v-show="isNight">" nothing to show right now" </p>
   <img id="img1" v-show="isNight" alt="no-thumbnail" src="../assets/no-thumbnail.jpg">
-<p id="para1" v-show="!isNight1">"show right now"</p>
+<p id="para1" v-show="!isNight1"></p>
 <div v-show="!isNight1">
    <form>
    <label  id="sremail"><strong >Recipient Id:</strong>
@@ -263,7 +262,6 @@
   <!-- </div> -->
   <!-- Output from the popover interaction -->
 </div>
-<p id="para1" v-show="!isNight2">"show right now"</p>
 <div v-show="!isNight2">
      <form>
      <label  id="sremail"><strong >Recipient Id:</strong>
@@ -406,6 +404,8 @@ export default {
       if (this.aprovselected.indexOf(pk) !== -1) {
         return 'first'
       }
+      // console.log(indexof(pk))
+      console.log(this.gsvselected.indexOf(pk))
       if (this.gsvselected.indexOf(pk) !== -1) {
         return 'second'
       }
@@ -855,13 +855,13 @@ img{
 h1{
 position: absolute;
 left: 40%;
-top: 5%;
+top: 2%;
 margin:0px;
 font-style: normal;
 font-weight: normal;
 font-size: 2em;
 text-align: center;
-color: #000000;
+color: #FFFFFF;
 }
 
 #col1inner{
@@ -869,19 +869,20 @@ position: absolute;
 width: 43%;
 height: 90%;
 left: 7%;
-top: 15%;
+top: 10%;
 z-index: -1;
 background: #4ABDAC;
 border: 1px solid #000000;
 box-sizing: border-box;
 border-radius: 10px;
+
 }
 #col2inner{
 position: absolute;
 width: 48%;
 height: 90%;
 right: 1%;
-top: 15%;
+top: 10%;
 
 background: #4ABDAC;
 border: 1px solid #000000;
@@ -1225,6 +1226,8 @@ top: 52%;
 tr ,td,thead,table,th{
   padding:0px;
   padding-left:6px;
-
+}
+#goback{
+  float:right;
 }
 </style>

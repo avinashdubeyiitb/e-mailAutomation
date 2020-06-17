@@ -1001,7 +1001,7 @@ def cwssubmit(request):
         try:
             var = JSONParser().parse(request)
             serializer = CreateWorkshop(data=var)
-            print(serializer)
+            print(serializer.is_valid())
             if serializer.is_valid():
                 serializer.save()
                 print('done')
