@@ -172,7 +172,7 @@
         <b-button size="sm" @click='getfile(value)' >{{value}}</b-button>
         <b-button @click="disc1(value,key)" class="close" aria-label="Close"><span class="d-inline-block" aria-hidden="true">&times;</span></b-button></b-button>
          </div>
-        <input type="file" id="upfile1" ref="upfile1" multiple v-on:change="handleattachUpload"/>
+        <input type="file" id="upfile1" ref="upfile1" v-on:change="handleattachUpload" multiple>
   </label><br>
  </form>
  </div>
@@ -270,6 +270,7 @@ export default {
       reqdata: '',
       editedTodo: null,
       upfile1: [],
+      mulupfile1: [],
       upfile2: '',
       result: ''
     }
@@ -404,6 +405,7 @@ export default {
     handleattachUpload () {
       this.upfile1 = this.$refs.upfile1.files[0]
       // this.upfile1 = this.$refs.upfile1.files
+
     },
     selectedstate (state, index) {
       console.log(state, index)
@@ -462,8 +464,9 @@ export default {
     },
     approve (e) {
       const formData = new FormData()
-      formData.append('file1', this.upfile1)
-      // formData.append('file2', this.$refs.upfile1.files[1])
+      for (var i = 0; i < this.mulupfile1.length; i++) {
+        formData.append('file1[' + i + ']', this.mulupfile1[i])
+      }
       formData.append('files2send1', Object.values(this.output.attachments))
       formData.append('bcc', this.output.bcc)
       formData.append('body', this.output.body)
@@ -488,7 +491,9 @@ export default {
     },
     gsave (e) {
       const formData = new FormData()
-      formData.append('file1', this.upfile1)
+      for (var i = 0; i < this.mulupfile1.length; i++) {
+        formData.append('file1[' + i + ']', this.mulupfile1[i])
+      }
       formData.append('files2send1', Object.values(this.output.attachments))
       formData.append('bcc', this.output.bcc)
       formData.append('body', this.output.body)

@@ -652,12 +652,10 @@ def csvapprove(request):
                                 attachments.append(os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'))
                             elif f == 'letter-of-intent.docx':
                                 attachments.append(os.path.join(SCRIPTS_DIR,'letter-of-intent.docx'))
-                        if 'file2' in request.FILES :
-                            file=request.FILES['file2']
-                            #  Saving POST'ed file to storage
-                            file_name = default_storage.save(file.name, file)
-                            attachments.append(os.path.join(BASE_DIR,file_name))
-                            print(attachments)
+                        if request.FILES :
+                            for i in request.FILES:
+                                file_name = default_storage.save(request.FILES[i].name, request.FILES[i])
+                                attachments.append(os.path.join(BASE_DIR,file_name))
                 sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,attachments)
                 if sent :
                     if "to" in re:
@@ -748,12 +746,10 @@ def csvdraft(request):
                             attachments.append(os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'))
                         elif f == 'letter-of-intent.docx':
                             attachments.append(os.path.join(SCRIPTS_DIR,'letter-of-intent.docx'))
-                    if 'file2' in request.FILES :
-                        file=request.FILES['file2']
-                        #  Saving POST'ed file to storage
-                        file_name = default_storage.save(file.name, file)
-                        attachments.append(os.path.join(BASE_DIR,file_name))
-                        print(attachments)
+                    if request.FILES :
+                        for i in request.FILES:
+                            file_name = default_storage.save(request.FILES[i].name, request.FILES[i])
+                            attachments.append(os.path.join(BASE_DIR,file_name))
                 attachmentFile = attachments
                 if attachmentFile:
                     message = createMessageWithAttachment(EMAIL_HOST_USER, to,cc,bcc, subject,body, attachmentFile)
@@ -935,11 +931,10 @@ def approve(request):
                     attachments.append(os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'))
                 elif f == 'letter-of-intent.docx':
                     attachments.append(os.path.join(SCRIPTS_DIR,'letter-of-intent.docx'))
-            if 'file1' in request.FILES :
-                file=request.FILES['file1']
-                #  Saving POST'ed file to storage
-                file_name = default_storage.save(file.name, file)
-                attachments.append(os.path.join(BASE_DIR,file_name))
+            if request.FILES :
+                for i in request.FILES:
+                    file_name = default_storage.save(request.FILES[i].name, request.FILES[i])
+                    attachments.append(os.path.join(BASE_DIR,file_name))
             print(attachments)
             sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,attachments)
             if 'file1' in request.FILES :
@@ -974,12 +969,11 @@ def gsave(request):
             attachments.append(os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'))
         elif f == 'letter-of-intent.docx':
             attachments.append(os.path.join(SCRIPTS_DIR,'letter-of-intent.docx'))
-        if 'file1' in request.FILES :
-            file=request.FILES['file1']
-            #  Saving POST'ed file to storage
-            file_name = default_storage.save(file.name, file)
+    if request.FILES :
+        for i in request.FILES:
+            file_name = default_storage.save(request.FILES[i].name, request.FILES[i])
             attachments.append(os.path.join(BASE_DIR,file_name))
-        print(attachments)
+    print(attachments)
     credentials = get_credentials()
     attachmentFile=attachments
     result = None

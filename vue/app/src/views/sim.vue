@@ -212,7 +212,7 @@
       <b-button @click="disc1(value,key)" class="close" aria-label="Close"><span class="d-inline-block" aria-hidden="true">&times;</span></b-button></b-button>
        </div>
 
-       <input type="file" id="upfile1" ref="upfile1" v-on:change="handleattachUpload1()"/>
+       <input type="file" id="upfile1" ref="upfile1" v-on:change="handleattachUpload1()" multiple>
         {{upfile1.name}}
  </label><br>
  </form>
@@ -316,7 +316,7 @@
       </b-button>
     </div>
 
-    <input type="file" id="upfile2" ref="upfile2" v-on:change="handleattachUpload2()"/>
+    <input type="file" id="upfile2" ref="upfile2" v-on:change="handleattachUpload2()"multiple>
 
    </label><br>
       <b-button id="save" @click="save"> Save </b-button>
@@ -369,6 +369,8 @@ export default {
       file: this.$store.getters.file,
       upfile1: this.$store.getters.upfile1,
       upfile2: this.$store.getters.upfile2,
+      mulupfile1: [],
+      mulupfile2: [],
       key1: '',
       key2: '',
       key3: '',
@@ -462,12 +464,14 @@ export default {
       this.$store.commit('file', this.file)
     },
     handleattachUpload1 () {
-      this.upfile1 = (this.$refs.upfile1.files[0])
-      this.$store.commit('upfile1', this.upfile1)
+      for (var i = 0; i < this.$refs.upfile1.files.length; i++) {
+        this.mulupfile1.push(this.$refs.upfile1.files[i])
+      }
     },
     handleattachUpload2 () {
-      this.upfile2 = (this.$refs.upfile2.files[0])
-      this.$store.commit('upfile2', this.upfile2)
+      for (var i = 0; i < this.$refs.upfile2.files.length; i++) {
+        this.mulupfile2.push(this.$refs.upfile2.files[i])
+      }
     },
     gobacktoform () {
       this.isNight = true
@@ -534,7 +538,9 @@ export default {
       this.csvapp = true
       this.$store.commit('csvapp', this.csvapp)
       const formData = new FormData()
-      formData.append('file2', this.upfile2)
+      for (var i = 0; i < this.mulupfile2.length; i++) {
+        formData.append('file2[' + i + ']', this.mulupfile2[i])
+      }
       formData.append('file2send2', Object.values(this.reqdata.attachments))
       formData.append('list', this.selected)
       const currentObj = this
@@ -620,7 +626,9 @@ export default {
       this.csvgsave = true
       this.$store.commit('csvgsave', this.csvgsave)
       const formData = new FormData()
-      formData.append('file2', this.upfile2)
+      for (var i = 0; i < this.mulupfile2.length; i++) {
+        formData.append('file2[' + i + ']', this.mulupfile2[i])
+      }
       formData.append('file2send2', Object.values(this.reqdata.attachments))
       formData.append('list', this.selected)
       const currentObj = this
@@ -738,6 +746,9 @@ export default {
     },
     approve (e) {
       const formData = new FormData()
+      for (var i = 0; i < this.mulupfile1.length; i++) {
+        formData.append('file1[' + i + ']', this.mulupfile1[i])
+      }
       formData.append('file1', this.upfile1)
       formData.append('files2send1', Object.values(this.output.attachments))
       formData.append('remail', this.output.remail)
@@ -780,7 +791,9 @@ export default {
     },
     gsave (e) {
       const formData = new FormData()
-      formData.append('file1', this.upfile1)
+      for (var i = 0; i < this.mulupfile1.length; i++) {
+        formData.append('file1[' + i + ']', this.mulupfile1[i])
+      }
       formData.append('files2send1', Object.values(this.output.attachments))
       formData.append('remail', this.output.remail)
       formData.append('cc', this.output.cc)
