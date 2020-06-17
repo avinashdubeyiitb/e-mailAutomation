@@ -316,7 +316,7 @@
       </b-button>
     </div>
 
-    <input type="file" id="upfile2" ref="upfile2" v-on:change="handleattachUpload2()"multiple>
+    <input type="file" id="upfile2" ref="upfile2" v-on:change="handleattachUpload2()" multiple>
 
    </label><br>
       <b-button id="save" @click="save"> Save </b-button>
@@ -559,7 +559,7 @@ export default {
           console.log(error)
         })
       this.popoverShow3 = false
-      for (var i = 0; i < this.selected.length; i++) {
+      for (i = 0; i < this.selected.length; i++) {
         if (this.aprovselected.indexOf(this.selected[i]) === -1) {
           this.aprovselected.push(this.selected[i])
         }
@@ -647,7 +647,7 @@ export default {
           console.log(error)
         })
       this.popoverShow4 = false
-      for (var i = 0; i < this.selected.length; i++) {
+      for (i = 0; i < this.selected.length; i++) {
         if (this.gsvselected.indexOf(this.selected[i]) === -1) {
           this.gsvselected.push(this.selected[i])
         }

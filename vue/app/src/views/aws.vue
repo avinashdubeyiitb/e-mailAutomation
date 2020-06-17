@@ -403,9 +403,9 @@ export default {
       }
     },
     handleattachUpload () {
-      this.upfile1 = this.$refs.upfile1.files[0]
-      // this.upfile1 = this.$refs.upfile1.files
-
+      for (var i = 0; i < this.$refs.upfile1.files.length; i++) {
+        this.mulupfile1.push(this.$refs.upfile1.files[i])
+      }
     },
     selectedstate (state, index) {
       console.log(state, index)
