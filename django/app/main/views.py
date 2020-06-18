@@ -34,26 +34,14 @@ import csv
 from .serializers import *
 from .models import *
 from app.settings import EMAIL_HOST_USER,BASE_DIR,SCRIPTS_DIR
-<<<<<<< HEAD
-
-##############################
-from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
-from rest_auth.registration.views import SocialLoginView
-
-
-class GoogleLogin(SocialLoginView):
-    adapter_class = GoogleOAuth2Adapter
-#################################
-######################
-=======
 #############################################################################################################
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from rest_auth.registration.views import SocialLoginView
->>>>>>> 22b6358d3431b3e2f6e4825c25263330da131012
-
+#from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
+    #client_class = OAuth2Client
 ############################################################################################################################
 import googlemaps
 import requests

@@ -27,7 +27,7 @@ SECRET_KEY = 'wygqr7y3yvx#c1=1gak2)uffyoqtk@4**1m0=#hi-m4r*+n*6q'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-SITE_ID = 1
+SITE_ID = 3
 
 REST_USE_JWT = True
 
@@ -37,31 +37,23 @@ REST_USE_JWT = True
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
+    'django.contrib.sites',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'main',
     'rest_framework',
     'corsheaders',
-    'main',
     'easyaudit',
-<<<<<<< HEAD
-=======
-    'django.contrib.sites',  # don't forget
-
     'rest_framework.authtoken',
->>>>>>> 22b6358d3431b3e2f6e4825c25263330da131012
     'rest_auth',
     'rest_auth.registration',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-<<<<<<< HEAD
-    'django.contrib.sites',
-=======
     # 'main.apps.MainConfig',
->>>>>>> 22b6358d3431b3e2f6e4825c25263330da131012
     #'social_django', # <--
 ]
 

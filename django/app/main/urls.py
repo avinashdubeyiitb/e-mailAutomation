@@ -28,13 +28,8 @@ urlpatterns = [
     url(r'^api/main/awssave',views.awssave),
     # url(r'^api/public/', views.public),
     # url(r'^api/private/', views.private),
-<<<<<<< HEAD
-    url(r'^api/main/algo',views.algo_for_willing_mem),
-    url(r'auth/google', views.GoogleLogin.as_view(), name='google_login'),
-=======
-    url(r'^api/main/google/', views.GoogleLogin.as_view(), name='google_login'),
+    url(r'^api/main/google', views.GoogleLogin.as_view(), name='google_login'),
     url(r'^api/main/algo',views.algo_for_willing_mem)
->>>>>>> 22b6358d3431b3e2f6e4825c25263330da131012
 ]
 '''
     url(r'^$', views.home, name='home'),

@@ -22,7 +22,7 @@
    clickMode="push"
  >
  </vue-particles>
-
+<!--
  <div class="columns" style="margin: 100px;">
         <div class="column col-2 centered">
           <g-signin-button
@@ -36,12 +36,12 @@
           <user-panel v-else :user="user"></user-panel>
         </div>
       </div>
-
+-->
 </div>
     <router-view/>
   </div>
 </template>
-
+<!--
 <script>
 import axios from 'axios'
 import UserPanel from '@/components/UserPanel'
@@ -87,6 +87,7 @@ export default {
   }
 }
 </script>
+-->
 <style>
 /* #app {
   margin: 0px;

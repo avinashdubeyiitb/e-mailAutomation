@@ -117,34 +117,6 @@ class create_workshop(models.Model):
         db_table = 'create_workshop'
         managed = False
 
-<<<<<<< HEAD
-=======
-class userdetail(models.Model):
-    id = models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
-    emailid = models.EmailField(blank=False,null=False)
-    name = models.CharField(max_length=50,blank=False,null=True)
-    language = models.TextField(blank=True,null=True)
-
-    def __str__(self):
-        return self.emailid
-
-    class Meta:
-        db_table = 'user_details'
-        managed = False
-
-class headdetail(models.Model):
-    id = models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
-    emailid = models.EmailField(blank=False,null=False)
-    name = models.CharField(max_length=50,blank=False,null=True)
-    head = models.CharField(max_length=50,blank=False,null=True)
-    def __str__(self):
-        return self.emailid
-
-    class Meta:
-        db_table = 'head_details'
-        managed = False
-
->>>>>>> 22b6358d3431b3e2f6e4825c25263330da131012
 class WorkshopsTakenCount(models.Model):
     name = models.TextField(max_length=50,blank=False,null=False)
     active_member = models.IntegerField(blank=False,null=False)
