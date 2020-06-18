@@ -1,5 +1,6 @@
 from django.conf.urls import url,include
 from main import views
+from django.urls import path
 from django.contrib import admin
 urlpatterns = [
     url(r'^api/main/submit', views.submit),
@@ -27,6 +28,7 @@ urlpatterns = [
     url(r'^api/main/awssave',views.awssave),
     # url(r'^api/public/', views.public),
     # url(r'^api/private/', views.private),
+    url(r'^api/main/google/', views.GoogleLogin.as_view(), name='google_login'),
     url(r'^api/main/algo',views.algo_for_willing_mem)
 ]
 '''

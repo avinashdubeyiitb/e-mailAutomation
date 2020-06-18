@@ -1,6 +1,15 @@
 from django.db import models
 import uuid
+from django.contrib.auth.models import AbstractUser
 # Create your models here.
+class User(AbstractUser):
+    photo = models.URLField(blank=True)
+
+    def __str__(self):
+        return self.username
+    class Meta:
+        db_table = 'user'
+        managed = False
 
 class DemoDtls(models.Model):
     name = models.CharField(max_length=50,blank=False,null=False)
@@ -17,6 +26,7 @@ class DemoDtls(models.Model):
         return self.name
     class Meta:
         db_table = 'demo_dtls'
+        managed = False
 
 class WorkshopTeamStatus(models.Model):
     workshop_id = models.IntegerField(blank=False,null=False)
@@ -45,6 +55,7 @@ class WorkshopTeamStatus(models.Model):
         return self.workshop_venue
     class Meta:
         db_table = 'workshop_team_status'
+        managed = False
 
 class create_workshop(models.Model):
     id = models.AutoField(primary_key=True)
@@ -60,6 +71,7 @@ class create_workshop(models.Model):
         return str(self.id)
     class Meta:
         db_table = 'create_workshop'
+        managed = False
 
 class userdetail(models.Model):
     id = models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
@@ -72,6 +84,7 @@ class userdetail(models.Model):
 
     class Meta:
         db_table = 'user_details'
+        managed = False
 
 class headdetail(models.Model):
     id = models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
@@ -83,6 +96,7 @@ class headdetail(models.Model):
 
     class Meta:
         db_table = 'head_details'
+        managed = False
 
 class WorkshopsTakenCount(models.Model):
     name = models.TextField(max_length=50,blank=False,null=False)
@@ -102,6 +116,7 @@ class WorkshopsTakenCount(models.Model):
 
     class Meta:
         db_table = 'workshops_taken_count'
+        managed = False
 
 class ElsiCollegeDtls(models.Model):
     id = models.IntegerField(blank=True, null=False, primary_key=True)

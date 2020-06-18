@@ -34,28 +34,13 @@ import csv
 from .serializers import *
 from .models import *
 from app.settings import EMAIL_HOST_USER,BASE_DIR,SCRIPTS_DIR
-######################
+#############################################################################################################
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from rest_auth.registration.views import SocialLoginView
 
-# from django.contrib.auth.decorators import login_required
-#
-# @login_required
-# def home(request):
-#     return render(request, os.path.join(SCRIPTS_DIR,'home.html'))
-#
-# def login(request):
-#     return render(request, os.path.join(SCRIPTS_DIR,'login.html'))
-#
-# def logout(request):
-#     return render(request, os.path.join(SCRIPTS_DIR,'logout.html'))
-#
-# def public(request):
-#     return HttpResponse("You don't need to be authenticated to see this")
-#
-#
-# @api_view(['GET'])
-# def private(request):
-#     return HttpResponse("You should not see this message if not authenticated!")
-#####################
+
+class GoogleLogin(SocialLoginView):
+    adapter_class = GoogleOAuth2Adapter
 ############################################################################################################################
 import googlemaps
 import requests
