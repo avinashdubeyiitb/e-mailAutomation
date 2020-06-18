@@ -36,12 +36,12 @@
           </b-dropdown>
       </div>
 
-    <strong id="hcn" >Host College Name:</strong>
+    <strong id="hcn" >Host College Name: {{showing}}</strong>
 
     <div class="dropdown" id="hcni">
-  <input v-model="selectedhcn" class="dropdown-input" type="text" placeholder="Find college"  />
+  <input v-model="selectedhcn" class="dropdown-input" type="text" placeholder="Find college" @click="chngclg()"/>
     <div  v-show="selectedhcn" class="dropdown-list" style="z-index:100; position: fixed;background: #FFFFFF">
-      <div v-for="(p,i) in hcn" v-bind:key='i' v-show="showing">
+      <div v-for="(p,i) in hcn" v-bind:key='i' v-show="showing" >
         <div  v-for="(host,index) in p" v-bind:key='index' v-show="itemVisible(host)" @click="savehcn(host,index)" class="dropdown-item">
           {{host}}
         </div>
@@ -129,20 +129,25 @@ export default {
       key3: '',
       key4: '',
       key5: '',
-      showing: 'false',
+      showing: true,
       reqdata: ''
     }
   },
   watch: {
   },
   methods: {
+    chngclg () {
+      if (this.showing === false) {
+        this.showing = true
+      }
+    },
     discard () {
       this.popoverShow1 = false
       this.popoverShow2 = false
       this.isNight = true
       this.isNight1 = true
       this.isNight2 = true
-      this.state = ''
+      this.state = 'State'
       this.selectedhcn = ''
       this.startdate = ''
       this.enddate = ''

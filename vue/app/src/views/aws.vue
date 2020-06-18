@@ -27,7 +27,7 @@
     <form @submit="formSubmit">
       <strong id="wrk" >Select Workshop:</strong>
       <div class="dropdown" id="wrki">
-    <input v-model="selectedworkshop" class="dropdown-input" type="text" placeholder="Select"  />
+    <input v-model="selectedworkshop" class="dropdown-input" type="text" placeholder="Select"  @click="chngclg()"/>
       <div  v-show="selectedworkshop" class="dropdown-list" style="z-index:100; position: fixed;background: #FFFFFF">
         <div v-for="(p,i) in wrklist" v-bind:key='i' v-show="showing">
           <div  v-for="(host,index) in p" v-bind:key='index' v-show="itemVisible(host)" @click="savehcn(host,index)" class="dropdown-item">
@@ -240,7 +240,7 @@ export default {
       index: '',
       in: '',
       wrklist: [],
-      showing: 'false',
+      showing: true,
       districts: [],
       d: 'District',
       district: [],
@@ -278,6 +278,11 @@ export default {
   watch: {
   },
   methods: {
+    chngclg () {
+      if (this.showing === false) {
+        this.showing = true
+      }
+    },
     onDivInput (e) {
       this.output.body = document.getElementById('container').innerHTML
     },

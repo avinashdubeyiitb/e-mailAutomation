@@ -34,6 +34,15 @@ import csv
 from .serializers import *
 from .models import *
 from app.settings import EMAIL_HOST_USER,BASE_DIR,SCRIPTS_DIR
+
+##############################
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from rest_auth.registration.views import SocialLoginView
+
+
+class GoogleLogin(SocialLoginView):
+    adapter_class = GoogleOAuth2Adapter
+#################################
 ######################
 
 # from django.contrib.auth.decorators import login_required
@@ -1133,7 +1142,7 @@ def algo_for_available_mem(spl_mem_available,workshop_lead,ranked_data,availcrit
             if spl_mem_available[j] == p[i].name:
                 d.append([p[i].past_year, p[i].name,p[i].total_count])
     for i in range(len(d)):
-        lang_data = userdetail.objects.filter(name = d[i][1])
+        lang_data = memberdetail.objects.filter(name = d[i][1])
         if lang_data[0].language is None:
             d[i].extend('1')
         else:
@@ -1256,7 +1265,7 @@ def algo_for_willing_mem(request):
             if will_mem_available[j] == p[i].name:
                 d.append([p[i].past_year, p[i].name, p[i].willingness_shown,p[i].total_count])
     for i in range(len(d)):
-        lang_data = userdetail.objects.filter(name = d[i][1])
+        lang_data = memberdetail.objects.filter(name = d[i][1])
         if lang_data[0].language is None:
             d[i].extend('0')
         else:
@@ -1305,7 +1314,7 @@ def algo_for_willing_mem(request):
 
 @api_view(['POST'])
 def mailids(request):
-    objs = userdetail.objects.all()
+    objs = memberdetail.objects.filter(team = '1')
     print(objs)
     l = []
     for idx in range(objs.count()):
@@ -1317,22 +1326,38 @@ def form(request,uid,wid):
     return render(request,'form.html',context={'uuid':uid,'wid':wid})
 
 def headapproval(request,uid,wid):
-    headdet = headdetail.objects.filter(id = uid)
+    headdet = memberdetail.objects.filter(id = uid)
     wrkshp = create_workshop.objects.filter(id = wid)
-    if headdet[0].head == 'eYRC':
-        data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYRC = '1')
-    elif headdet[0].head == 'eYIC':
-        data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYIC = '1')
-    elif headdet[0].head == 'eYRDC':
-        data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYRDC = '1')
-    elif headdet[0].head == 'eLSI':
-        data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eLSI = '1')
-    elif headdet[0].head == 'web':
-        data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,web = '1')
-    elif headdet[0].head == 'course_or_other_eyantra_work':
-        data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,course_or_other_eyantra_work = '1')
-    else:
-        data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,personal_or_any_other = '1')
+    if headdet[0].iscohead == '1':
+        if headdet[0].cohead == 'eYRC':
+            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYRC = '1')
+        elif headdet[0].cohead == 'eYIC':
+            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYIC = '1')
+        elif headdet[0].cohead == 'eYRDC':
+            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYRDC = '1')
+        elif headdet[0].cohead == 'eLSI':
+            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eLSI = '1')
+        elif headdet[0].cohead == 'web':
+            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,web = '1')
+        elif headdet[0].cohead == 'course_or_other_eyantra_work':
+            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,course_or_other_eyantra_work = '1')
+        else:
+            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,personal_or_any_other = '1')
+    else: 
+        if headdet[0].head == 'eYRC':
+            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYRC = '1')
+        elif headdet[0].head == 'eYIC':
+            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYIC = '1')
+        elif headdet[0].head == 'eYRDC':
+            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYRDC = '1')
+        elif headdet[0].head == 'eLSI':
+            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eLSI = '1')
+        elif headdet[0].head == 'web':
+            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,web = '1')
+        elif headdet[0].head == 'course_or_other_eyantra_work':
+            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,course_or_other_eyantra_work = '1')
+        else:
+            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,personal_or_any_other = '1')
     return render(request,'headapproval.html',context={'uuid':uid,'wid':wid,'datas':data})
 
 @api_view(['POST'])
@@ -1342,33 +1367,33 @@ def headresults(request):
     values = var.get('values')
     nms = var.get('names')
     wrkshp = create_workshop.objects.filter(id = var.get('wid'))
-    headdet = headdetail.objects.filter(id = var.get('uuid'))
+    headdet = memberdetail.objects.filter(id = var.get('uuid'))
     '''
     eYRC,eYIC,eYRDC,eLSI,web,Course/Other e-Yantra Work,Personal/Any Other
     '''
     for idx in range(len(nms)):
         obj = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,
                 responder = nms[idx])
-        if headdet[0].head == 'eYRC':
+        if headdet[0].head == 'eYRC' or headdet[0].cohead == 'eYRC':
             obj.update(approval_eYRC = values[idx])
-        elif headdet[0].head == 'eYIC':
+        elif headdet[0].head == 'eYIC' or headdet[0].cohead == 'eYIC':
             obj.update(approval_eYIC = values[idx])
-        elif headdet[0].head == 'eYRDC':
+        elif headdet[0].head == 'eYRDC' or headdet[0].cohead == 'eYRDC':
             obj.update(approval_eYRDC = values[idx])
-        elif headdet[0].head == 'eLSI':
+        elif headdet[0].head == 'eLSI' or headdet[0].cohead == 'eLSI':
             obj.update(approval_eLSI = values[idx])
-        elif headdet[0].head == 'web':
+        elif headdet[0].head == 'web' or headdet[0].cohead == 'web':
             obj.update(approval_web = values[idx])
-        elif headdet[0].head == 'course_or_other_eyantra_work':
+        elif headdet[0].head == 'course_or_other_eyantra_work' or headdet[0].cohead == 'course_or_other_eyantra_work':
             obj.update(approval_course_or_other_eyantra_work = values[idx])
-        elif headdet[0].head == 'personal_or_any_other':
+        elif headdet[0].head == 'personal_or_any_other' or headdet[0].cohead == 'personal_or_any_other':
             obj.update(approval_personal_or_any_other = values[idx])
     return Response('success')
 
 @api_view(['POST'])
 def formdata(request):
     var = JSONParser().parse(request)
-    print(var.get('uuid'),var.get('wid'))
+    print(var.get('uuid'),var.get('wid'),var.get('category'))
     wrkshp = create_workshop.objects.filter(id = var.get('wid'))
     category = var.get('category')
     feedreason = ['0','0','0','0','0','0','0']
@@ -1376,7 +1401,8 @@ def formdata(request):
     for i in range(len(category)):
         index = cat.index(category[i])
         feedreason[index] = '1'
-    name = userdetail.objects.filter(id = var.get('uuid'))[0].name
+    print(feedreason)
+    name = memberdetail.objects.filter(id = var.get('uuid'),team = '1')[0].name
     WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,
         responder = name).update(willingness_or_unavailability = var.get('option'),
         reason = var.get('reason'),eYRC = feedreason[0],eYIC = feedreason[1],
@@ -1394,16 +1420,18 @@ def sendmail(request):
     district = d[0].district
     #selected = var.get('selected')
     #print(selected)
-    objs = userdetail.objects.all()
+    objs = memberdetail.objects.filter(team = '1')
     d = {'sent':[],'success':'','failure':'','total':objs.count()}
     sucs = flr = 0
     for idx in range(objs.count()):
             dte = wrkshp[0].startdate + ' & ' + wrkshp[0].enddate
-            serializer = WorkshopTeamSerializer(data = {'workshop_venue' : selectedworkshop,
+            serializer = WorkshopTeamSerializer(data = {'workshop_id':wrkshp[0].id,'workshop_venue' : selectedworkshop,
                 'date' : dte,'district' : district,'responder' : objs[idx].name})
             print(serializer)
             if serializer.is_valid():
                 serializer.save()
+            else :
+                print(serializer.errors)
             to = objs[idx].emailid
             #if to in selected:
             uuid = objs[idx].id
@@ -1415,10 +1443,9 @@ def sendmail(request):
                 'venue_address':wrkshp[0].venueadd,'start_date':wrkshp[0].startdate,
                 'end_date':wrkshp[0].enddate})
             sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body)
-            sent = True
             if sent:
                 sucs+=1
-                #d['sent'].append(to)
+                d['sent'].append(to)
             else:
                 flr+=1
     d['success'] = sucs
@@ -1430,7 +1457,7 @@ def headmail(request):
     var = JSONParser().parse(request)
     selectedworkshop = var.get('selectedworkshop')
     wrkshp = create_workshop.objects.filter(hcn = selectedworkshop)
-    objs = headdetail.objects.all()
+    objs = memberdetail.objects.filter(ishead = '1')
     d = {'sent':[],'success':'','failure':'','total':objs.count()}
     sucs = flr = 0
     #eYRC,eYIC,eYRDC,eLSI,web,Course/Other e-Yantra Work,Personal/Any Other
@@ -1446,7 +1473,6 @@ def headmail(request):
             rsnd[2]['eYRDC'].append(team[idx].responder)
         if team[idx].eLSI == '1':
             rsnd[3]['eLSI'].append(team[idx].responder)
-            print(rsnd[3],'hii')
         if team[idx].web == '1':
             rsnd[4]['web'].append(team[idx].responder)
         if team[idx].course_or_other_eyantra_work == '1':
@@ -1457,24 +1483,32 @@ def headmail(request):
     print(objs.count())
     for idx in range(objs.count()):
         to = objs[idx].emailid
-        print(len(list(rsnd[idx].values())[0]))
-        if len(list(rsnd[idx].values())[0]):
-            uuid = objs[idx].id
-            print(uuid)
-            cc = ''
-            bcc = ''
-            subject = 'Workshop Team Selection approval'
-            body = render_to_string(os.path.join(SCRIPTS_DIR,'headlink.html'),
-                {'uid':uuid,'wid':wrkshp[0].id,'workshop_name':wrkshp[0].hcn,
-                'venue_address':wrkshp[0].venueadd,'start_date':wrkshp[0].startdate,
-                'end_date':wrkshp[0].enddate})
-            sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body)
-            #sent = True
-            if sent:
-                sucs+=1
-                d['sent'].append(to)
-            else:
-                flr+=1
+        uuid = objs[idx].id
+        #print(len(list(rsnd[idx].values())[0]))
+        for i in range(len(rsnd)):
+            if objs[idx].head in list(rsnd[i].keys())[0] and len(list(rsnd[i].values())[0]):
+                if objs[idx].name in list(rsnd[i].values())[0]:
+                    cohead = memberdetail.objects.filter(iscohead = '1',cohead = list(rsnd[i].keys())[0])
+                    to = cohead[0].emailid
+                    uuid = cohead[0].id
+                    print(cohead[0].name)
+                else :
+                    print(list(rsnd[i].values()))
+                print(objs[idx].name)
+                cc = ''
+                bcc = ''
+                subject = 'Workshop Team Selection approval'
+                body = render_to_string(os.path.join(SCRIPTS_DIR,'headlink.html'),
+                    {'uid':uuid,'wid':wrkshp[0].id,'workshop_name':wrkshp[0].hcn,
+                    'venue_address':wrkshp[0].venueadd,'start_date':wrkshp[0].startdate,
+                    'end_date':wrkshp[0].enddate})
+                sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body)
+                #sent = True
+                if sent:
+                    sucs+=1
+                    d['sent'].append(to)
+                else:
+                    flr+=1
     d['success'] = sucs
     d['failure'] = flr
     return JsonResponse(d)

@@ -2,6 +2,48 @@ from django.db import models
 import uuid
 # Create your models here.
 
+class memberdetail(models.Model):
+    id = models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
+    emailid = models.EmailField(blank=False,null=False)
+    name = models.CharField(max_length=50,blank=False,null=True)
+    language = models.TextField(blank=True,null=True)
+    team = models.CharField(max_length=10,blank=False,null=True)
+    head = models.CharField(max_length=30,blank=False,null=True)
+    cohead = models.CharField(max_length=30,blank=False,null=True)
+    ishead = models.CharField(max_length=10,blank=False,null=True)
+    iscohead = models.CharField(max_length=10,blank=False,null=True)
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        managed = False
+        db_table = 'member_detail'
+
+class algo_detail(models.Model):
+    demo_module_cnt = models.IntegerField(blank=False,null=False)
+    will_ttl_wrkshp_cnt = models.IntegerField(blank=False,null=False)
+    aval_ttl_wrkshp_cnt = models.IntegerField(blank=False,null=False)
+
+    class Meta:
+        managed = False
+        db_table = 'algo_detail'
+
+class ssn_detail(models.Model):
+    ssn_id = models.CharField(max_length=50,blank=False,null=False)
+    user = models.CharField(max_length=50,blank=False,null=False)
+    timestamp = models.DateTimeField()
+    mail_label = models.CharField(max_length=50,blank=False,null=False)
+    rcptmailid = models.CharField(max_length=50,blank=False,null=False)
+    delegated_access = models.CharField(max_length=10,blank=False,null=False)
+    dcprovider = models.CharField(max_length=50,blank=False,null=False)
+
+    def __str__(self):
+        return self.user
+
+    class Meta:
+        managed = False
+        db_table = 'ssn_detail'    
+
 class DemoDtls(models.Model):
     name = models.CharField(max_length=50,blank=False,null=False)
     intro_demo = models.IntegerField(blank=False,null=False)
@@ -16,30 +58,31 @@ class DemoDtls(models.Model):
     def __str__(self):
         return self.name
     class Meta:
+        managed = False
         db_table = 'demo_dtls'
 
 class WorkshopTeamStatus(models.Model):
     workshop_id = models.IntegerField(blank=False,null=False)
-    workshop_venue = models.CharField(max_length=50,blank=False,null=False)
+    workshop_venue = models.CharField(max_length=100,blank=False,null=False)
     date = models.TextField(blank=False,null=False)
     district = models.CharField(max_length=50,blank=False,null=False)
     responder = models.CharField(max_length=50,blank=False,null=False)
     willingness_or_unavailability = models.CharField(max_length=50,blank=True,null=True,default='None')
     reason = models.CharField(max_length=100,blank=True,null=True)
-    eYRC = models.CharField(max_length=50,blank=False,null=False,default='0')
-    eYIC = models.CharField(max_length=50,blank=False,null=False,default='0')
-    eYRDC = models.CharField(max_length=50,blank=False,null=False,default='0')
-    eLSI = models.CharField(max_length=50,blank=False,null=False,default='0')
-    web = models.CharField(max_length=50,blank=False,null=False,default='0')
-    course_or_other_eyantra_work = models.CharField(max_length=50,blank=False,null=False,default='0')
-    personal_or_any_other = models.CharField(max_length=50,blank=False,null=False,default='0')
-    approval_eYRC = models.CharField(max_length=20,blank=False,null=False,default='None')
-    approval_eYIC = models.CharField(max_length=20,blank=False,null=False,default='None')
-    approval_eYRDC = models.CharField(max_length=20,blank=False,null=False,default='None')
-    approval_eLSI = models.CharField(max_length=20,blank=False,null=False,default='None')
-    approval_web = models.CharField(max_length=20,blank=False,null=False,default='None')
-    approval_course_or_other_eyantra_work = models.CharField(max_length=20,blank=False,null=False,default='None')
-    approval_personal_or_any_other = models.CharField(max_length=20,blank=False,null=False,default='None')
+    eYRC = models.CharField(max_length=50,blank=False,null=True,default='0')
+    eYIC = models.CharField(max_length=50,blank=False,null=True,default='0')
+    eYRDC = models.CharField(max_length=50,blank=False,null=True,default='0')
+    eLSI = models.CharField(max_length=50,blank=False,null=True,default='0')
+    web = models.CharField(max_length=50,blank=False,null=True,default='0')
+    course_or_other_eyantra_work = models.CharField(max_length=50,blank=False,null=True,default='0')
+    personal_or_any_other = models.CharField(max_length=50,blank=False,null=True,default='0')
+    approval_eYRC = models.CharField(max_length=20,blank=False,null=True,default='None')
+    approval_eYIC = models.CharField(max_length=20,blank=False,null=True,default='None')
+    approval_eYRDC = models.CharField(max_length=20,blank=False,null=True,default='None')
+    approval_eLSI = models.CharField(max_length=20,blank=False,null=True,default='None')
+    approval_web = models.CharField(max_length=20,blank=False,null=True,default='None')
+    approval_course_or_other_eyantra_work = models.CharField(max_length=20,blank=False,null=True,default='None')
+    approval_personal_or_any_other = models.CharField(max_length=20,blank=False,null=True,default='None')
 
     def __str__(self):
         return self.workshop_venue
@@ -59,30 +102,8 @@ class create_workshop(models.Model):
     def __str__(self):
         return str(self.id)
     class Meta:
+        managed = False
         db_table = 'create_workshop'
-
-class userdetail(models.Model):
-    id = models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
-    emailid = models.EmailField(blank=False,null=False)
-    name = models.CharField(max_length=50,blank=False,null=True)
-    language = models.TextField(blank=True,null=True)
-
-    def __str__(self):
-        return self.emailid
-
-    class Meta:
-        db_table = 'user_details'
-
-class headdetail(models.Model):
-    id = models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
-    emailid = models.EmailField(blank=False,null=False)
-    name = models.CharField(max_length=50,blank=False,null=True)
-    head = models.CharField(max_length=50,blank=False,null=True)
-    def __str__(self):
-        return self.emailid
-
-    class Meta:
-        db_table = 'head_details'
 
 class WorkshopsTakenCount(models.Model):
     name = models.TextField(max_length=50,blank=False,null=False)
@@ -101,6 +122,7 @@ class WorkshopsTakenCount(models.Model):
         return self.name
 
     class Meta:
+        managed = False
         db_table = 'workshops_taken_count'
 
 class ElsiCollegeDtls(models.Model):

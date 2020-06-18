@@ -24,7 +24,7 @@
   <div id="col1inner" >
     <strong id="wrk" >Select Workshop:</strong>
     <div class="dropdown" id="wrki">
-  <input v-model="selectedworkshop" class="dropdown-input" type="text" placeholder="Select"  />
+  <input v-model="selectedworkshop" class="dropdown-input" type="text" placeholder="Select"  @click="chngclg()"/>
     <div  v-show="selectedworkshop" class="dropdown-list" style="z-index:100; position: fixed;background: #FFFFFF">
       <div v-for="(p,i) in wrklist" v-bind:key='i' v-show="showing">
         <div  v-for="(host,index) in p" v-bind:key='index' v-show="itemVisible(host)" @click="savehcn(host,index)" class="dropdown-item">
@@ -139,7 +139,7 @@ export default {
       tcntt: this.$store.getters.tcntt,
       selectedworkshop: this.$store.getters.selectedworkshop,
       wrklist: this.$store.getters.wrklist,
-      showing: this.$store.getters.algoshowing,
+      showing: true,
       willcriteria: this.$store.getters.willcriteria,
       availcriteria: this.$store.getters.availcriteria,
       lang: this.$store.getters.lang,
@@ -149,7 +149,11 @@ export default {
   watch: {
   },
   methods: {
-
+    chngclg () {
+      if (this.showing === false) {
+        this.showing = true
+      }
+    },
     willupdate (event) {
       this.willcriteria.splice(event.newIndex, 0, this.willcriteria.splice(event.oldIndex, 1)[0])
       this.$store.commit('willcriteria', this.willcriteria)

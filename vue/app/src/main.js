@@ -10,11 +10,15 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import XLSX from 'xlsx'
 import UUID from 'vue-uuid'
 import VueParticles from 'vue-particles'
+import GSignInButton from 'vue-google-signin-button'
+import VueHead from 'vue-head'
 Vue.use(UUID)
 Vue.use(XLSX)
 Vue.use(VueAxios, axios)
 Vue.use(BootstrapVue)
 Vue.use(VueParticles)
+Vue.use(GSignInButton)
+Vue.use(VueHead)
 Vue.config.productionTip = false
 new Vue({
   router,
