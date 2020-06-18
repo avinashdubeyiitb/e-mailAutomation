@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from main.models import create_workshop,WorkshopTeamStatus
+from main.models import create_workshop,WorkshopTeamStatus,User
 
 class CreateWorkshop(serializers.ModelSerializer):
 
@@ -25,3 +25,9 @@ class WorkshopTeamSerializer(serializers.ModelSerializer):
             'district',
             'responder',
         )
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name', 'last_name', 'photo')
+        read_only_fields = ('email', )

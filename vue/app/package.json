@@ -23,12 +23,17 @@
     "file-saver": "^2.0.2",
     "jquery": "^3.5.1",
     "js-file-download": "^0.4.12",
+    "postscribe": "^2.0.8",
     "register-service-worker": "^1.7.1",
     "request": "^2.88.2",
     "vue": "^2.6.11",
     "vue-axios": "^2.1.5",
     "vue-google-signin-button": "^1.0.4",
+<<<<<<< HEAD
     "vue-head": "^2.2.0",
+=======
+    "vue-google-signin-button-directive": "^1.0.3",
+>>>>>>> 22b6358d3431b3e2f6e4825c25263330da131012
     "vue-multiselect": "^2.1.6",
     "vue-router": "^3.1.6",
     "vue-sortable": "^0.1.3",

@@ -27,6 +27,9 @@ SECRET_KEY = 'wygqr7y3yvx#c1=1gak2)uffyoqtk@4**1m0=#hi-m4r*+n*6q'
 DEBUG = True
 
 ALLOWED_HOSTS = []
+SITE_ID = 1
+
+REST_USE_JWT = True
 
 
 # Application definition
@@ -42,13 +45,23 @@ INSTALLED_APPS = [
     'corsheaders',
     'main',
     'easyaudit',
+<<<<<<< HEAD
+=======
+    'django.contrib.sites',  # don't forget
+
+    'rest_framework.authtoken',
+>>>>>>> 22b6358d3431b3e2f6e4825c25263330da131012
     'rest_auth',
     'rest_auth.registration',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+<<<<<<< HEAD
     'django.contrib.sites',
+=======
+    # 'main.apps.MainConfig',
+>>>>>>> 22b6358d3431b3e2f6e4825c25263330da131012
     #'social_django', # <--
 ]
 
@@ -134,7 +147,18 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'main.User'
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+}
 
+REST_AUTH_SERIALIZERS = {
+    'USER_DETAILS_SERIALIZER': 'main.serializers.UserSerializer',
+}
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 

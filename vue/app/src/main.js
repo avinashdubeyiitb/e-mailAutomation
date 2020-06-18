@@ -7,11 +7,16 @@ import VueAxios from 'vue-axios'
 import BootstrapVue from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+import GSignInButton from 'vue-google-signin-button'
 import XLSX from 'xlsx'
 import UUID from 'vue-uuid'
 import VueParticles from 'vue-particles'
+<<<<<<< HEAD
 import GSignInButton from 'vue-google-signin-button'
 import VueHead from 'vue-head'
+=======
+Vue.use(GSignInButton)
+>>>>>>> 22b6358d3431b3e2f6e4825c25263330da131012
 Vue.use(UUID)
 Vue.use(XLSX)
 Vue.use(VueAxios, axios)
