@@ -90,8 +90,11 @@ export default {
   methods: {
     OnGoogleAuthSuccess (idToken) {
       console.log(idToken)
-      axios.post('http://127.0.0.1:8081/api/main/google', {
+      // var csrftoken = getCookie('csrftoken');
+      // console.log(csrftoken)
+      axios.post('http://127.0.0.1:8081/google', {
         access_token: idToken,
+        provider: 'google-oauth2',
         header: {
           Accept: 'application/json'
         }
