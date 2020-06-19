@@ -94,7 +94,6 @@ export default {
       // console.log(csrftoken)
       axios.post('http://127.0.0.1:8081/google', {
         access_token: idToken,
-        provider: 'google-oauth2',
         header: {
           Accept: 'application/json'
         }
