@@ -478,7 +478,7 @@ export default {
       formData.append('bcc', this.output.bcc)
       formData.append('body', this.output.body)
       formData.append('subject', this.output.subject)
-      formData.append('label','aws')
+      formData.append('label', 'aws')
       const currentObj = this
       e.preventDefault()
       this.axios.post('http://localhost:8081/api/main/approve', formData,
@@ -506,7 +506,7 @@ export default {
       formData.append('bcc', this.output.bcc)
       formData.append('body', this.output.body)
       formData.append('subject', this.output.subject)
-      formData.append('label','aws')
+      formData.append('label', 'aws')
       e.preventDefault()
       const currentObj = this
       this.axios.post('http://localhost:8081/api/main/gsave', formData,

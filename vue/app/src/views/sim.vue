@@ -543,7 +543,7 @@ export default {
       }
       formData.append('file2send2', Object.values(this.reqdata.attachments))
       formData.append('list', this.selected)
-      formData.append('label','sim')
+      formData.append('label', 'sim')
       const currentObj = this
       this.axios.post('http://localhost:8081/api/main/csv/approve', formData,
         {
@@ -632,7 +632,7 @@ export default {
       }
       formData.append('file2send2', Object.values(this.reqdata.attachments))
       formData.append('list', this.selected)
-      formData.append('label','sim')
+      formData.append('label', 'sim')
       const currentObj = this
       this.axios.post('http://localhost:8081/api/main/csv/gsave', formData,
         {
@@ -758,7 +758,7 @@ export default {
       formData.append('bcc', this.output.bcc)
       formData.append('body', this.output.body)
       formData.append('subject', this.output.subject)
-      formData.append('label','sim')
+      formData.append('label', 'sim')
       e.preventDefault()
       const currentObj = this
       this.detail = ''
@@ -803,7 +803,7 @@ export default {
       formData.append('bcc', this.output.bcc)
       formData.append('body', this.output.body)
       formData.append('subject', this.output.subject)
-      formData.append('label','sim')
+      formData.append('label', 'sim')
       e.preventDefault()
       const currentObj = this
       this.detail = ''
