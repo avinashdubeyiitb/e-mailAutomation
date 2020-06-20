@@ -11,7 +11,6 @@ import GSignInButton from 'vue-google-signin-button'
 import XLSX from 'xlsx'
 import UUID from 'vue-uuid'
 import VueParticles from 'vue-particles'
-import VueHead from 'vue-head'
 
 Vue.use(GSignInButton)
 Vue.use(UUID)
@@ -20,7 +19,6 @@ Vue.use(VueAxios, axios)
 Vue.use(BootstrapVue)
 Vue.use(VueParticles)
 Vue.use(GSignInButton)
-Vue.use(VueHead)
 Vue.config.productionTip = false
 new Vue({
   router,

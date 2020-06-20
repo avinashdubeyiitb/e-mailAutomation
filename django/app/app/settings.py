@@ -37,12 +37,12 @@ REST_USE_JWT = True
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
-    'django.contrib.sites',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'main',
+    'django.contrib.sites',
     'rest_framework',
     'corsheaders',
     'easyaudit',
@@ -56,6 +56,16 @@ INSTALLED_APPS = [
     # 'main.apps.MainConfig',
     #'social_django', # <--
 ]
+
+# class DisableMigrations(object):
+#
+#     def __contains__(self, item):
+#         return True
+#
+#     def __getitem__(self, item):
+#         return "notmigrations"
+#
+# MIGRATION_MODULES = DisableMigrations()
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',

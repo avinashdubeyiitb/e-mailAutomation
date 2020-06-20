@@ -19,6 +19,7 @@
     "core-js": "^3.6.4",
     "custom-electron-titlebar": "^3.2.2-hotfix62",
     "electron-navigation": "^1.5.8",
+    "electron-vue-google-auth": "^1.0.3",
     "eventemitter3": "^4.0.4",
     "file-saver": "^2.0.2",
     "jquery": "^3.5.1",

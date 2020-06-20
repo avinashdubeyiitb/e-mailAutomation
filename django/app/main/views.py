@@ -38,7 +38,9 @@ from app.settings import EMAIL_HOST_USER,BASE_DIR,SCRIPTS_DIR
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from rest_auth.registration.views import SocialLoginView
 #from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
+@csrf_exempt
+@api_view(['POST'])
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
     #client_class = OAuth2Client
@@ -1265,7 +1267,7 @@ def algo_for_willing_mem(request):
     [spl_mem_available.append(x) for x in mem_available if x not in spl_mem_available]
     print(spl_mem_available,'step1')
     #step 2
-    y = WorkshopTeamStatus.objects.filter(workshop_id = 2 ,willingness_or_unavailability = 'Willingness')
+    y = WorkshopTeamStatus.objects.filter(workshop_id = 1,willingness_or_unavailability = 'Willingness')
     will_mem_available = []
     for i in range(y.count()):
         will_mem_available.append(y[i].responder)
@@ -1368,7 +1370,7 @@ def headapproval(request,uid,wid):
             data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,course_or_other_eyantra_work = '1')
         else:
             data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,personal_or_any_other = '1')
-    else: 
+    else:
         if headdet[0].head == 'eYRC':
             data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYRC = '1')
         elif headdet[0].head == 'eYIC':
