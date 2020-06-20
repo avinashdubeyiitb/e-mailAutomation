@@ -65,7 +65,45 @@ import requests
 #  + '&client_secret=' + '4SCOWU5XHQIG2RYIDEI1HRBV32A11EJ4YFQKCJO2G4DZISRF')
 # x = result.json()
 # print(x)
+###############################
+def CreateLabel(service, user_id, label_object):
+  """Creates a new label within user's mailbox, also prints Label ID.
 
+  Args:
+    service: Authorized Gmail API service instance.
+    user_id: User's email address. The special value "me"
+    can be used to indicate the authenticated user.
+    label_object: label to be added.
+
+  Returns:
+    Created Label.
+  """
+  try:
+    label = service.users().labels().create(userId=user_id,
+                                            body=label_object).execute()
+    print(label['id'])
+    return label
+  except errors.HttpError as error:
+    print('An error occurred: %s' % error)
+
+
+def MakeLabel(label_name, mlv='show', llv='labelShow'):
+  """Create Label object.
+
+  Args:
+    label_name: The name of the Label.
+    mlv: Message list visibility, show/hide.
+    llv: Label list visibility, labelShow/labelHide.
+
+  Returns:
+    Created Label.
+  """
+  label = {'messageListVisibility': mlv,
+           'name': label_name,
+           'labelListVisibility': llv}
+  return label
+
+#################################
 
 
 ###########################################################################################################################
@@ -274,6 +312,11 @@ def SendMessage(sender, to, cc, bcc, subject, body, attachmentFile=None):
     #msgPlain = body
     #with open('templates/new.html' ,'r') as email_content:
         #msgHtml = email_content.read()
+    #label_obj = MakeLabel('sim')
+    #print(label_obj)
+    #label = CreateLabel(service,"me",label_obj)
+    #print(label)
+    #label = ['Label_1']
     if attachmentFile:
         message = createMessageWithAttachment(sender, to,cc,bcc, subject,body, attachmentFile)
     else:
@@ -319,6 +362,11 @@ def SendMessageInternal(service, user_id, message):
     try:
         message = (service.users().messages().send(userId=user_id, body=message).execute())
         print('Message Id: %s' % message['id'])
+        #print(message['labelIds'])
+        #msg_labels = {'removeLabelIds': [], 'addLabelIds': ['Label_1']}
+        #message = service.users().messages().modify(userId=user_id,id=message['id'],body=msg_labels).execute()
+        #print('Message Id: %s' % message['id'])
+        #print(message['labelIds'])
         return message
     except errors.HttpError as error:
         print('An error occurred: %s' % error)
@@ -346,7 +394,7 @@ def createMessageWithAttachment(
     message['Cc'] = cc
     message['from'] = sender
     message['subject'] = subject
-
+    print(message)
     messageA = MIMEMultipart('alternative')
     messageR = MIMEMultipart('related')
 
@@ -738,7 +786,7 @@ def csvdraft(request):
                             attachments.append(os.path.join(BASE_DIR,file_name))
                 attachmentFile = attachments
                 if attachmentFile:
-                    message = createMessageWithAttachment(EMAIL_HOST_USER, to,cc,bcc, subject,body, attachmentFile)
+                    message = True#createMessageWithAttachment(EMAIL_HOST_USER, to,cc,bcc, subject,body, attachmentFile)
                 else:
                     message = None
                     message = CreateMessageHtml(EMAIL_HOST_USER, to, cc, bcc, subject, body)
@@ -965,7 +1013,7 @@ def gsave(request):
     result = None
     service = build('gmail', 'v1', credentials=credentials)
     if attachmentFile:
-        message = createMessageWithAttachment(EMAIL_HOST_USER, to,cc,bcc, subject, body, attachmentFile)
+        message = True#createMessageWithAttachment(EMAIL_HOST_USER, to,cc,bcc, subject, body, attachmentFile)
     else:
         message = CreateMessageHtml(EMAIL_HOST_USER, to, cc, bcc, subject, body)
     result = CreateDraft(service,"me",message)

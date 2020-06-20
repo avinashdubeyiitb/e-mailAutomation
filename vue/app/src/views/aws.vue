@@ -328,7 +328,8 @@ export default {
       const currentObj = this
       this.result = 'sending mails'
       this.axios.post('http://localhost:8081/api/main/headmail', {
-        selectedworkshop: this.selectedworkshop
+        selectedworkshop: this.selectedworkshop,
+        label: 'tam'
       })
         .then(function (response) {
           currentObj.result = response.data
@@ -342,7 +343,8 @@ export default {
       const currentObj = this
       this.result = 'sending mails'
       this.axios.post('http://localhost:8081/api/main/sendmail', {
-        selectedworkshop: this.selectedworkshop
+        selectedworkshop: this.selectedworkshop,
+        label: 'tsm'
       })
         .then(function (response) {
           currentObj.result = response.data
@@ -476,6 +478,7 @@ export default {
       formData.append('bcc', this.output.bcc)
       formData.append('body', this.output.body)
       formData.append('subject', this.output.subject)
+      formData.append('label','aws')
       const currentObj = this
       e.preventDefault()
       this.axios.post('http://localhost:8081/api/main/approve', formData,
@@ -503,6 +506,7 @@ export default {
       formData.append('bcc', this.output.bcc)
       formData.append('body', this.output.body)
       formData.append('subject', this.output.subject)
+      formData.append('label','aws')
       e.preventDefault()
       const currentObj = this
       this.axios.post('http://localhost:8081/api/main/gsave', formData,
