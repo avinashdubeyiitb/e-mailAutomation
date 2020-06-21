@@ -1,2 +1,2 @@
-vue/app/dist_electron filter=lfs diff=lfs merge=lfs -text
-vue/app/node_modules filter=lfs diff=lfs merge=lfs -text
+/e:/dist_electron filter=lfs diff=lfs merge=lfs -text
+/e:/node_modules filter=lfs diff=lfs merge=lfs -text
