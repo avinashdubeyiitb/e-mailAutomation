@@ -148,8 +148,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-<<<<<<< HEAD
-# AUTH_USER_MODEL = 'main.User'
+AUTH_USER_MODEL = 'main.User'
 # REST_FRAMEWORK = {
 #     'DEFAULT_AUTHENTICATION_CLASSES': (
 #         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
@@ -157,34 +156,20 @@ AUTH_PASSWORD_VALIDATORS = [
 #         'rest_framework.authentication.BasicAuthentication',
 #     ),
 # }
-#
 # REST_AUTH_SERIALIZERS = {
 #     'USER_DETAILS_SERIALIZER': 'main.serializers.UserSerializer',
 # }
-=======
-AUTH_USER_MODEL = 'main.User'
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
-    ),
-}
-REST_AUTH_SERIALIZERS = {
-    'USER_DETAILS_SERIALIZER': 'main.serializers.UserSerializer',
-}
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': [
-            'profile',
-            'email',
-        ],
-        'AUTH_PARAMS': {
-            'access_type': 'offline',
-        }
-    }
-}
->>>>>>> 08c9326da907b570b272d625ff6d6a6d73035111
+# SOCIALACCOUNT_PROVIDERS = {
+#     'google': {
+#         'SCOPE': [
+#             'profile',
+#             'email',
+#         ],
+#         'AUTH_PARAMS': {
+#             'access_type': 'offline',
+#         }
+#     }
+# }
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
