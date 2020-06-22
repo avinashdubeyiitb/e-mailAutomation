@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from main.models import create_workshop,WorkshopTeamStatus,User
+from main.models import create_workshop,WorkshopTeamStatus,User,ssn_detail
 
 class CreateWorkshop(serializers.ModelSerializer):
 
@@ -31,3 +31,9 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('username', 'email', 'first_name', 'last_name', 'photo')
         read_only_fields = ('email', )
+
+class SsnSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ssn_detail
+        fields = ('ssn_id','user','timestamp','mail_label','rcptmailid','delegated_access','dcprovider')
