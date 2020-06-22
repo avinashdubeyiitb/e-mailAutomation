@@ -27,9 +27,6 @@ SECRET_KEY = 'wygqr7y3yvx#c1=1gak2)uffyoqtk@4**1m0=#hi-m4r*+n*6q'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-SITE_ID = 3
-
-REST_USE_JWT = True
 
 
 # Application definition
@@ -46,13 +43,13 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'easyaudit',
-    'rest_framework.authtoken',
-    'rest_auth',
-    'rest_auth.registration',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
+    # 'rest_framework.authtoken',
+    # 'rest_auth',
+    # 'rest_auth.registration',
+    # 'allauth',
+    # 'allauth.account',
+    # 'allauth.socialaccount',
+    # 'allauth.socialaccount.providers.google',
     # 'main.apps.MainConfig',
     #'social_django', # <--
 ]
@@ -81,7 +78,9 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'app.urls'
-
+# SOCIALACCOUNT_EMAIL_VERIFICATION = None
+# SOCIALACCOUNT_EMAIL_REQUIRED = False
+# SOCIALACCOUNT_QUERY_EMAIL = True
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -149,18 +148,18 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTH_USER_MODEL = 'main.User'
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
-    ),
-}
-
-REST_AUTH_SERIALIZERS = {
-    'USER_DETAILS_SERIALIZER': 'main.serializers.UserSerializer',
-}
+# AUTH_USER_MODEL = 'main.User'
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': (
+#         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+#         'rest_framework.authentication.SessionAuthentication',
+#         'rest_framework.authentication.BasicAuthentication',
+#     ),
+# }
+#
+# REST_AUTH_SERIALIZERS = {
+#     'USER_DETAILS_SERIALIZER': 'main.serializers.UserSerializer',
+# }
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 

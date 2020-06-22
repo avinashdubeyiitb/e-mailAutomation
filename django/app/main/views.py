@@ -34,16 +34,66 @@ import csv
 from .serializers import *
 from .models import *
 from app.settings import EMAIL_HOST_USER,BASE_DIR,SCRIPTS_DIR
+from django.contrib.auth import authenticate, login,logout
+from django.views.decorators.csrf import csrf_exempt
+
 #############################################################################################################
-from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
-from rest_auth.registration.views import SocialLoginView
-#from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
-@csrf_exempt
-@api_view(['POST'])
-class GoogleLogin(SocialLoginView):
-    adapter_class = GoogleOAuth2Adapter
+# from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+# from rest_auth.registration.views import SocialLoginView
+#
+#
+# class GoogleLogin(SocialLoginView):
+#     adapter_class = GoogleOAuth2Adapter
     #client_class = OAuth2Client
+@csrf_exempt
+def gauthlogin(request):
+    # token = request.data['token']
+    print(request,'1')
+    var = JSONParser().parse(request)
+    token = var.get('cred')
+    print(token,'token')
+    return JsonResponse({'status':'success'})
+
+@csrf_exempt
+def authlogin(request):
+    var = JSONParser().parse(request)
+    name = var.get('username')
+    passw = var.get('password')
+    # logout required for login
+    print(name,passw)
+    if request.user.is_authenticated:
+        return JsonResponse({'status':'already logged in'})
+
+    # if form filled
+    if request.method == 'POST':
+        print('1here')
+        user = authenticate(username=name, password=passw)
+        print(user)
+        if user is not None:
+            print('1')
+            if user.is_active:
+                print('2')
+                login(request, user)
+                return JsonResponse({'status':'success'})
+
+            else:
+                print('3')
+                return JsonResponse({'status':'Account Terminated!'})
+
+        else:
+            print('4')
+            return JsonResponse({'status':'User Doesnt exist!'})
+
+    # if new form is to be rendered
+    else:
+        print('5')
+    return JsonResponse({'status':'Check method'})
+
+@csrf_exempt
+def authlogout(request):
+    logout(request)
+    return JsonResponse({'status':'logged out'})
+
 ############################################################################################################################
 import googlemaps
 import requests
@@ -272,6 +322,7 @@ def CreateDraft(service, user_id, message_body):
 
 def SendMessage(sender, to, cc, bcc, subject, body, attachmentFile=None):
     credentials = get_credentials()
+    print(credentials,'credentials')
     service = build('gmail', 'v1', credentials=credentials)
     #msgPlain = body
     #with open('templates/new.html' ,'r') as email_content:
@@ -293,6 +344,7 @@ def get_credentials():
     if os.path.exists(file_path):
         with open(file_path, 'rb') as token:
             creds = pickle.load(token)
+            print(creds,'1')
         # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:

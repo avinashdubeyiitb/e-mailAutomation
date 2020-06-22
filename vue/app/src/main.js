@@ -11,7 +11,9 @@ import GSignInButton from 'vue-google-signin-button'
 import XLSX from 'xlsx'
 import UUID from 'vue-uuid'
 import VueParticles from 'vue-particles'
+import VueHead from 'vue-head'
 
+Vue.use(VueHead)
 Vue.use(GSignInButton)
 Vue.use(UUID)
 Vue.use(XLSX)

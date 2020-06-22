@@ -1,15 +1,15 @@
 from django.db import models
 import uuid
-from django.contrib.auth.models import AbstractUser
+# from django.contrib.auth.models import AbstractUser
 # Create your models here.
-class User(AbstractUser):
-    photo = models.URLField(blank=True)
-
-    def __str__(self):
-        return self.username
-    class Meta:
-        db_table = 'user'
-        managed = False
+# class User(AbstractUser):
+#     photo = models.URLField(blank=True)
+#
+#     def __str__(self):
+#         return self.username
+#     class Meta:
+#         db_table = 'user'
+#         managed = False
 
 class memberdetail(models.Model):
     id = models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
@@ -51,7 +51,7 @@ class ssn_detail(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'ssn_detail'    
+        db_table = 'ssn_detail'
 
 class DemoDtls(models.Model):
     name = models.CharField(max_length=50,blank=False,null=False)

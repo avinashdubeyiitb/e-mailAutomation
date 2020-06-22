@@ -9,7 +9,27 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
+import ElectronGoogleOAuth2 from '@getstation/electron-google-oauth2';
+const {ipcMain}     	= require('electron'); // include the ipc module to communicate with render process ie to receive the message from render process
 
+ipcMain.on("btnclick",function (event, arg) {
+  const myApiOauth = new ElectronGoogleOAuth2(
+    '257717644642-ssdbt8958dphipjbd9f97u0norked40s.apps.googleusercontent.com',
+    'j-bzdgBu6gke8kWDjA-xRp93',
+     [
+        'https://www.googleapis.com/auth/gmail.readonly',
+        'https://www.googleapis.com/auth/gmail.send',
+        'https://www.googleapis.com/auth/gmail.compose',
+        'https://www.googleapis.com/auth/gmail.modify',
+    ]
+  );
+
+  myApiOauth.openAuthWindowAndGetTokens()
+    .then(token => {
+      // use your token.access_token
+      event.sender.send("btnclick-task-finished",token);
+    });
+});
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }])
 const {shell} = require("electron");
@@ -27,10 +47,10 @@ function createWindow () {
   })
 
   win.setMenuBarVisibility(false)
-  // win.webContents.on("new-window", function(event, url) {
-  //   event.preventDefault();
-  //   shell.openExternal(url);
-  // });
+  win.webContents.on("new-window", function(event, url) {
+    event.preventDefault();
+    shell.openExternal(url);
+  });
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)

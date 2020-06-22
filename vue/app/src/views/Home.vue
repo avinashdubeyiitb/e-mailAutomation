@@ -1,6 +1,9 @@
 <template>
     <div id="app">
-  <div id="leftbar">
+      <div v-show="success">
+      <button class="btn" @click="logout" id="logout">Log Out!</button>
+    </div>
+  <div id="leftbar" v-show="success">
     <div id="baritem0" class="baritems">
       <router-link to="/home" style="text-decoration: none; color: inherit;position:absolute" >Home</router-link>
       </div>
@@ -21,97 +24,145 @@
     </div>
   <router-view/>
   </div>
-  <div class="container">
-    <div class="columns" style="margin-top: 100px;">
-      <div class="column col-2 centered">
-        <button v-if="isEmpty(user)" v-google-signin-button="clientId" class="google-signin-button"> Continue with Google</button>
-        <user-panel v-else :user="user"></user-panel>
-      </div>
+  <div v-show="!success">
+    <div class="container">
+            <br/>
+            <form>
+            <div class="form-group">
+                <label for="usr">User Name:</label>
+                <input type="text" class="form-control" id="txtUsr" v-model="user_name">
+            </div>
+            <div class="form-group">
+                <label for="pwd">Password:</label>
+                <input type="password" class="form-control" id="txtPwd" v-model="user_pass">
+            </div>
+            <button class="btn" @click="login">Login</button>
+            <label  id="lbl">{{stat}}</label>
+          </form>
+          <div class="content-blk">
+          Helo.. This is my first desktop app    <button id="loadnewwindow" @click="say">click to load new window</button>
+                 <div id='message'></div>
+          </div>
+          <div>
+            <button @click="conti">continue</button>
+          </div>
     </div>
   </div>
 </div>
 </template>
-<style scoped>
-</style>
 <script>
-// import axios from 'axios'
-// import UserPanel from '@/components/UserPanel'
-// export default {
-//   name: 'App',
-//   components: {
-//     UserPanel
-//   },
-//   data () {
-//     return {
-//       user: {},
-//       googleSignInParams: {
-//         client_id: '257717644642-ssdbt8958dphipjbd9f97u0norked40s.apps.googleusercontent.com'
-//       }
-//     }
-//   },
-//   methods: {
-//     onGoogleSignInSuccess (googleUser) {
-//       const token = googleUser.Zi.access_token
-//       console.log('triggered')
-//       console.log(token)
-//       axios.post('http://localhost:8081/api/main/google/', {
-//         access_token: token
-//       })
-//         .then(resp => {
-//           this.user = resp.data.user
-//         })
-//         .catch(err => {
-//           console.log(err.response)
-//         })
-//     },
-//     onGoogleSignInError (error) {
-//       console.log('OH NOES', error)
-//     },
-//     isEmpty (obj) {
-//       return Object.keys(obj).length === 0
-//     }
-//   }
-// }
-import GoogleSignInButton from 'vue-google-signin-button-directive'
-import axios from 'axios'
-import UserPanel from '@/components/UserPanel'
+const ipcRenderer = require('electron').ipcRenderer
+
 export default {
-  name: 'App',
-  components: {
-    UserPanel
+  mounted () {
+    console.log('Component mounted.')
   },
-  directives: {
-    GoogleSignInButton
+  computed: {
+
   },
-  data: () => ({
-    user: {},
-    clientId: '257717644642-ssdbt8958dphipjbd9f97u0norked40s.apps.googleusercontent.com'
-  }),
+  data () {
+    return {
+      stat: '',
+      user_name: '',
+      user_pass: '',
+      success: false,
+      token: ''
+    }
+  },
+  watch: {
+  },
   methods: {
-    OnGoogleAuthSuccess (idToken) {
-      console.log(idToken)
-      // var csrftoken = getCookie('csrftoken');
-      // console.log(csrftoken)
-      axios.post('http://127.0.0.1:8081/google', {
-        access_token: idToken,
-        header: {
-          Accept: 'application/json'
-        }
+    conti (e) {
+      e.preventDefault()
+      const cred = this.token
+      // const currentObj = this
+      this.axios.post('http://localhost:8081/api/main/glogin', {
+        cred: cred,
+        hii: 'hii'
       })
-        .then(resp => {
-          this.user = resp.data.user
+        .then(status => {
+          this.stat = status.data.status
+          console.log(this.stat)
+          if (this.stat === 'success') {
+            this.success = true
+          }
+          // if (this.output.status === 'Created Successfully') {
+          //   this.success = true
+          // }
         })
-        .catch(err => {
-          console.log(err.response)
+        .catch(function (error) {
+          this.status = error
         })
-      // Receive the idToken and make your magic with the backend
     },
-    OnGoogleAuthFail (error) {
-      console.log(error)
+    say () {
+      var arg = 'secondparam'
+      // send the info to main process . we can pass any arguments as second param.
+      ipcRenderer.send('btnclick', arg) // ipcRender.send will pass the information to main process
+      ipcRenderer.on('btnclick-task-finished', function (event, param) {
+        this.token = param
+        console.log(this.token)
+      })
+      console.log('i am here')
     },
-    isEmpty (obj) {
-      return Object.keys(obj).length === 0
+    login (e) {
+      e.preventDefault()
+      console.log('request')
+      this.axios.post('http://localhost:8081/api/main/login', {
+        username: this.user_name,
+        password: this.user_pass
+      })
+        .then(status => {
+          this.stat = status.data.status
+          console.log(this.stat)
+          if (this.stat === 'success') {
+            this.success = true
+          }
+          // if (this.output.status === 'Created Successfully') {
+          //   this.success = true
+          // }
+        })
+        .catch(function (error) {
+          this.status = error
+        })
+    },
+    logout (e) {
+      e.preventDefault()
+      console.log('request')
+      this.axios.post('http://localhost:8081/api/main/logout', {
+        username: this.user_name
+      })
+        .then(status => {
+          this.stat = status.data.status
+          console.log(this.stat)
+          if (this.stat === 'logged out') {
+            this.success = false
+          }
+          // if (this.output.status === 'Created Successfully') {
+          //   this.success = true
+          // }
+        })
+        .catch(function (error) {
+          this.status = error
+        })
     }
   }
 }
 </script>
+<style scoped>
+.container{
+  background: #FFFFFF;
+  position:absolute;
+  top: 30%;
+  left:33%;
+  height:37%;
+  width:37%;
+}
+.btn{
+  background: #008CBA;
+}
+#logout{
+  position:absolute;
+  top: 5%;
+  right:4%;
+}
+</style>
