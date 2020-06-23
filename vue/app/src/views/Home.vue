@@ -40,7 +40,7 @@
             <label  id="lbl">{{stat}}</label>
           </form>
           <div class="content-blk">
-          Helo.. This is my first desktop app    <button id="loadnewwindow" @click="say">click to load new window</button>
+          <button id="loadnewwindow" @click="say">Google Login</button>
                  <div id='message'></div>
           </div>
           <div>
@@ -65,7 +65,7 @@ export default {
       stat: '',
       user_name: '',
       user_pass: '',
-      success: false,
+      success: this.$store.getters.log,
       token: ''
     }
   },
@@ -74,17 +74,18 @@ export default {
   methods: {
     conti (e) {
       e.preventDefault()
-      const cred = this.token
+      console.log('here')
+      console.log(this.token)
       // const currentObj = this
       this.axios.post('http://localhost:8081/api/main/glogin', {
-        cred: cred,
-        hii: 'hii'
+        token: this.token
       })
         .then(status => {
           this.stat = status.data.status
           console.log(this.stat)
           if (this.stat === 'success') {
             this.success = true
+            this.$store.commit('log', this.success)
           }
           // if (this.output.status === 'Created Successfully') {
           //   this.success = true
@@ -98,11 +99,9 @@ export default {
       var arg = 'secondparam'
       // send the info to main process . we can pass any arguments as second param.
       ipcRenderer.send('btnclick', arg) // ipcRender.send will pass the information to main process
-      ipcRenderer.on('btnclick-task-finished', function (event, param) {
+      ipcRenderer.on('btnclick-task-finished', (event, param) => {
         this.token = param
-        console.log(this.token)
       })
-      console.log('i am here')
     },
     login (e) {
       e.preventDefault()
@@ -116,6 +115,7 @@ export default {
           console.log(this.stat)
           if (this.stat === 'success') {
             this.success = true
+            this.$store.commit('log', this.success)
           }
           // if (this.output.status === 'Created Successfully') {
           //   this.success = true
