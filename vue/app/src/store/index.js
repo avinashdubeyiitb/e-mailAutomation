@@ -7,12 +7,8 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     user: {
-<<<<<<< HEAD
       success: false,
       user_name: '',
-=======
-      log: false,
->>>>>>> 994864d3023cc34149e236b878e43e446fec56ee
       csvapp: false, // sim
       csvgsave: false,
       simisNight: true,
@@ -105,18 +101,12 @@ export default new Vuex.Store({
     }
   },
   getters: {
-<<<<<<< HEAD
     success: state => {
       return state.user.success
     },
     user_name: state => {
       return state.user.user_name
     },
-=======
-    log: state => {
-      return state.user.log
-    }, // sim
->>>>>>> 994864d3023cc34149e236b878e43e446fec56ee
     csvapp: state => {
       return state.user.csvapp
     }, // sim
@@ -386,16 +376,11 @@ export default new Vuex.Store({
     }
   },
   mutations: {
-<<<<<<< HEAD
     success (state, payload) {
       state.user.success = payload
     },
     user_name (state, payload) {
       state.user.user_name = payload
-=======
-    log (state, payload) {
-      state.user.log = payload
->>>>>>> 994864d3023cc34149e236b878e43e446fec56ee
     },
     csvapp (state, payload) {
       state.user.csvapp = payload

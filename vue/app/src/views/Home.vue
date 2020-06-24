@@ -65,11 +65,7 @@ export default {
       stat: '',
       user_name: this.$store.getters.user_name,
       user_pass: '',
-<<<<<<< HEAD
       success: this.$store.getters.success,
-=======
-      success: this.$store.getters.log,
->>>>>>> 994864d3023cc34149e236b878e43e446fec56ee
       token: ''
     }
   },
@@ -89,11 +85,7 @@ export default {
           console.log(this.stat)
           if (this.stat === 'success') {
             this.success = true
-<<<<<<< HEAD
             this.$store.commit('success', this.success)
-=======
-            this.$store.commit('log', this.success)
->>>>>>> 994864d3023cc34149e236b878e43e446fec56ee
           }
           // if (this.output.status === 'Created Successfully') {
           //   this.success = true
@@ -123,12 +115,8 @@ export default {
           console.log(this.stat)
           if (this.stat === 'success') {
             this.success = true
-<<<<<<< HEAD
             this.$store.commit('success', this.success)
             this.$store.commit('user_name', this.user_name)
-=======
-            this.$store.commit('log', this.success)
->>>>>>> 994864d3023cc34149e236b878e43e446fec56ee
           }
           // if (this.output.status === 'Created Successfully') {
           //   this.success = true
