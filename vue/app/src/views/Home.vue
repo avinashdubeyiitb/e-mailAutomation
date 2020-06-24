@@ -39,13 +39,13 @@
             <button class="btn" @click="login">Login</button>
             <label  id="lbl">{{stat}}</label>
           </form>
-          <div class="content-blk">
+          <!-- <div class="content-blk">
           <button id="loadnewwindow" @click="say">Google Login</button>
                  <div id='message'></div>
           </div>
           <div>
             <button @click="conti">continue</button>
-          </div>
+          </div> -->
     </div>
   </div>
 </div>
@@ -66,7 +66,7 @@ export default {
       user_name: '',
       user_pass: '',
       success: this.$store.getters.log,
-      token: ''
+      token: this.$store.getters.token
     }
   },
   watch: {
@@ -101,6 +101,7 @@ export default {
       ipcRenderer.send('btnclick', arg) // ipcRender.send will pass the information to main process
       ipcRenderer.on('btnclick-task-finished', (event, param) => {
         this.token = param
+        this.$store.commit('token', this.token.access_token)
       })
     },
     login (e) {

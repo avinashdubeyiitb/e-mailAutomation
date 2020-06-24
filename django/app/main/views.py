@@ -36,6 +36,7 @@ from .models import *
 from app.settings import EMAIL_HOST_USER,BASE_DIR,SCRIPTS_DIR
 from django.contrib.auth import authenticate, login,logout
 from django.views.decorators.csrf import csrf_exempt
+from oauth2client.client import AccessTokenCredentials
 
 #############################################################################################################
 # from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
@@ -45,12 +46,75 @@ from django.views.decorators.csrf import csrf_exempt
 # class GoogleLogin(SocialLoginView):
 #     adapter_class = GoogleOAuth2Adapter
     #client_class = OAuth2Client
+
+def get_user_info(credentials):
+  """Send a request to the UserInfo API to retrieve the user's information.
+
+  Args:
+    credentials: oauth2client.client.OAuth2Credentials instance to authorize the
+                 request.
+  Returns:
+    User information as a dict.
+  """
+  access_token = credentials['access_token']
+  # url = 'https://www.googleapis.com/oauth2/v3/tokeninfo?access_token={0}'.format(access_token)
+  # r = requests.get(url)
+  # data = r.json()
+  # print(data,'data')
+  credentials = AccessTokenCredentials(access_token, "MyAgent/1.0", None)
+  print(credentials)
+  file_path = os.path.join(SCRIPTS_DIR,'pickle.token')
+  with open(file_path, 'wb') as token:
+      pickle.dump(credentials, token)
+  # if os.path.exists(file_path):
+  #   with open(file_path, 'rb') as token:
+  #       creds = pickle.load(token)
+  #       print(creds,'1')
+          # If there are no (valid) credentials available, let the user log in.
+  # if not creds:
+  #       if creds and creds.expired and creds.refresh_token:
+  #           creds.refresh(Request())
+  #       else:
+  #           flow = InstalledAppFlow.from_client_secrets_file(
+  #           credentials_path, SCOPES)
+  #           creds = flow.run_local_server(host='127.0.0.1',port=8081)
+            # Save the credentials for the next run
+  #
+  # user_info_service = build('oauth2', 'v2', credentials=credentials)
+  # user_info = None
+  # try:
+  #   user_info = user_info_service.userinfo().get().execute()
+  # except errors.HttpError:
+  #   logging.error('An error occurred: %s', errors.HttpError)
+  # if user_info and user_info.get('id'):
+  #   return user_info
+  # else:
+  return 'done'
+
+def check(credentials):
+     access_token = credentials['access_token']
+     url = 'https://www.googleapis.com/oauth2/v3/tokeninfo?access_token={0}'.format(access_token)
+     r = requests.get(url)
+     data = r.json()
+     print(data,'data')
+     return data['email_verified']
+
+
 @csrf_exempt
 def gauthlogin(request):
     var = JSONParser().parse(request)
     toke = var.get('token')
     print(toke)
-    return JsonResponse({'status':'success'})
+    # x = get_user_info(toke)
+    # print(x)
+    s = check(toke)
+    if s:
+        return JsonResponse({'status':'success'})
+    else:
+        return JsonResponse({'status':'failed'})
+    # letshope = get_user_info(toke)
+    # print(letshope)
+    # if
 
 @csrf_exempt
 def authlogin(request):

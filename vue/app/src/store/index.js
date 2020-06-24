@@ -7,6 +7,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     user: {
+      token: null,
       log: false,
       csvapp: false, // sim
       csvgsave: false,
@@ -100,6 +101,9 @@ export default new Vuex.Store({
     }
   },
   getters: {
+    token: state => {
+      return state.user.token
+    }, // sim
     log: state => {
       return state.user.log
     }, // sim
@@ -372,6 +376,9 @@ export default new Vuex.Store({
     }
   },
   mutations: {
+    token (state, payload) {
+      state.user.token = payload
+    },
     log (state, payload) {
       state.user.log = payload
     },
