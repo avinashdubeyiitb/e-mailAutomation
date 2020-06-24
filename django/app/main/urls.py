@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^api/main/login',views.authlogin),
     url(r'^api/main/glogin',views.gauthlogin),
     url(r'^api/main/logout',views.authlogout),
+    url(r'^api/main/stats',views.stats),
     # url(r'^api/public/', views.public),
     # url(r'^api/private/', views.private),
     # url(r'^api/main/google', views.GoogleLogin),

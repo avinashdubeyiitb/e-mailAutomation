@@ -329,7 +329,8 @@ export default {
       this.result = 'sending mails'
       this.axios.post('http://localhost:8081/api/main/headmail', {
         selectedworkshop: this.selectedworkshop,
-        label: 'tam'
+        label: 'tam',
+        user: this.$store.getters.user_name
       })
         .then(function (response) {
           currentObj.result = response.data
@@ -344,7 +345,8 @@ export default {
       this.result = 'sending mails'
       this.axios.post('http://localhost:8081/api/main/sendmail', {
         selectedworkshop: this.selectedworkshop,
-        label: 'tsm'
+        label: 'tsm',
+        user: this.$store.getters.user_name
       })
         .then(function (response) {
           currentObj.result = response.data

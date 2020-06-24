@@ -59,11 +59,12 @@ def authlogin(request):
     var = JSONParser().parse(request)
     name = var.get('username')
     passw = var.get('password')
+    #print(User.objects.all().values())
+    #print(User.objects.filter(logged_in='True').values())
     # logout required for login
     print(name,passw)
     if request.user.is_authenticated:
         return JsonResponse({'status':'already logged in'})
-
     # if form filled
     if request.method == 'POST':
         print('1here')
@@ -74,6 +75,7 @@ def authlogin(request):
             if user.is_active:
                 print('2')
                 login(request, user)
+                #print(User.objects.filter(logged_in = 'True').values())
                 return JsonResponse({'status':'success'})
 
             else:
@@ -92,6 +94,7 @@ def authlogin(request):
 @csrf_exempt
 def authlogout(request):
     logout(request)
+    #print(User.objects.filter(logged_in = 'True').values())
     return JsonResponse({'status':'logged out'})
 
 ############################################################################################################################
@@ -125,6 +128,129 @@ SCOPES = [
 ]
 ###############################
 # common functions
+@api_view(['POST'])
+def stats(request):
+    obj = ssn_detail.objects.all()
+    dct = {'Sent':[],'Inbox':[],'Draft':[]}
+    lbl = []
+    for idx in range(obj.count()):
+        lst = obj[idx].mail_label.split(',')
+        if 'DRAFT' in lst or not len(lst):
+            for i in range(len(dct['Draft'])):
+                if dct['Draft'][i]['user'] == obj[idx].user:
+                    if len(lst):
+                        dct['Draft'][i]['Data']['count']+=1
+                        dct['Draft'][i]['Data']['clist'].append(obj[idx].rcptmailid)
+                    else:
+                        dct['Draft'][i]['Data']['failed']+=1
+                        dct['Draft'][i]['Data']['flist'].append(obj[idx].rcptmailid)
+                    break
+            else:
+                if len(lst):
+                    dct['Draft'].append({'user':obj[idx].user,'Data':{'count':1,'failed':0,'clist':[obj[idx].rcptmailid],'flist':[]}})
+                else:
+                    dct['Draft'].append({'user':obj[idx].user,'Data':{'count':0,'failed':1,'clist':[],'flist':[obj[idx].rcptmailid]}})
+        else:
+            for i in range(len(dct['Sent'])):
+                if dct['Sent'][i]['user'] == obj[idx].user:
+                    break
+            else:
+                i = len(dct['Sent'])
+                dct['Sent'].append({'user':obj[idx].user,'Data':[]})
+            for j in range(len(dct['Sent'][i]['Data'])):
+                if dct['Sent'][i]['Data'][j]['label'] in lst:
+                    if len(lst) == 1:
+                        dct['Sent'][i]['Data'][j]['failed'] +=1
+                        dct['Sent'][i]['Data'][j]['flist'].append(obj[idx].rcptmailid)
+                    else :
+                        dct['Sent'][i]['Data'][j]['count'] +=1
+                        dct['Sent'][i]['Data'][j]['clist'].append(obj[idx].rcptmailid)
+                    break
+            else:
+                if len(lst) == 1:
+                    lbl.append(lst[0])
+                    dct['Sent'][i]['Data'].append({'label':lst[0],'count':0,'failed':1,'clist':[],'flist':[obj[idx].rcptmailid]})
+                else :
+                    lbl.append(lst[1])
+                    dct['Sent'][i]['Data'].append({'label':lst[1],'count':1,'failed':0,'clist':[obj[idx].rcptmailid],'flist':[]})
+    #print(dct)
+    #print(lbl)
+    ids = []
+    credentials = get_credentials()
+    #print(credentials,'credentials')
+    service = build('gmail', 'v1', credentials=credentials)
+    labels = ListLabels(service,'me')
+    for val in labels:
+        if val['name'] in lbl:
+            ids.append(val['id'])
+    msg = ListMessagesWithLabels(service,'me',['INBOX'])
+    #print(msg)
+    for idx in range(len(ids)):
+        m = ListMessagesWithLabels(service,'me',[ids[idx]])
+        for i in range(len(m)):
+            for j in range(len(msg)):
+                if m[i]['threadId'] == msg[j]['threadId']:
+                    tmp = service.users().messages().get(userId='me', id=msg[j]['id']).execute()
+                    for l in range(len(tmp['payload']['headers'])):
+                        if tmp['payload']['headers'][l]['name'] == 'From':
+                            #print(lbl[idx],tmp['payload']['headers'][l]['value'])
+                            f = tmp['payload']['headers'][l]['value']
+                            if f.find('<') != -1:
+                                f = f[f.index('<')+1:f.index('>')]
+                        if tmp['payload']['headers'][l]['name'] == 'To':
+                            #print(lbl[idx],tmp['payload']['headers'][l]['value'])
+                            t = tmp['payload']['headers'][l]['value']
+                            if t.find('<') != -1:
+                                t = t[t.index('<')+1:t.index('>')]
+                            break
+                    for a in range(len(dct['Inbox'])):
+                        if dct['Inbox'][a]['user'] == t:
+                            break
+                    else:
+                        a = len(dct['Inbox'])
+                        dct['Inbox'].append({'user':t,'Data':[]})
+                    for b in range(len(dct['Inbox'][a]['Data'])):
+                        if dct['Inbox'][a]['Data'][b]['label'] == lbl[idx]:
+                            dct['Inbox'][a]['Data'][b]['count'] +=1
+                            dct['Inbox'][a]['Data'][b]['clist'].append(f)
+                            break
+                    else:
+                        dct['Inbox'][a]['Data'].append({'label':lbl[idx],'count':1,'clist':[f]})
+    print(dct)
+    return JsonResponse(dct)
+
+def ListMessagesWithLabels(service, user_id, label_ids=[]):
+  """List all Messages of the user's mailbox with label_ids applied.
+
+  Args:
+    service: Authorized Gmail API service instance.
+    user_id: User's email address. The special value "me"
+    can be used to indicate the authenticated user.
+    label_ids: Only return Messages with these labelIds applied.
+
+  Returns:
+    List of Messages that have all required Labels applied. Note that the
+    returned list contains Message IDs, you must use get with the
+    appropriate id to get the details of a Message.
+  """
+  try:
+    response = service.users().messages().list(userId=user_id,
+                                               labelIds=label_ids).execute()
+    messages = []
+    if 'messages' in response:
+      messages.extend(response['messages'])
+
+    while 'nextPageToken' in response:
+      page_token = response['nextPageToken']
+      response = service.users().messages().list(userId=user_id,
+                                                 labelIds=label_ids,
+                                                 pageToken=page_token).execute()
+      messages.extend(response['messages'])
+
+    return messages
+  except errors.HttpError as error:
+    print('An error occurred: %s' % error)
+
 @api_view(['POST'])
 def getfile(request):
     print('hii')
@@ -708,6 +834,7 @@ def store(request):
 @api_view(['POST'])
 def csvapprove(request):
     sent = None
+    user = request.data.get('user')
     label = request.data.get('label')
     with open('scripts/info.json','r') as read:
         obj = json.load(read)
@@ -734,6 +861,7 @@ def csvapprove(request):
                     obj = ElsiCollegeDtls.objects.filter(college_name = clg)
                     coll = getname(clg)
                     print(coll)
+                    fn = []
                     if len(district) >0 and len(state)>0:
                         dis = getname(district)
                         sta = getname(state)
@@ -756,11 +884,14 @@ def csvapprove(request):
                                 attachments.append(os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'))
                             elif f == 'letter-of-intent.docx':
                                 attachments.append(os.path.join(SCRIPTS_DIR,'letter-of-intent.docx'))
+                        fn = []
                         if request.FILES :
                             for i in request.FILES:
                                 file_name = default_storage.save(request.FILES[i].name, request.FILES[i])
+                                fn.append(file_name)
                                 attachments.append(os.path.join(BASE_DIR,file_name))
-                sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label,attachments)
+                #sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label,attachments)
+                sent = True
                 now = datetime.now()
                 ts = now.strftime("%Y-%m-%d %H:%M:%S") 
                 if sent :
@@ -773,7 +904,7 @@ def csvapprove(request):
                       re["status"].append("1")
                     else:
                       re["status"] = ["1"]
-                    serializer = SsnSerializer(data = {'ssn_id':'ssn1','name' : EMAIL_HOST_USER,
+                    serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
                         'timestamp' : ts,'mail_label' : 'SENT,'+label,'rcptmailid' : to,
                         'delegated_access':'1','dcprovider':'None'})
                 else:
@@ -786,7 +917,7 @@ def csvapprove(request):
                       re["status"].append("0")
                     else:
                       re["status"] = ["0"]
-                    serializer = SsnSerializer(data = {'ssn_id':'ssn1','name' : EMAIL_HOST_USER,
+                    serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
                         'timestamp' : ts,'mail_label' : label,'rcptmailid' : to,
                         'delegated_access':'1','dcprovider':'None'})
                 if serializer.is_valid():
@@ -794,6 +925,8 @@ def csvapprove(request):
                 else:
                     print(serializer.errors)
                 print(serializer)
+                for i in range(len(fn)):
+                    os.remove(os.path.join(BASE_DIR,fn[i]))
     success = 0
     failure = 0
     for key,value in re.items():
@@ -814,6 +947,7 @@ def csvapprove(request):
 @api_view(['POST'])
 def csvdraft(request):
     sent = None
+    user = request.data.get('user')
     with open('scripts/info.json','r') as read:
         obj = json.load(read)
     file_path = obj['file_path']
@@ -855,7 +989,7 @@ def csvdraft(request):
                     res = getbody(clg,obj,sta,dis)
                     subject = res['subject']
                     body = res['body']
-                    files2send2 = list(request.data.get('files2send2').split(","))
+                    files2send2 = list(request.data.get('file2send2').split(","))
                     print(files2send2)
                     attachments = []
                     for f in files2send2:
@@ -863,16 +997,19 @@ def csvdraft(request):
                             attachments.append(os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'))
                         elif f == 'letter-of-intent.docx':
                             attachments.append(os.path.join(SCRIPTS_DIR,'letter-of-intent.docx'))
+                    fn = []
                     if request.FILES :
                         for i in request.FILES:
                             file_name = default_storage.save(request.FILES[i].name, request.FILES[i])
+                            fn.append(file_name)
                             attachments.append(os.path.join(BASE_DIR,file_name))
                 attachmentFile = attachments
                 if attachmentFile:
                     message = createMessageWithAttachment(EMAIL_HOST_USER, to,cc,bcc, subject,body, attachmentFile)
                 else:
                     message = CreateMessageHtml(EMAIL_HOST_USER, to, cc, bcc, subject, body)
-                result = CreateDraft(service,"me",message)
+                #result = CreateDraft(service,"me",message)
+                result = True
                 now = datetime.now()
                 ts = now.strftime("%Y-%m-%d %H:%M:%S") 
                 if result :
@@ -885,7 +1022,7 @@ def csvdraft(request):
                       re["status"].append("1")
                     else:
                       re["status"] = ["1"]
-                    serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : EMAIL_HOST_USER,
+                    serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
                                     'timestamp' : ts,'mail_label' : 'DRAFT','rcptmailid' : to,
                                     'delegated_access':'0','dcprovider':'None'})
                 else:
@@ -898,7 +1035,7 @@ def csvdraft(request):
                       re["status"].append("0")
                     else:
                       re["status"] = ["0"]
-                    serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : EMAIL_HOST_USER,
+                    serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
                                     'timestamp' : ts,'mail_label' : '','rcptmailid' : to,
                                     'delegated_access':'0','dcprovider':'None'})
                 if serializer.is_valid():
@@ -906,6 +1043,8 @@ def csvdraft(request):
                 else :
                     print(serializer.errors)
                 print(serializer)
+                for i in range(len(fn)):
+                    os.remove(os.path.join(BASE_DIR,fn[i]))
     success = 0
     failure = 0
     for key,value in re.items():
@@ -963,7 +1102,6 @@ def idrequest(request):
 @api_view(['POST'])
 def save(request):
     var = JSONParser().parse(request)
-
     with open('scripts/info.json','r') as read:
         obj = json.load(read)
     file_path = obj['file_path']
@@ -1040,6 +1178,9 @@ def approve(request):
         try:
             #print(request.data.get('file1'))
             #print(request.data.get('file2'))
+            user = request.data.get('user')
+            if request.user.is_authenticated:
+                print({'status':'already logged in'})
             to = request.data.get('remail')
             label = request.data.get('label')
             if type(request.data.get('cc')) == list:
@@ -1061,9 +1202,11 @@ def approve(request):
                     attachments.append(os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'))
                 elif f == 'letter-of-intent.docx':
                     attachments.append(os.path.join(SCRIPTS_DIR,'letter-of-intent.docx'))
+            fn = []
             if request.FILES :
                 for i in request.FILES:
                     file_name = default_storage.save(request.FILES[i].name, request.FILES[i])
+                    fn.append(file_name)
                     attachments.append(os.path.join(BASE_DIR,file_name))
             print(attachments)
             #sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label,attachments)
@@ -1073,7 +1216,7 @@ def approve(request):
             if 'file1' in request.FILES :
                 os.remove(os.path.join(BASE_DIR,file_name))
             if sent :
-                serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : EMAIL_HOST_USER,
+                serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
                         'timestamp' : ts,'mail_label' : 'SENT,'+label,'rcptmailid' : to,
                         'delegated_access':'0','dcprovider':'None'})
                 if serializer.is_valid():
@@ -1081,9 +1224,11 @@ def approve(request):
                 else :
                     print(serializer.errors)
                 print(serializer)
+                for i in range(len(fn)):
+                    os.remove(os.path.join(BASE_DIR,fn[i]))
                 return JsonResponse({'status':'success','info':'mail sent successfully'})
             else :
-                serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : EMAIL_HOST_USER,
+                serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
                         'timestamp' : ts,'mail_label' : label,'rcptmailid' : to,
                         'delegated_access':'0','dcprovider':'None'})
                 if serializer.is_valid():
@@ -1091,14 +1236,16 @@ def approve(request):
                 else :
                     print(serializer.errors)
                 print(serializer)
+                for i in range(len(fn)):
+                    os.remove(os.path.join(BASE_DIR,fn[i]))
                 return JsonResponse({'status':'failure','info':'mail was not sent'})
-            #return JsonResponse({'status':'success'})
         except ValueError as e:
             return Response(e.args[0],status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def gsave(request):
     to = request.data.get('remail')
+    user = request.data.get('user')
     if type(request.data.get('cc')) == list:
         cc = ','.join(map(str,request.data.get('cc') ))
     else:
@@ -1118,9 +1265,11 @@ def gsave(request):
             attachments.append(os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'))
         elif f == 'letter-of-intent.docx':
             attachments.append(os.path.join(SCRIPTS_DIR,'letter-of-intent.docx'))
+    fn = []
     if request.FILES :
         for i in request.FILES:
             file_name = default_storage.save(request.FILES[i].name, request.FILES[i])
+            fn.append(file_name)
             attachments.append(os.path.join(BASE_DIR,file_name))
     print(attachments)
     credentials = get_credentials()
@@ -1131,15 +1280,16 @@ def gsave(request):
         message = createMessageWithAttachment(EMAIL_HOST_USER, to,cc,bcc, subject, body, attachmentFile)
     else:
         message = CreateMessageHtml(EMAIL_HOST_USER, to, cc, bcc, subject, body)
-    result = CreateDraft(service,"me",message)
+    #result = CreateDraft(service,"me",message)
+    result = True
     now = datetime.now()
     ts = now.strftime("%Y-%m-%d %H:%M:%S") 
     if result:
-        serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : EMAIL_HOST_USER,
+        serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
                         'timestamp' : ts,'mail_label' : 'DRAFT','rcptmailid' : to,
                         'delegated_access':'0','dcprovider':'None'})
     else:
-        serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : EMAIL_HOST_USER,
+        serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
                         'timestamp' : ts,'mail_label' : '','rcptmailid' : to,
                         'delegated_access':'0','dcprovider':'None'})
     if serializer.is_valid():
@@ -1147,8 +1297,8 @@ def gsave(request):
     else :
         print(serializer.errors)
     print(serializer)
-    if 'file1' in request.FILES :
-        os.remove(os.path.join(BASE_DIR,file_name))
+    for i in range(len(fn)):
+        os.remove(os.path.join(BASE_DIR,fn[i]))
     return JsonResponse({'status':'saved to draft'})
 ######################
 
@@ -1569,6 +1719,7 @@ def formdata(request):
 @api_view(['POST'])
 def sendmail(request):
     var = JSONParser().parse(request)
+    user = var.get('user')
     selectedworkshop = var.get('selectedworkshop')
     wrkshp = create_workshop.objects.filter(hcn = selectedworkshop)
     d = ElsiCollegeDtls.objects.filter(college_name = selectedworkshop)
@@ -1598,12 +1749,26 @@ def sendmail(request):
                 {'uid':uuid,'wid':wrkshp[0].id,'workshop_name':wrkshp[0].hcn,
                 'venue_address':wrkshp[0].venueadd,'start_date':wrkshp[0].startdate,
                 'end_date':wrkshp[0].enddate})
-            sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
+            #sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
+            sent = True
+            now = datetime.now()
+            ts = now.strftime("%Y-%m-%d %H:%M:%S") 
             if sent:
                 sucs+=1
                 d['sent'].append(to)
+                serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
+                        'timestamp' : ts,'mail_label' : 'SENT,'+label,'rcptmailid' : to,
+                        'delegated_access':'1','dcprovider':'None'})
             else:
                 flr+=1
+                serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
+                        'timestamp' : ts,'mail_label' : label,'rcptmailid' : to,
+                        'delegated_access':'1','dcprovider':'None'})
+            if serializer.is_valid():
+                serializer.save()
+            else:
+                print(serializer.errors)
+            print(serializer)
     d['success'] = sucs
     d['failure'] = flr
     return JsonResponse(d)
@@ -1611,6 +1776,7 @@ def sendmail(request):
 @api_view(['POST'])
 def headmail(request):
     var = JSONParser().parse(request)
+    user = var.get('user')
     selectedworkshop = var.get('selectedworkshop')
     wrkshp = create_workshop.objects.filter(hcn = selectedworkshop)
     objs = memberdetail.objects.filter(ishead = '1')
@@ -1659,13 +1825,26 @@ def headmail(request):
                     {'uid':uuid,'wid':wrkshp[0].id,'workshop_name':wrkshp[0].hcn,
                     'venue_address':wrkshp[0].venueadd,'start_date':wrkshp[0].startdate,
                     'end_date':wrkshp[0].enddate})
-                sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
-                #sent = True
+                #sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
+                sent = True
+                now = datetime.now()
+                ts = now.strftime("%Y-%m-%d %H:%M:%S") 
                 if sent:
                     sucs+=1
                     d['sent'].append(to)
+                    serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
+                        'timestamp' : ts,'mail_label' : 'DRAFT','rcptmailid' : to,
+                        'delegated_access':'1','dcprovider':'None'})
                 else:
                     flr+=1
+                    serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
+                        'timestamp' : ts,'mail_label' : '','rcptmailid' : to,
+                        'delegated_access':'1','dcprovider':'None'})
+                if serializer.is_valid():
+                    serializer.save()
+                else:
+                    print(serializer.errors)
+                print(serializer)
     d['success'] = sucs
     d['failure'] = flr
     return JsonResponse(d)

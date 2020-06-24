@@ -20,7 +20,7 @@
         <router-link style="text-decoration: none; color: inherit;" to="/tsa">Coming soon :(</router-link>
       </div>
     </div>
-    <h1>Send Mail To Team</h1>
+    <h1>Email Analytics</h1>
 
     <!--
   <div id="col1inner" >
@@ -58,6 +58,92 @@
   </div>
   <div id="col2inner">
   </div-->
+  <div id="col1inner" >
+    Sent
+<table class="table">
+<thead>
+<tr>
+<th>User</th>
+<th>Label</th>
+<th>Count</th>
+<th>Failed</th>
+</tr>
+</thead>
+<tbody v-for='value in output.Sent' v-bind:key='value.user'>
+  <tr v-for='data in value.Data' v-bind:key='data.label'>
+    <td>{{value.user}}</td>
+    <td>{{data.label}}</td>
+    <td>{{data.count}}
+      <b-dropdown>
+              <div v-for="(id,idx) in data.clist" v-bind:key='idx' >
+                <b-dropdown-item>{{id}}</b-dropdown-item>
+              </div>
+      </b-dropdown>
+      </td>
+    <td>{{data.failed}}
+      <b-dropdown>
+              <div v-for="(id,idx) in data.flist" v-bind:key='idx' >
+                <b-dropdown-item>{{id}}</b-dropdown-item>
+              </div>
+      </b-dropdown>
+      </td>
+  </tr>
+</tbody>
+</table>
+Draft
+<table class="table">
+  <thead>
+<tr>
+<th>User</th>
+<th>Count</th>
+<th>Failed</th>
+</tr>
+</thead>
+  <tbody >
+  <tr v-for='data in output.Draft' v-bind:key='data.user'>
+    <td>{{data.user}}</td>
+    <td>
+      {{data.Data.count}}
+      <b-dropdown>
+              <div v-for="(id,idx) in data.Data.clist" v-bind:key='idx' >
+                <b-dropdown-item>{{id}}</b-dropdown-item>
+              </div>
+      </b-dropdown>
+      </td>
+    <td>{{data.Data.failed}}
+      <b-dropdown>
+              <div v-for="(id,idx) in data.Data.flist" v-bind:key='idx' >
+                <b-dropdown-item>{{id}}</b-dropdown-item>
+              </div>
+      </b-dropdown>
+      </td>
+  </tr>
+</tbody>
+</table>
+Inbox
+<table class="table">
+  <thead>
+<tr>
+<th>User</th>
+<th>Label</th>
+<th>Count</th>
+</tr>
+</thead>
+  <tbody v-for='value in output.Inbox' v-bind:key='value.user'>
+  <tr v-for='data in value.Data' v-bind:key='data.label'>
+    <td>{{value.user}}</td>
+    <td>{{data.label}}</td>
+    <td>{{data.count}}
+      <b-dropdown>
+              <div v-for="(id,idx) in data.clist" v-bind:key='idx' >
+                <b-dropdown-item>{{id}}</b-dropdown-item>
+              </div>
+      </b-dropdown>
+      </td>
+  </tr>
+</tbody>
+</table>
+  </div>
   </div>
 </template>
 
@@ -65,20 +151,33 @@
 export default {
   mounted () {
     console.log('Component mounted.')
+    this.stats()
   },
   computed: {
   },
   data () {
     return {
-      output: '',
-      isget: false,
-      issend: false,
-      selected: [],
-      result: '',
-      sent: []
+      output: ''
+      // isget: false,
+      // issend: false,
+      // selected: [],
+      // result: '',
+      // sent: []
     }
   },
   methods: {
+    stats () {
+      this.axios.post('http://localhost:8081/api/main/stats', {
+      })
+        .then(output => {
+          this.output = output.data
+          console.log('SUCCESS')
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    }
+    /*
     getstate (mailid) {
       if (this.issend === true && this.selected.indexOf(mailid) !== -1) {
         if (this.result.success > 0 && this.sent.indexOf(mailid) !== -1) {
@@ -125,7 +224,7 @@ export default {
       for (var val in this.output.data) {
         this.selected.push(this.output.data[val].mailid)
       }
-    }
+    */
   }
 }
 </script>
@@ -145,11 +244,12 @@ color: #000000;
 
 #col1inner{
 position: absolute;
-width: 43%;
+width: 90%;
 height: 90%;
 left: 7%;
-top: 15%;
-z-index:-1;
+right:1%;
+top: 10%;
+z-index: -1;
 background: #4ABDAC;
 border: 1px solid #000000;
 box-sizing: border-box;
