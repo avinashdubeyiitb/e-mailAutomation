@@ -63,9 +63,9 @@ export default {
   data () {
     return {
       stat: '',
-      user_name: '',
+      user_name: this.$store.getters.user_name,
       user_pass: '',
-      success: this.$store.getters.log,
+      success: this.$store.getters.success,
       token: this.$store.getters.token
     }
   },
@@ -85,7 +85,7 @@ export default {
           console.log(this.stat)
           if (this.stat === 'success') {
             this.success = true
-            this.$store.commit('log', this.success)
+            this.$store.commit('success', this.success)
           }
           // if (this.output.status === 'Created Successfully') {
           //   this.success = true
@@ -116,7 +116,8 @@ export default {
           console.log(this.stat)
           if (this.stat === 'success') {
             this.success = true
-            this.$store.commit('log', this.success)
+            this.$store.commit('success', this.success)
+            this.$store.commit('user_name', this.user_name)
           }
           // if (this.output.status === 'Created Successfully') {
           //   this.success = true
@@ -137,6 +138,8 @@ export default {
           console.log(this.stat)
           if (this.stat === 'logged out') {
             this.success = false
+            this.$store.commit('success', this.success)
+            this.$store.commit('user_name', '')
           }
           // if (this.output.status === 'Created Successfully') {
           //   this.success = true

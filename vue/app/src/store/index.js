@@ -8,7 +8,8 @@ export default new Vuex.Store({
   state: {
     user: {
       token: null,
-      log: false,
+      success: false,
+      user_name: '',
       csvapp: false, // sim
       csvgsave: false,
       simisNight: true,
@@ -62,7 +63,7 @@ export default new Vuex.Store({
       cwsoutput: '',
       selectedhcn: '',
       hcn: [],
-      success: false,
+      cwssuccess: false,
       showing: 'false',
       awsstate: 'State', // aws
       awsindex: '',
@@ -104,9 +105,12 @@ export default new Vuex.Store({
     token: state => {
       return state.user.token
     }, // sim
-    log: state => {
-      return state.user.log
-    }, // sim
+    success: state => {
+      return state.user.success
+    },
+    user_name: state => {
+      return state.user.user_name
+    },
     csvapp: state => {
       return state.user.csvapp
     }, // sim
@@ -266,7 +270,7 @@ export default new Vuex.Store({
     hcn: state => {
       return state.user.hcn
     },
-    success: state => {
+    cwssuccess: state => {
       return state.user.success
     },
     showing: state => {
@@ -379,8 +383,11 @@ export default new Vuex.Store({
     token (state, payload) {
       state.user.token = payload
     },
-    log (state, payload) {
-      state.user.log = payload
+    success (state, payload) {
+      state.user.success = payload
+    },
+    user_name (state, payload) {
+      state.user.user_name = payload
     },
     csvapp (state, payload) {
       state.user.csvapp = payload
@@ -538,7 +545,7 @@ export default new Vuex.Store({
     hcn (state, payload) {
       state.user.hcn = payload
     },
-    success (state, payload) {
+    cwssuccess (state, payload) {
       state.user.success = payload
     },
     showing (state, payload) {

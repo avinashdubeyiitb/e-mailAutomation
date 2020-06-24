@@ -1,0 +1,157 @@
+discord link: http://discord.gg/EtKsHK
+
+```**Date**: ***09-05-20***
+**Name**: ***Dikshita Jain***
+---
+* Looked through eLSI site : 
+	has shown its data about yearly stablished Robotics labs
+	depicted this data statewise on google map and accordingly used color codes
+* made survey upon email apis :
+	on the basis of our needs we could use email apis that offer validation, integration, transactional supports, etc.
+* frameworks to be worked upon in backend
+	say for python, we can use django, flask, pyramid 
+	say for java, we can use spring, hibernate, struts 
+```
+```Date : 11-05-20
+Name : Dikshita Jain
+---
+* worked upon django & its restframework
+* working with json and ajax in javascript
+```
+```Date : 12-05-20
+Name : Dikshita Jain
+---
+* worked upon communication between electron and django(still working)
+* reflecting the updates within the database if so(done)
+* according send the mail(still working)
+```
+```
+Date : 13-05-20
+Name: Dikshita Jain
+* debugged the channel for communication between django nd electron(using ajax) 
+*sending the mail through smtplib module
+*looking through vue. Js for ui part
+```
+```
+Date : 14-05-20
+Name: Dikshita Jain
+* using bootstrap vue & bootstarp for ui(not fully implemented yet)
+```
+```
+Date : 15-05-20
+Name: Dikshita Jain
+* working on gmail api(authentication part)
+* looked through figma for prototypes of ui
+```
+```
+Date : 16-05-20
+Name: Dikshita Jain
+* authentication done through gmail api 
+* working on sending mail through gmail api
+```
+```
+Date : 19-05-20
+Name: Dikshita Jain
+* worked on drafts 
+* worked on backend for opitimising the code(removing the dependency on database)
+```
+```
+Date : 20-05-20
+Name: Dikshita Jain
+* looked through announce workshop section flow and its implementation in backend
+```
+```
+Date : 22-05-20
+Name: Dikshita Jain
+* looked through frontend designs upon dribble
+* worked upon sending multiple mails through reading of csv file, looping through the attributes and accordingly sending mails.
+```
+```
+Date : 23-05-20
+Name: Dikshita Jain
+* worked on backend for implementing csv file reading and saving the changes accordingly in the mail layout.
+```
+```
+Date : 26-05-20
+Name: Dikshita Jain
+* migrating sql to postgresql using pgloader(still working)
+* added functionality to send imformation mail while uploading data for multiple colleges(completed)
+```
+```
+Date : 28-05-20
+Name: Dikshita Jain
+* migrating sql to postgresql using pgloader(done)
+* added few functionality in frontend(send information mail part)
+```
+```
+Date : 29-05-20
+Name: Dikshita Jain
+* adding more funtionality to information mail part
+```
+Our future activities will be affected by the economical environment we will live in and geo-economics  acting as a connecting tool between the global economies, will prove as a determinant for the manner in which we perform those activities.  
+"C:\Program Files\PostgreSQL\12\bin\psql" -d elsi -U postgres -c "\copy public.AICTE_list from C:/Users/Asus/Downloads/AICTE_list.csv delimiter ',' csv header"
+
+
+
+test.csv
+23 count
+500 test_counter
+[58, 128, 131, 136, 158, 177, 186, 250, 278, 298, 355, 375, 418, 428, 430, 434, 464, 466, 478, 484, 488, 489, 492] err
+
+test3500.csv(+501)
+22 count
+500 test_counter
+[45, 135, 166, 189, 199, 227, 279, 294, 301, 329, 331, 352, 368, 375, 390, 398, 401, 407, 413, 414, 428, 476] err
+
+test4000.csv(+1001)
+46 count
+1000 test_counter
+[66, 89, 176, 211, 237, 240, 260, 273, 276, 277, 284, 318, 359, 403, 405, 413, 415, 416, 430, 440, 450, 464, 465, 472, 530, 531, 576, 584, 608, 653, 702, 716, 726, 743, 798, 812, 819, 839, 891, 910, 913, 918, 937, 948, 950, 995] err
+
+test5000.csv(+2001)
+58 count
+1000 test_counter
+[26, 31, 40, 46, 63, 117, 118, 119, 120, 122, 123, 134, 160, 225, 234, 249, 259, 272, 285, 299, 341, 366, 372, 381, 384, 385, 391, 393, 397, 448, 502, 514, 536, 570, 587, 591, 623, 668, 671, 677, 689, 704, 775, 779, 803, 831, 839, 841, 862, 864, 875, 879, 890, 913, 915, 927, 934, 937] err
+
+test6000.csv(+3001)
+37 count
+645 test_counter
+[19, 34, 89, 90, 91, 92, 110, 112, 113, 118, 192, 225, 235, 255, 271, 272, 276, 291, 297, 312, 339, 358, 365, 372, 404, 418, 441, 495, 535, 547, 550, 551, 552, 560, 565, 589, 634] err
+
+test1800.csv
+144 count
+200 test_counter
+[4, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 23, 24, 29, 30, 31, 
+32, 33, 34, 35, 36, 37, 38, 39, 40, 42, 45, 47, 56, 69, 75, 82, 86, 87, 88, 93, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 108, 109, 110, 111, 112, 113, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200] err
+
+test2000.csv
+111 count
+1000 test_counter
+[1, 8, 9, 23, 24, 25, 29, 34, 44, 51, 53, 56, 59, 61, 64, 72, 83, 84, 86, 87, 103, 106, 112, 113, 118, 119, 129, 130, 132, 134, 135, 143, 152, 154, 166, 170, 174, 177, 190, 207, 208, 228, 237, 241, 246, 252, 257, 264, 266, 267, 268, 282, 291, 306, 316, 321, 322, 332, 342, 343, 348, 367, 368, 371, 380, 394, 
+395, 396, 397, 398, 427, 447, 453, 455, 462, 463, 486, 489, 491, 493, 494, 499, 501, 507, 522, 536, 543, 587, 600, 622, 626, 646, 662, 675, 713, 772, 782, 785, 799, 833, 834, 835, 847, 850, 865, 881, 892, 893, 939, 947, 984] err 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
