@@ -36,7 +36,7 @@
           </b-dropdown>
       </div>
 
-    <strong id="hcn" >Host College Name: {{showing}}</strong>
+    <strong id="hcn" >Host College Name: </strong>
 
     <div class="dropdown" id="hcni">
   <input v-model="selectedhcn" class="dropdown-input" type="text" placeholder="Find college" @click="chngclg()"/>

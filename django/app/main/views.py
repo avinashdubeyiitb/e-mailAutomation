@@ -47,11 +47,9 @@ from django.views.decorators.csrf import csrf_exempt
     #client_class = OAuth2Client
 @csrf_exempt
 def gauthlogin(request):
-    # token = request.data['token']
-    print(request,'1')
     var = JSONParser().parse(request)
-    token = var.get('cred')
-    print(token,'token')
+    toke = var.get('token')
+    print(toke)
     return JsonResponse({'status':'success'})
 
 @csrf_exempt
@@ -533,7 +531,7 @@ def get_credentials():
             creds = pickle.load(token)
             print(creds,'1')
         # If there are no (valid) credentials available, let the user log in.
-    if not creds or not creds.valid:
+    if not creds:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
@@ -893,7 +891,7 @@ def csvapprove(request):
                 #sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label,attachments)
                 sent = True
                 now = datetime.now()
-                ts = now.strftime("%Y-%m-%d %H:%M:%S") 
+                ts = now.strftime("%Y-%m-%d %H:%M:%S")
                 if sent :
                     # res['msg'] = "mail sent successfully"
                     if "to" in re:
@@ -1011,7 +1009,7 @@ def csvdraft(request):
                 #result = CreateDraft(service,"me",message)
                 result = True
                 now = datetime.now()
-                ts = now.strftime("%Y-%m-%d %H:%M:%S") 
+                ts = now.strftime("%Y-%m-%d %H:%M:%S")
                 if result :
                     # res['msg'] = "mail sent successfully"
                     if "to" in re:
@@ -1209,10 +1207,9 @@ def approve(request):
                     fn.append(file_name)
                     attachments.append(os.path.join(BASE_DIR,file_name))
             print(attachments)
-            #sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label,attachments)
-            sent = True
+            sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label,attachments)
             now = datetime.now()
-            ts = now.strftime("%Y-%m-%d %H:%M:%S") 
+            ts = now.strftime("%Y-%m-%d %H:%M:%S")
             if 'file1' in request.FILES :
                 os.remove(os.path.join(BASE_DIR,file_name))
             if sent :
@@ -1283,7 +1280,7 @@ def gsave(request):
     #result = CreateDraft(service,"me",message)
     result = True
     now = datetime.now()
-    ts = now.strftime("%Y-%m-%d %H:%M:%S") 
+    ts = now.strftime("%Y-%m-%d %H:%M:%S")
     if result:
         serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
                         'timestamp' : ts,'mail_label' : 'DRAFT','rcptmailid' : to,
