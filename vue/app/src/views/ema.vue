@@ -120,9 +120,6 @@ export default {
   },
   data () {
     return {
-<<<<<<< HEAD:vue/app/src/views/ema.vue
-      output: ''
-=======
       output: '',
       port: this.$store.getters.port
       // isget: false,
@@ -130,7 +127,6 @@ export default {
       // selected: [],
       // result: '',
       // sent: []
->>>>>>> e6bc0ef8aa4c3fe571eae7c2045065e261764e93:vue/app/src/views/tsa.vue
     }
   },
   methods: {

@@ -172,15 +172,7 @@ export default {
     formSubmit (e) {
       e.preventDefault()
       const currentObj = this
-<<<<<<< HEAD
       this.axios.post('http://localhost:8081/api/main/cwssubmit', {
-=======
-      this.isNight = false
-      this.isNight1 = false
-      this.isNight2 = true
-      this.isNight3 = true
-      this.axios.post('http://localhost:' + this.port + '/api/main/cwssubmit', {
->>>>>>> e6bc0ef8aa4c3fe571eae7c2045065e261764e93
         hcn: this.selectedhcn,
         startdate: this.startdate,
         enddate: this.enddate,

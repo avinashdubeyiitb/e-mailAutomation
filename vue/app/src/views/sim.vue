@@ -643,26 +643,6 @@ export default {
       this.selected = []
       this.$store.commit('selected', this.selected)
     },
-<<<<<<< HEAD
-=======
-    save (e) {
-      e.preventDefault()
-      const currentObj = this
-      this.axios.post('http://localhost:' + this.port + '/api/main/save', {
-        remail: this.reqdata.to,
-        cc: this.reqdata.cc,
-        bcc: this.reqdata.bcc,
-        body: this.reqdata.body,
-        subject: this.reqdata.subject
-      })
-        .then(function (response) {
-          currentObj.saveoutput = response.data
-        })
-        .catch(function (error) {
-          currentObj.saveoutput = error
-        })
-    },
->>>>>>> e6bc0ef8aa4c3fe571eae7c2045065e261764e93
     saveDetail (e) {
       e.preventDefault()
       const currentObj = this
