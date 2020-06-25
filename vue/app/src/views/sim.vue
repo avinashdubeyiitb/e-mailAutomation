@@ -17,7 +17,7 @@
         <router-link style="text-decoration: none; color: inherit;" to="/algo">Run Algorithm</router-link>
       </div>
       <div id="baritem5" class="baritems">
-        <router-link style="text-decoration: none; color: inherit;" to="/tsa">Coming soon :(</router-link>
+        <router-link style="text-decoration: none; color: inherit;" to="/ema">Email Analytics</router-link>
       </div>
     </div>
     <router-view/>
@@ -63,11 +63,6 @@
     <input id="cnoi" type="tel" v-model="cno" @change="$store.commit('cno', cno)"><br>
     <button id="msub">Submit</button>
     </form>
-    <!-- <strong>Response:</strong> -->
-    <!-- <pre>
-    </pre> -->
-    <!-- <p id="rmsg">{{output}}</p> -->
-    <!-- <div  v-if="{{output.key}} === 'success'"> -->
     <p id="or">-----------------------or------------------------</p>
     <p id="up">Upload csv file</p>
     <label id="file">File:
@@ -104,7 +99,6 @@
 </table>
   </div>
   <form>
-    <!--<p id="rmsg">{{approvecsv}}</p>-->
   <b-button id="popover-reactive-3" ref="button3">Approve Selected</b-button>
 </form>
   <b-popover
@@ -199,7 +193,7 @@
   <b-button @click="refresh">Refresh</b-button>
   </div>
     <b-button v-b-modal.modal-2 id="srbody">body</b-button>
-    <b-modal id="modal-2" size="lg" title="Body" hide-footer v-on:keyup.enter = "NoEnter" >
+    <b-modal id="modal-2" size="lg" title="Body" hide-footer >
     <b-container class="px-2" >
     <span v-html="output.body"></span>
     </b-container>
@@ -259,8 +253,6 @@
         </div>
       </b-popover>
       <b-button id="save" @click="saveDetail" v-if="output.subdiv !== 'A'">Store Changes</b-button>
-  <!-- </div> -->
-  <!-- Output from the popover interaction -->
 </div>
 <div v-show="!isNight2">
      <form>
@@ -301,7 +293,7 @@
      </div>
      </label><br>
     <b-button v-b-modal.modal-1 id="srbody">body</b-button>
-    <b-modal id="modal-1" size="lg" title="Body" hide-footer v-on:keyup.enter = "NoEnter" >
+    <b-modal id="modal-1" size="lg" title="Body" hide-footer>
     <b-container class="px-2" >
     <span v-html="reqdata.body"></span>
     </b-container>
@@ -319,7 +311,6 @@
     <input type="file" id="upfile2" ref="upfile2" v-on:change="handleattachUpload2()" multiple>
 
    </label><br>
-      <b-button id="save" @click="save"> Save </b-button>
  </form>
 </div>
 </div>
@@ -369,19 +360,13 @@ export default {
       file: this.$store.getters.file,
       upfile1: this.$store.getters.upfile1,
       upfile2: this.$store.getters.upfile2,
-      mulupfile1: [],
-      mulupfile2: [],
+      mulupfile1: this.$store.getters.mulupfile1,
+      mulupfile2: this.$store.getters.mulupfile2,
       key1: '',
       key2: '',
       key3: '',
-      key4: '',
       key5: '',
-      key6: '',
-      key7: '',
-      key8: '',
-      key9: '',
       reqdata: this.$store.getters.reqdata,
-      saveoutput: '',
       approvecsv: this.$store.getters.approvecsv,
       gsavecsv: this.$store.getters.gsavecsv,
       aprovselected: this.$store.getters.aprovselected,
@@ -406,8 +391,6 @@ export default {
       if (this.aprovselected.indexOf(pk) !== -1) {
         return 'first'
       }
-      // console.log(indexof(pk))
-      // console.log(this.gsvselected.indexOf(pk))
       if (this.gsvselected.indexOf(pk) !== -1) {
         return 'second'
       }
@@ -423,10 +406,6 @@ export default {
         }
       }
       this.$store.commit('selected', this.selected)
-    },
-    NoEnter (e) {
-      e.preventDefault()
-      console.log(e)
     },
     discard () {
       this.popoverShow1 = false
@@ -467,11 +446,15 @@ export default {
       for (var i = 0; i < this.$refs.upfile1.files.length; i++) {
         this.mulupfile1.push(this.$refs.upfile1.files[i])
       }
+      this.$store.commit('upfile1', this.upfile1)
+      this.$store.commit('mulupfile1', this.mulupfile1)
     },
     handleattachUpload2 () {
       for (var i = 0; i < this.$refs.upfile2.files.length; i++) {
         this.mulupfile2.push(this.$refs.upfile2.files[i])
       }
+      this.$store.commit('upfile2', this.upfile2)
+      this.$store.commit('mulupfile2', this.mulupfile2)
     },
     gobacktoform () {
       this.isNight = true
@@ -487,7 +470,6 @@ export default {
     },
     submitFile () {
       const frmData = new FormData()
-      // const currentObj = this
       frmData.append('file', this.file)
       this.isNight = false
       this.$store.commit('simisNight', this.isNight)
@@ -604,7 +586,6 @@ export default {
     discardselected () {
       this.popoverShow3 = false
       this.popoverShow4 = false
-      this.saveoutput = ''
       if (this.reqdata !== '') {
         this.reqdata.to = ''
         this.reqdata.cc = ''
@@ -660,23 +641,6 @@ export default {
       this.$store.commit('csvapp', this.csvapp)
       this.selected = []
       this.$store.commit('selected', this.selected)
-    },
-    save (e) {
-      e.preventDefault()
-      const currentObj = this
-      this.axios.post('http://localhost:8081/api/main/save', {
-        remail: this.reqdata.to,
-        cc: this.reqdata.cc,
-        bcc: this.reqdata.bcc,
-        body: this.reqdata.body,
-        subject: this.reqdata.subject
-      })
-        .then(function (response) {
-          currentObj.saveoutput = response.data
-        })
-        .catch(function (error) {
-          currentObj.saveoutput = error
-        })
     },
     saveDetail (e) {
       e.preventDefault()
@@ -773,7 +737,7 @@ export default {
         })
         .then(function (response) {
           currentObj.output = response.data
-          this.$store.commit('output', currentObj.output)
+          currentObj.$store.commit('output', currentObj.output)
           console.log(currentObj.output)
         })
         .catch(function (error) {
@@ -818,7 +782,7 @@ export default {
         })
         .then(function (response) {
           currentObj.output = response.data
-          this.$store.commit('output', currentObj.output)
+          currentObj.$store.commit('output', currentObj.output)
           console.log(currentObj.output)
         })
         .catch(function (error) {
@@ -850,9 +814,11 @@ export default {
 .third:hover {
   background-color: rgba(255, 38, 0, 0.925);
 }
+/*
 h3 {
   margin: 40px 0 0;
 }
+
 ul {
   list-style-type: none;
   padding: 0;
@@ -860,13 +826,14 @@ ul {
 li {
   display: inline-block;
   margin: 0 10px;
-}
+
 a {
   color: #42b983;
 }
+
 .form-control{
   margin:10px
-}
+}*/
 img{
   height:200px;
   width:200px;
@@ -882,7 +849,6 @@ font-size: 2em;
 text-align: center;
 color: #FFFFFF;
 }
-
 #col1inner{
 position: absolute;
 width: 43%;
@@ -1125,11 +1091,12 @@ position: absolute;
 right:10%;
 top: 61%;
 }
+/*
 #rmsg{
   position: absolute;
   left:35%;
   top: 55%;
-}
+}*/
 #or{
   position: absolute;
   left:20%;
@@ -1236,7 +1203,6 @@ top: 52%;
   top:80%;
   left:30%;
 }
-
 #csvresult{
   position: absolute;
   top:80%;
