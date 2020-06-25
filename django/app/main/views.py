@@ -33,7 +33,7 @@ import email.encoders
 import csv
 from .serializers import *
 from .models import *
-from app.settings import EMAIL_HOST_USER,BASE_DIR,SCRIPTS_DIR
+from app.settings import EMAIL_HOST_USER,BASE_DIR,STATIC_DIR,ASSETS_DIR,TEMP_FILES_DIR
 from django.contrib.auth import authenticate, login,logout
 from django.views.decorators.csrf import csrf_exempt
 from oauth2client.client import AccessTokenCredentials
@@ -71,7 +71,7 @@ def get_user_info(credentials):
   # print(data,'data')
   credentials = AccessTokenCredentials(access_token, "MyAgent/1.0", None)
   print(credentials)
-  file_path = os.path.join(SCRIPTS_DIR,'pickle.token')
+  file_path = os.path.join(ASSETS_DIR,'pickle.token')
   with open(file_path, 'wb') as token:
       pickle.dump(credentials, token)
   # if os.path.exists(file_path):
@@ -327,12 +327,12 @@ def getfile(request):
     var = JSONParser().parse(request)
     v = var.get('value')
     if v == 'Pamphlet2020.pdf':
-        with open(os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'), 'rb') as fh:
+        with open(os.path.join(ASSETS_DIR,'Pamphlet2020.pdf'), 'rb') as fh:
             response = HttpResponse(fh.read(), content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
             response['Content-Disposition'] = "attachment; filename={}".format(escape_uri_path('Pamphlet2020.pdf'))
             return response
     else:
-        with open(os.path.join(SCRIPTS_DIR,'letter-of-intent.docx'), 'rb') as fh:
+        with open(os.path.join(ASSETS_DIR,'letter-of-intent.docx'), 'rb') as fh:
             response = HttpResponse(fh.read(), content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
             response['Content-Disposition'] = "attachment; filename={}".format(escape_uri_path('letter-of-intent.docx'))
             return response
@@ -353,7 +353,7 @@ def getbody(clg,obj,sta,dis):
                 subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): " +\
                     "Information for e-Yantra Lab Setup Initiative (eLSI): " +\
                      clg + " , " + district + " , " + state
-                body = render_to_string(os.path.join(SCRIPTS_DIR,'a.html'),{'count':count})
+                body = render_to_string(os.path.join(STATIC_DIR,'no_record.html'),{'count':count})
             else :
                 college_name = obj[0].normalised_ins_name
                 district = obj[0].district
@@ -384,7 +384,7 @@ def getbody(clg,obj,sta,dis):
                             if field.name in tchdtl2:
                                 d['data'][idx]['value'].append(det.values()[idx][field.name])
                     print(d)
-                    body = render_to_string(os.path.join(SCRIPTS_DIR,'elsi_college.html'),
+                    body = render_to_string(os.path.join(STATIC_DIR,'elsi_college.html'),
                     {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
                     'count':count,"datas":d,'lst':l})
                 elif obj[0].wo_attend and obj[0].tbt_allowed:
@@ -416,7 +416,7 @@ def getbody(clg,obj,sta,dis):
                         end_date = det[0].end_date
                         end_date = datetime.strptime(end_date, '%d-%m-%Y')
                         end_date = datetime.strftime(end_date,'%B %d, %Y')
-                        body = render_to_string(os.path.join(SCRIPTS_DIR,'tbt_complete.html'),
+                        body = render_to_string(os.path.join(STATIC_DIR,'tbt_complete.html'),
                         {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
                         'count':count,'start_date':start_date,'end_date':end_date,'host_college':temp[0].college_name,'host_State':temp[0].state,
                         'host_District':temp[0].district,"datas":d,'lst':l})
@@ -448,7 +448,7 @@ def getbody(clg,obj,sta,dis):
                         end_date = det[0].end_date
                         end_date = datetime.strptime(end_date, '%d-%m-%Y')
                         end_date = datetime.strftime(end_date,'%B %d, %Y')
-                        body = render_to_string(os.path.join(SCRIPTS_DIR,'tbt_notcomplete.html'),
+                        body = render_to_string(os.path.join(STATIC_DIR,'tbt_notcomplete.html'),
                         {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
                         'count':count,'start_date':start_date,'end_date':end_date,'host_college':temp[0].college_name,'host_State':temp[0].state,
                         'host_District':temp[0].district,"datas":d,'lst':l})
@@ -478,14 +478,14 @@ def getbody(clg,obj,sta,dis):
                     clg_id = workshop_dtl[0].clg_id
                     temp = ElsiCollegeDtls.objects.filter(id = clg_id)
                     print(temp.values())
-                    body = render_to_string(os.path.join(SCRIPTS_DIR,'b.html'),
+                    body = render_to_string(os.path.join(STATIC_DIR,'workshop_done.html'),
                     {'CollegeName':college_name,'State': state,'District':district,
                         'count':count,'host_college':temp[0].college_name,'host_State':temp[0].state,'host_District':temp[0].district,
                         "datas":d,'lst':l})
                 else :
                     print('A')
                     subdiv = 'A'
-                    body = render_to_string(os.path.join(SCRIPTS_DIR,'a.html'),{'count':count})
+                    body = render_to_string(os.path.join(STATIC_DIR,'no_record.html'),{'count':count})
             return {'subject':subject,'body':body,'subdiv':subdiv,'tchdtl':tchdtl}
         except ValueError as e:
             return {'status':'failed','info':e.args[0]}
@@ -596,8 +596,8 @@ def get_credentials():
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    file_path = os.path.join(SCRIPTS_DIR,'pickle.token')
-    credentials_path=os.path.join(SCRIPTS_DIR,'credentials.json')
+    file_path = os.path.join(ASSETS_DIR,'pickle.token')
+    credentials_path=os.path.join(ASSETS_DIR,'credentials.json')
     if os.path.exists(file_path):
         with open(file_path, 'rb') as token:
             creds = pickle.load(token)
@@ -713,7 +713,7 @@ def getname(name):
     options.add_argument('--headless')
     options.add_argument("--silent")
     options.add_argument('--ignore-certificate-errors')
-    file_path = os.path.join(SCRIPTS_DIR,'chromedriver.exe')
+    file_path = os.path.join(ASSETS_DIR,'chromedriver.exe')
     driver = webdriver.Chrome(executable_path=file_path, options=options) #path to chromedriver.exe
     def test(name):
         q1= urllib.parse.quote(name)
@@ -816,7 +816,7 @@ def store(request):
                             if field.name in tchdtl2:
                                 d['data'][idx]['value'].append(det.values()[idx][field.name])
                     print(d)
-                    body = render_to_string(os.path.join(SCRIPTS_DIR,'elsi_college.html'),
+                    body = render_to_string(os.path.join(STATIC_DIR,'elsi_college.html'),
                     {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
                     'count':count,"datas":d,'lst':l})
                 elif obj[0].wo_attend and obj[0].tbt_allowed:
@@ -846,7 +846,7 @@ def store(request):
                         end_date = det[0].end_date
                         end_date = datetime.strptime(end_date, '%d-%m-%Y')
                         end_date = datetime.strftime(end_date,'%b %d, %Y')
-                        body = render_to_string(os.path.join(SCRIPTS_DIR,'tbt_complete.html'),
+                        body = render_to_string(os.path.join(STATIC_DIR,'tbt_complete.html'),
                         {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
                         'count':count,'start_date':start_date,'end_date':end_date,'host_college':temp[0].college_name,'host_State':temp[0].state,
                         'host_District':temp[0].district,"datas":d,'lst':l})
@@ -875,7 +875,7 @@ def store(request):
                         end_date = det[0].end_date
                         end_date = datetime.strptime(end_date, '%d-%m-%Y')
                         end_date = datetime.strftime(end_date,'%b %d, %Y')
-                        body = render_to_string(os.path.join(SCRIPTS_DIR,'tbt_notcomplete.html'),
+                        body = render_to_string(os.path.join(STATIC_DIR,'tbt_notcomplete.html'),
                         {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
                         'count':count,'start_date':start_date,'end_date':end_date,'host_college':temp[0].college_name,'host_State':temp[0].state,
                         'host_District':temp[0].district,"datas":d,'lst':l})
@@ -902,7 +902,7 @@ def store(request):
                     clg_id = workshop_dtl[0].clg_id
                     temp = ElsiCollegeDtls.objects.filter(id = clg_id)
                     print(temp.values())
-                    body = render_to_string(os.path.join(SCRIPTS_DIR,'b.html'),
+                    body = render_to_string(os.path.join(STATIC_DIR,'workshop_done.html'),
                     {'CollegeName':college_name,'State': state,'District':district,
                         'count':count,'host_college':temp[0].college_name,'host_State':temp[0].state,'host_District':temp[0].district,
                         "datas":d,'lst':l})
@@ -948,7 +948,6 @@ def csvapprove(request):
                     obj = ElsiCollegeDtls.objects.filter(normalised_ins_name = coll)
                     print(coll)
                     fn = []
-<<<<<<< HEAD
                     # if len(district) >0 and len(state)>0:
                     #     dis = getname(district)
                     #     sta = getname(state)
@@ -964,42 +963,20 @@ def csvapprove(request):
                     subject = res['subject']
                     body = res['body']
                     files2send2 = list(request.data.get('files2send2').split(","))
-=======
-                    if len(district) >0 and len(state)>0:
-                        dis = getname(district)
-                        sta = getname(state)
-                    else:
-                        data = collx['candidates'][0]['formatted_address']
-                        data.replace(" ", "")
-                        data = data.split(",")
-                        dis = "".join(filter(lambda x: not x.isdigit(), data[-3]))
-                        print(dis)
-                        sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
-                        print(sta)
-                    res = getbody(clg,obj,sta,dis)
-                    subject = res['subject']
-                    body = res['body']
-                    files2send2 = list(request.data.get('file2send2').split(","))
->>>>>>> 4a17a11232ac3f4836e4e15f8055bae58e828f6e
                     print(files2send2)
                     attachments = []
                     for f in files2send2:
                         if f == 'Pamphlet2020.pdf':
-                            attachments.append(os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'))
+                            attachments.append(os.path.join(ASSETS_DIR,'Pamphlet2020.pdf'))
                         elif f == 'letter-of-intent.docx':
-                            attachments.append(os.path.join(SCRIPTS_DIR,'letter-of-intent.docx'))
+                            attachments.append(os.path.join(ASSETS_DIR,'letter-of-intent.docx'))
                     fn = []
                     if request.FILES :
                         for i in request.FILES:
                             file_name = default_storage.save(request.FILES[i].name, request.FILES[i])
                             fn.append(file_name)
                             attachments.append(os.path.join(BASE_DIR,file_name))
-<<<<<<< HEAD
-                #sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label,attachments)
-                sent = True
-=======
                 sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label,attachments)
->>>>>>> 4a17a11232ac3f4836e4e15f8055bae58e828f6e
                 now = datetime.now()
                 ts = now.strftime("%Y-%m-%d %H:%M:%S")
                 if sent :
@@ -1102,9 +1079,9 @@ def csvdraft(request):
                     attachments = []
                     for f in files2send2:
                         if f == 'Pamphlet2020.pdf':
-                            attachments.append(os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'))
+                            attachments.append(os.path.join(ASSETS_DIR,'Pamphlet2020.pdf'))
                         elif f == 'letter-of-intent.docx':
-                            attachments.append(os.path.join(SCRIPTS_DIR,'letter-of-intent.docx'))
+                            attachments.append(os.path.join(ASSETS_DIR,'letter-of-intent.docx'))
                     fn = []
                     if request.FILES :
                         for i in request.FILES:
@@ -1283,9 +1260,9 @@ def approve(request):
             attachments = []
             for f in files2send1:
                 if f == 'Pamphlet2020.pdf':
-                    attachments.append(os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'))
+                    attachments.append(os.path.join(ASSETS_DIR,'Pamphlet2020.pdf'))
                 elif f == 'letter-of-intent.docx':
-                    attachments.append(os.path.join(SCRIPTS_DIR,'letter-of-intent.docx'))
+                    attachments.append(os.path.join(ASSETS_DIR,'letter-of-intent.docx'))
             fn = []
             if request.FILES :
                 for i in request.FILES:
@@ -1345,9 +1322,9 @@ def gsave(request):
     attachments = []
     for f in files2send1:
         if f == 'Pamphlet2020.pdf':
-            attachments.append(os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'))
+            attachments.append(os.path.join(ASSETS_DIR,'Pamphlet2020.pdf'))
         elif f == 'letter-of-intent.docx':
-            attachments.append(os.path.join(SCRIPTS_DIR,'letter-of-intent.docx'))
+            attachments.append(os.path.join(ASSETS_DIR,'letter-of-intent.docx'))
     fn = []
     if request.FILES :
         for i in request.FILES:
@@ -1463,7 +1440,7 @@ def awssubmit(request):
                     print(dict)
                     subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): +\
                      Invitation to Attend the Two Day Workshop at " + hcn +", " + getdet[0].district +", " + getdet[0].state
-                    body = render_to_string(os.path.join(SCRIPTS_DIR,'announce_workshop.html'),
+                    body = render_to_string(os.path.join(STATIC_DIR,'announce_workshop.html'),
                     {'venueadd':venueadd,'cooname': cooname,'cooemail':cooemail, 'coono':coono, 'hcn':hcn ,'hcnstate':getdet[0].state,
                         'hcndistrict':getdet[0].district,'count':count,'startdate':startdate,'enddate':enddate,'day1':day1,'day2':day2,'filldate':filldate})
                     dict['subject']=subject
@@ -1828,7 +1805,7 @@ def sendmail(request):
             cc = ''
             bcc = ''
             subject = 'Workshop Team Selection Form'
-            body = render_to_string(os.path.join(SCRIPTS_DIR,'link.html'),
+            body = render_to_string(os.path.join(STATIC_DIR,'link.html'),
                 {'uid':uuid,'wid':wrkshp[0].id,'port':port,'workshop_name':wrkshp[0].hcn,
                 'venue_address':wrkshp[0].venueadd,'start_date':wrkshp[0].startdate,
                 'end_date':wrkshp[0].enddate})
@@ -1904,7 +1881,7 @@ def headmail(request):
                 cc = ''
                 bcc = ''
                 subject = 'Workshop Team Selection approval'
-                body = render_to_string(os.path.join(SCRIPTS_DIR,'headlink.html'),
+                body = render_to_string(os.path.join(STATIC_DIR,'headlink.html'),
                     {'uid':uuid,'wid':wrkshp[0].id,'port':port,'workshop_name':wrkshp[0].hcn,
                     'venue_address':wrkshp[0].venueadd,'start_date':wrkshp[0].startdate,
                     'end_date':wrkshp[0].enddate})

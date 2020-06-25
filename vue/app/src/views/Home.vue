@@ -5,7 +5,7 @@
       <div>
         <b-dropdown id="dropdown-form" text="Settings" ref="dropdown" class="m-2 settings">
           <b-dropdown-form>
-            <b-form-group label="post number" label-for="dropdown-form" @submit.stop.prevent>
+            <b-form-group label="port number" label-for="dropdown-form" @submit.stop.prevent>
               <b-form-input
                 id="dropdown-form"
                 size="sm"

@@ -72,7 +72,9 @@ ROOT_URLCONF = 'app.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR,'scripts')],
+        'DIRS': [os.path.join(BASE_DIR,'assets'),
+        os.path.join(BASE_DIR,'static'),
+        os.path.join(BASE_DIR,'temp_files')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -166,6 +168,8 @@ DJANGO_EASY_AUDIT_WATCH_MODEL_EVENTS = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
-SCRIPTS_DIR = os.path.join(BASE_DIR,'scripts')
+STATIC_DIR = os.path.join(BASE_DIR,'static')
+ASSETS_DIR = os.path.join(BASE_DIR,'assets')
+TEMP_FILES_DIR = os.path.join(BASE_DIR,'temp_files')
 CORS_ORIGIN_ALLOW_ALL = True
 EMAIL_HOST_USER = '5a.eysip2020@gmail.com'

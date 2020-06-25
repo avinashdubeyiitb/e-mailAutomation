@@ -54,10 +54,11 @@
               if(items[i].type=='checkbox' && items[i].checked==true)
               selectedItems.push(items[i].value);
             }
+            console.log(window.location.port)
             console.log(selectedItems)
             axios({
                 method: 'POST',
-                url: 'http://localhost:{{port}}/api/main/formdata',
+                url: 'http://localhost:'+window.location.port+'{{port}}/api/main/formdata',
                 data: {
                     option: document.getElementById('option').value,
                     reason: document.getElementById('reason').value,
