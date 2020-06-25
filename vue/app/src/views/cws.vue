@@ -106,6 +106,7 @@ export default {
   },
   data () {
     return {
+      port: this.$store.getters.port,
       statedisdata: statedisdata,
       state: 'State',
       index: '',
@@ -144,7 +145,7 @@ export default {
       console.log(state, index)
       this.state = state
       this.index = index
-      this.axios.post('http://localhost:8081/api/main/gethcn', {
+      this.axios.post('http://localhost:' + this.port + '/api/main/gethcn', {
         state: this.state
       })
         .then(hcn => {
@@ -171,7 +172,15 @@ export default {
     formSubmit (e) {
       e.preventDefault()
       const currentObj = this
+<<<<<<< HEAD
       this.axios.post('http://localhost:8081/api/main/cwssubmit', {
+=======
+      this.isNight = false
+      this.isNight1 = false
+      this.isNight2 = true
+      this.isNight3 = true
+      this.axios.post('http://localhost:' + this.port + '/api/main/cwssubmit', {
+>>>>>>> e6bc0ef8aa4c3fe571eae7c2045065e261764e93
         hcn: this.selectedhcn,
         startdate: this.startdate,
         enddate: this.enddate,

@@ -120,12 +120,22 @@ export default {
   },
   data () {
     return {
+<<<<<<< HEAD:vue/app/src/views/ema.vue
       output: ''
+=======
+      output: '',
+      port: this.$store.getters.port
+      // isget: false,
+      // issend: false,
+      // selected: [],
+      // result: '',
+      // sent: []
+>>>>>>> e6bc0ef8aa4c3fe571eae7c2045065e261764e93:vue/app/src/views/tsa.vue
     }
   },
   methods: {
     stats () {
-      this.axios.post('http://localhost:8081/api/main/stats', {
+      this.axios.post('http://localhost:' + this.port + '/api/main/stats', {
       })
         .then(output => {
           this.output = output.data
@@ -143,13 +153,13 @@ export default {
 h1{
 position: absolute;
 left: 40%;
-top: 0%;
+top: 2%;
 margin:0px;
 font-style: normal;
 font-weight: normal;
 font-size: 2em;
 text-align: center;
-color: #000000;
+color: #FFFFFF;
 }
 
 #col1inner{

@@ -9,6 +9,7 @@ export default new Vuex.Store({
     user: {
       token: null,
       success: false,
+      port: 8081,
       user_name: '',
       csvapp: false, // sim
       csvgsave: false,
@@ -104,6 +105,9 @@ export default new Vuex.Store({
     }, // sim
     success: state => {
       return state.user.success
+    },
+    port: state => {
+      return state.user.port
     },
     user_name: state => {
       return state.user.user_name
@@ -373,6 +377,9 @@ export default new Vuex.Store({
     },
     success (state, payload) {
       state.user.success = payload
+    },
+    port (state, payload) {
+      state.user.port = payload
     },
     user_name (state, payload) {
       state.user.user_name = payload

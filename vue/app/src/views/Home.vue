@@ -2,10 +2,25 @@
     <div id="app">
       <div v-show="success">
       <button class="btn" @click="logout" id="logout">Log Out!</button>
+      <div>
+        <b-dropdown id="dropdown-form" text="Settings" ref="dropdown" class="m-2 settings">
+          <b-dropdown-form>
+            <b-form-group label="post number" label-for="dropdown-form" @submit.stop.prevent>
+              <b-form-input
+                id="dropdown-form"
+                size="sm"
+                placeholder="8081"
+                v-model="port"
+              ></b-form-input>
+            </b-form-group>
+            <b-button variant="primary" size="sm" @click="onClick(port)">Save</b-button>
+          </b-dropdown-form>
+        </b-dropdown>
+      </div>
     </div>
   <div id="leftbar" v-show="success">
     <div id="baritem0" class="baritems">
-      <router-link to="/home" style="text-decoration: none; color: inherit;position:absolute" >Home</router-link>
+      <router-link to="/" style="text-decoration: none; color: inherit;position:absolute" >Home</router-link>
       </div>
     <div id="baritem1" class="baritems">
       <router-link style="text-decoration: none; color: inherit; position:absolute" to="/sim">Send info. mail</router-link>
@@ -66,7 +81,8 @@ export default {
       user_name: this.$store.getters.user_name,
       user_pass: '',
       success: this.$store.getters.success,
-      token: this.$store.getters.token
+      token: this.$store.getters.token,
+      port: this.$store.getters.port
     }
   },
   watch: {
@@ -77,7 +93,7 @@ export default {
       console.log('here')
       console.log(this.token)
       // const currentObj = this
-      this.axios.post('http://localhost:8081/api/main/glogin', {
+      this.axios.post('http://localhost:' + this.port + '/api/main/glogin', {
         token: this.token
       })
         .then(status => {
@@ -107,7 +123,7 @@ export default {
     login (e) {
       e.preventDefault()
       console.log('request')
-      this.axios.post('http://localhost:8081/api/main/login', {
+      this.axios.post('http://localhost:' + this.port + '/api/main/login', {
         username: this.user_name,
         password: this.user_pass
       })
@@ -127,10 +143,16 @@ export default {
           this.status = error
         })
     },
+    onClick (i) {
+      // Close the menu and (by passing true) return focus to the toggle button
+      this.port = i
+      this.$store.commit('port', this.port)
+      this.$refs.dropdown.hide(true)
+    },
     logout (e) {
       e.preventDefault()
       console.log('request')
-      this.axios.post('http://localhost:8081/api/main/logout', {
+      this.axios.post('http://localhost:' + this.port + '/api/main/logout', {
         username: this.user_name
       })
         .then(status => {
@@ -161,12 +183,18 @@ export default {
   height:37%;
   width:37%;
 }
+
 .btn{
   background: #008CBA;
 }
 #logout{
   position:absolute;
   top: 5%;
+  right:13%;
+}
+.settings{
+  position:absolute;
+  top: 4%;
   right:4%;
 }
 </style>
