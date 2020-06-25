@@ -17,12 +17,12 @@
         <router-link style="text-decoration: none; color: inherit;" to="/algo">Run Algorithm</router-link>
       </div>
       <div id="baritem5" class="baritems">
-        <router-link style="text-decoration: none; color: inherit;" to="/tsa">Coming soon :(</router-link>
+        <router-link style="text-decoration: none; color: inherit;" to="/ema">Email Analytics</router-link>
       </div>
     </div>
     <h1>Create Workshop </h1>
   <div id="col1inner" >
-    <div v-show="isNight3" >
+    <div >
     <strong><p id="fd">Fill details:</p></strong>
     <form @submit="formSubmit">
       <strong id="hcnstatel">Hcn State:</strong>
@@ -110,11 +110,6 @@ export default {
       statedisdata: statedisdata,
       state: 'State',
       index: '',
-      in: '',
-      isNight: true,
-      isNight1: true,
-      isNight2: true,
-      isNight3: true,
       startdate: '',
       enddate: '',
       venueadd: '',
@@ -122,34 +117,22 @@ export default {
       cooemail: '',
       coono: '',
       output: '',
-      selectedhcn: '',
+      selectedhcn: this.$store.getters.selectedhcn,
       hcn: [],
       success: false,
-      key1: '',
-      key2: '',
-      key3: '',
-      key4: '',
-      key5: '',
-      showing: true,
-      reqdata: ''
+      showing: true
     }
   },
   watch: {
   },
   methods: {
     chngclg () {
-      if (this.showing === false) {
-        this.showing = true
-      }
+      this.showing = true
     },
     discard () {
-      this.popoverShow1 = false
-      this.popoverShow2 = false
-      this.isNight = true
-      this.isNight1 = true
-      this.isNight2 = true
       this.state = 'State'
       this.selectedhcn = ''
+      this.$store.commit('selectedhcn', this.selectedhcn)
       this.startdate = ''
       this.enddate = ''
       this.venueadd = ''
@@ -173,14 +156,12 @@ export default {
           this.hcn = error
         })
     },
-    disc (value, key) {
-      console.log(value, key)
-      this.$delete(this.output.attachments, key)
-      console.log(Object.values(this.output.attachments))
-    },
     savehcn (host, index) {
       console.log(host, index)
       this.selectedhcn = host
+      this.$store.commit('selectedhcn', this.selectedhcn)
+      this.$store.commit('awsselectedworkshop', this.selectedhcn)
+      this.$store.commit('selectedworkshop', this.selectedhcn)
       this.showing = !this.showing
     },
     itemVisible (item) {
@@ -191,11 +172,7 @@ export default {
     formSubmit (e) {
       e.preventDefault()
       const currentObj = this
-      this.isNight = false
-      this.isNight1 = false
-      this.isNight2 = true
-      this.isNight3 = true
-      this.axios.post('http://localhost:' + this.port + '/api/main/cwssubmit', {
+      this.axios.post('http://localhost:8081/api/main/cwssubmit', {
         hcn: this.selectedhcn,
         startdate: this.startdate,
         enddate: this.enddate,
@@ -219,27 +196,18 @@ export default {
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
+/*
 a {
   color: #42b983;
 }
 .form-control{
   margin:10px
 }
+
 img{
   height:200px;
   width:200px;
-}
+}*/
 h1{
 position: absolute;
 left: 40%;
@@ -265,7 +233,7 @@ border: 1px solid #000000;
 box-sizing: border-box;
 border-radius: 10px;
 }
-
+/*
 #para1{
 position: relative;
 width: 12em;
@@ -278,7 +246,7 @@ font-size: 24px;
 line-height: 30px;
 text-align: center;
 color: #000000;
-}
+}*/
 #fd{
 position: absolute;
 width: 154px;
@@ -469,6 +437,7 @@ position: absolute;
 left: 36%;
 top: 9%;
 }
+/*
 #recipientdis{
 position: absolute;
 width: 154px;
@@ -490,7 +459,7 @@ color: #000000;
 position: absolute;
 left: 36%;
 top: 57%;
-}
+}*/
 #msub{
 position: absolute;
 right:10%;
@@ -506,6 +475,7 @@ top: 53%;
   left:10%;
   top: 60%;
 }
+/*
 #or{
   position: absolute;
   left:20%;
@@ -581,7 +551,7 @@ left:40%;
    overflow-x: hidden;
    overflow-x: auto;
    text-align:justify;
-}
+}*/
 table, th, td {
   border: 1px solid black;
   border-collapse: collapse;

@@ -948,6 +948,7 @@ def csvapprove(request):
                     obj = ElsiCollegeDtls.objects.filter(normalised_ins_name = coll)
                     print(coll)
                     fn = []
+<<<<<<< HEAD
                     # if len(district) >0 and len(state)>0:
                     #     dis = getname(district)
                     #     sta = getname(state)
@@ -963,6 +964,23 @@ def csvapprove(request):
                     subject = res['subject']
                     body = res['body']
                     files2send2 = list(request.data.get('files2send2').split(","))
+=======
+                    if len(district) >0 and len(state)>0:
+                        dis = getname(district)
+                        sta = getname(state)
+                    else:
+                        data = collx['candidates'][0]['formatted_address']
+                        data.replace(" ", "")
+                        data = data.split(",")
+                        dis = "".join(filter(lambda x: not x.isdigit(), data[-3]))
+                        print(dis)
+                        sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
+                        print(sta)
+                    res = getbody(clg,obj,sta,dis)
+                    subject = res['subject']
+                    body = res['body']
+                    files2send2 = list(request.data.get('file2send2').split(","))
+>>>>>>> 4a17a11232ac3f4836e4e15f8055bae58e828f6e
                     print(files2send2)
                     attachments = []
                     for f in files2send2:
@@ -976,8 +994,12 @@ def csvapprove(request):
                             file_name = default_storage.save(request.FILES[i].name, request.FILES[i])
                             fn.append(file_name)
                             attachments.append(os.path.join(BASE_DIR,file_name))
+<<<<<<< HEAD
                 #sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label,attachments)
                 sent = True
+=======
+                sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label,attachments)
+>>>>>>> 4a17a11232ac3f4836e4e15f8055bae58e828f6e
                 now = datetime.now()
                 ts = now.strftime("%Y-%m-%d %H:%M:%S")
                 if sent :
@@ -1094,8 +1116,7 @@ def csvdraft(request):
                     message = createMessageWithAttachment(EMAIL_HOST_USER, to,cc,bcc, subject,body, attachmentFile)
                 else:
                     message = CreateMessageHtml(EMAIL_HOST_USER, to, cc, bcc, subject, body)
-                #result = CreateDraft(service,"me",message)
-                result = True
+                result = CreateDraft(service,"me",message)
                 now = datetime.now()
                 ts = now.strftime("%Y-%m-%d %H:%M:%S")
                 if result :
@@ -1184,29 +1205,6 @@ def idrequest(request):
     d['attachments'] = {'pamp':'Pamphlet2020.pdf','LoI':'letter-of-intent.docx'}
     d['attachmentlinks'] = {'pamp':'https://www.e-yantra.org/img/Pamphlet2020.pdf','LoI':'http://elsi.e-yantra.org/eyrtc/downloads/loi'}
     return JsonResponse(d)
-
-@api_view(['POST'])
-def save(request):
-    var = JSONParser().parse(request)
-    with open('scripts/info.json','r') as read:
-        obj = json.load(read)
-    file_path = obj['file_path']
-    with open(file_path,'r') as csvinput:
-        r = csv.reader(csvinput)
-        all=[]
-        for row in r:
-            if row[0] == 'remail':
-                row.append('body')
-                row.append('subject')
-            elif row[0] == var.get('remail') :
-                row[1] = var.get('ccbcc')
-                row.append(var.get('subject'))
-                row.append(var.get('body'))
-            all.append(row)
-        with open(file_path, 'w') as csvoutput:
-            writer = csv.writer(csvoutput, lineterminator='\n')
-            writer.writerows(all)
-    return JsonResponse({'status':'saved'})
 
 @api_view(['POST'])
 def csvsubmit(request):
@@ -1365,8 +1363,7 @@ def gsave(request):
         message = createMessageWithAttachment(EMAIL_HOST_USER, to,cc,bcc, subject, body, attachmentFile)
     else:
         message = CreateMessageHtml(EMAIL_HOST_USER, to, cc, bcc, subject, body)
-    #result = CreateDraft(service,"me",message)
-    result = True
+    result = CreateDraft(service,"me",message)
     now = datetime.now()
     ts = now.strftime("%Y-%m-%d %H:%M:%S")
     if result:
@@ -1835,8 +1832,7 @@ def sendmail(request):
                 {'uid':uuid,'wid':wrkshp[0].id,'port':port,'workshop_name':wrkshp[0].hcn,
                 'venue_address':wrkshp[0].venueadd,'start_date':wrkshp[0].startdate,
                 'end_date':wrkshp[0].enddate})
-            #sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
-            sent = True
+            sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
             now = datetime.now()
             ts = now.strftime("%Y-%m-%d %H:%M:%S")
             if sent:
@@ -1912,8 +1908,7 @@ def headmail(request):
                     {'uid':uuid,'wid':wrkshp[0].id,'port':port,'workshop_name':wrkshp[0].hcn,
                     'venue_address':wrkshp[0].venueadd,'start_date':wrkshp[0].startdate,
                     'end_date':wrkshp[0].enddate})
-                #sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
-                sent = True
+                sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
                 now = datetime.now()
                 ts = now.strftime("%Y-%m-%d %H:%M:%S")
                 if sent:

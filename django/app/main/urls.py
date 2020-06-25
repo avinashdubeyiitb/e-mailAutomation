@@ -8,7 +8,6 @@ urlpatterns = [
     url(r'^api/main/gsave', views.gsave),
     url(r'^api/main/idrequest',views.idrequest),
     url(r'^api/main/csv/submit', views.csvsubmit),
-    url(r'^api/main/save',views.save),
     url(r'^api/main/csv/approve', views.csvapprove),
     url(r'^api/main/csv/gsave', views.csvdraft),
     url(r'^api/main/cwssubmit', views.cwssubmit),
@@ -36,9 +35,3 @@ urlpatterns = [
     # url(r'^auth/google/',views.GoogleLogin.as_view(), name ='google_login' ),
     url(r'^api/main/algo',views.algo_for_willing_mem)
 ]
-'''
-    url(r'^$', views.home, name='home'),
-    url(r'^login/$', views.login, name='login'),
-    url(r'^logout/$', views.logout, name='logout'),
-    url(r'^oauth/', include('social_django.urls', namespace='social')),  # <--
-'''

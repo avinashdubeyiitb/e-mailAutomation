@@ -35,7 +35,7 @@
       <router-link style="text-decoration: none; color: inherit;" to="/algo">Run Algorithm</router-link>
     </div>
     <div id="baritem5" class="baritems">
-      <router-link style="text-decoration: none; color: inherit;" to="/tsa">Coming soon :(</router-link>
+      <router-link style="text-decoration: none; color: inherit;" to="/ema">Email Analytics</router-link>
     </div>
   <router-view/>
   </div>

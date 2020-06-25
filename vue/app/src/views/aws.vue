@@ -17,7 +17,7 @@
         <router-link style="text-decoration: none; color: inherit;" to="/algo">Run Algorithm</router-link>
       </div>
       <div id="baritem5" class="baritems">
-        <router-link style="text-decoration: none; color: inherit;" to="/tsa">Coming soon :(</router-link>
+        <router-link style="text-decoration: none; color: inherit;" to="/ema">Email Analytics</router-link>
       </div>
     </div>
     <h1>Announce Workshop </h1>
@@ -66,10 +66,6 @@
 
     </form>
     <button id="sub3" @click="edtalw">Edit</button>
-    <!-- <strong>Response:</strong> -->
-    <!-- <pre>
-    </pre> -->
-    <!-- <p id="rmsg">{{output}}</p> -->
   </div>
   <div v-show="!isNight2">
     <form @submit="sndchngs">
@@ -142,7 +138,7 @@
    <form>
    <label id="srbcc"><strong>Bcc:</strong>
      <b-button v-b-modal.modal-3 >Bcc</b-button>
-     <b-modal id="modal-3" size="lg" title="Bcc" hide-footer v-on:keyup.enter = "NoEnter" >
+     <b-modal id="modal-3" size="lg" title="Bcc" hide-footer >
      <b-container class="px-2" >
         <b-button v-for='(p,inn) in output.bcc' v-bind:key='inn' v-model = "output.bcc" >{{p}}<b-button @click="disc(p,inn)" class="close" aria-label="Close"><span class="d-inline-block" aria-hidden="true">&times;</span></b-button></b-button>
      </b-container>
@@ -217,8 +213,6 @@
           <b-button id="bdiscard" @click="discard" size="sm" variant="danger">Discard</b-button>
         </div>
       </b-popover>
-  <!-- </div> -->
-  <!-- Output from the popover interaction -->
 </div>
 </div>
   </div>
@@ -239,9 +233,8 @@ export default {
       statedisdata: statedisdata,
       state: 'State',
       index: '',
-      in: '',
       wrklist: [],
-      showing: true,
+      showing: false,
       districts: [],
       d: 'District',
       district: [],
@@ -249,18 +242,15 @@ export default {
       isNight1: true,
       isNight2: true,
       isNight3: true,
-      selectedworkshop: '',
+      selectedworkshop: this.$store.getters.awsselectedworkshop,
       popoverShow1: false,
       popoverShow2: false,
-      popoverShow3: false,
-      popoverShow4: false,
       hcn: '',
       filldate: '',
       output: '',
       selected: [],
       selectAll: false,
       key1: '',
-      key2: '',
       key3: '',
       key4: '',
       key5: '',
@@ -272,7 +262,6 @@ export default {
       editedTodo: null,
       upfile1: [],
       mulupfile1: [],
-      upfile2: '',
       result: ''
     }
   },
@@ -280,9 +269,7 @@ export default {
   },
   methods: {
     chngclg () {
-      if (this.showing === false) {
-        this.showing = true
-      }
+      this.showing = true
     },
     onDivInput (e) {
       this.output.body = document.getElementById('container').innerHTML
@@ -361,6 +348,7 @@ export default {
     savehcn (host, index) {
       console.log(host, index)
       this.selectedworkshop = host
+      this.$store.commit('awsselectedworkshop', this.selectedworkshop)
       this.showing = !this.showing
     },
     itemVisible (item) {
@@ -534,6 +522,7 @@ export default {
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+/*
 h3 {
   margin: 40px 0 0;
 }
@@ -550,7 +539,7 @@ a {
 }
 .form-control{
   margin:10px
-}
+}*/
 img{
   height:200px;
   width:200px;
@@ -737,6 +726,7 @@ position: absolute;
 right:20%;
 top: 83%;
 }
+/*
 #rmsg{
   position: absolute;
   left:35%;
@@ -751,7 +741,7 @@ top: 83%;
   position: absolute;
   left:40%;
   top: 71%;
-}
+}*/
 #file{
   position: absolute;
   left:20%;
@@ -832,12 +822,13 @@ left:40%;
   top:75%;
   left:30%;
 }
+/*
 #upfile2{
   position: absolute;
   top:80%;
   left:30%;
 }
-
+*/
 tr ,td,thead,table,th{
   padding:0px;
   padding-left:6px;

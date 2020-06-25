@@ -48,13 +48,10 @@ export default new Vuex.Store({
       gsvselected: [],
       dscrdselected: [],
       detail: [],
+      mulupfile1: [],
+      mulupfile2: [],
       cwsstate: 'State', // cws
       cwsindex: '',
-      cwsin: '',
-      cwsisNight: true,
-      cwsisNight1: true,
-      cwsisNight2: true,
-      cwsisNight3: true,
       startdate: '',
       enddate: '',
       venueadd: '',
@@ -226,26 +223,17 @@ export default new Vuex.Store({
     detail: state => {
       return state.user.detail
     },
+    mulupfile1: state => {
+      return state.user.mulupfile1
+    },
+    mulupfile2: state => {
+      return state.user.mulupfile2
+    },
     cwsstate: state => {
       return state.user.cwsstate
     }, // cws
     cwsindex: state => {
       return state.user.cwsindex
-    },
-    cwsin: state => {
-      return state.user.cwsin
-    },
-    cwsisNight: state => {
-      return state.user.cwsisNight
-    },
-    cwsisNight1: state => {
-      return state.user.cwsisNight1
-    },
-    cwsisNight2: state => {
-      return state.user.cwsisNight2
-    },
-    cwsisNight3: state => {
-      return state.user.cwsisNight3
     },
     startdate: state => {
       return state.user.startdate
@@ -504,26 +492,17 @@ export default new Vuex.Store({
     detail (state, payload) {
       state.user.detail = payload
     },
+    mulupfile1 (state, payload) {
+      state.user.mulupfile1 = payload
+    },
+    mulupfile2 (state, payload) {
+      state.user.mulupfile2 = payload
+    },
     cwsstate (state, payload) {
       state.user.cwsstate = payload
     }, // cws
     cwsindex (state, payload) {
       state.user.cwsindex = payload
-    },
-    cwsin (state, payload) {
-      state.user.cwsin = payload
-    },
-    cwsisNight (state, payload) {
-      state.user.cwsisNight = payload
-    },
-    cwsisNight1 (state, payload) {
-      state.user.cwsisNight1 = payload
-    },
-    cwsisNight2 (state, payload) {
-      state.user.cwsisNight2 = payload
-    },
-    cwsisNight3 (state, payload) {
-      state.user.cwsisNight3 = payload
     },
     startdate (state, payload) {
       state.user.startdate = payload

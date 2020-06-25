@@ -17,7 +17,7 @@
         <router-link style="text-decoration: none; color: inherit;" to="/algo">Run Algorithm</router-link>
       </div>
       <div id="baritem5" class="baritems">
-        <router-link style="text-decoration: none; color: inherit;" to="/tsa">Coming soon :(</router-link>
+        <router-link style="text-decoration: none; color: inherit;" to="/ema">Email Analytics</router-link>
       </div>
     </div>
     <h1>Algorithm for Team Selection </h1>
@@ -93,7 +93,6 @@
     </label><br>
   </div>
   <button id="msub" @click="formSubmit">Submit</button>
-<!-- <p id="rmsg">Output:</p> -->
 <p id="rep"> {{output.msg}}</p>
 <table id="rmsg">
   <thead>
@@ -140,7 +139,7 @@ export default {
       tcntt: this.$store.getters.tcntt,
       selectedworkshop: this.$store.getters.selectedworkshop,
       wrklist: this.$store.getters.wrklist,
-      showing: true,
+      showing: false,
       willcriteria: this.$store.getters.willcriteria,
       availcriteria: this.$store.getters.availcriteria,
       lang: this.$store.getters.lang,
@@ -151,9 +150,7 @@ export default {
   },
   methods: {
     chngclg () {
-      if (this.showing === false) {
-        this.showing = true
-      }
+      this.showing = true
     },
     willupdate (event) {
       this.willcriteria.splice(event.newIndex, 0, this.willcriteria.splice(event.oldIndex, 1)[0])
@@ -207,9 +204,6 @@ export default {
           this.output = output.data
           console.log(this.output)
           this.$store.commit('algooutput', this.output)
-          // if (this.output.status === 'Created Successfully') {
-          //   this.success = true
-          // }
         })
         .catch(function (error) {
           this.output = error
@@ -220,6 +214,7 @@ export default {
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+/*
 ul {
   list-style-type: none;
   padding: 0;
@@ -233,7 +228,7 @@ a {
 }
 .form-control{
   margin:10px
-}
+}*/
 h1{
 position: absolute;
 left: 35%;

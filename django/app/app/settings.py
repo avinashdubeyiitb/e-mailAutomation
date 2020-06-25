@@ -42,16 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'rest_framework',
     'corsheaders',
-    'easyaudit',
-    # 'rest_framework.authtoken',
-    # 'rest_auth',
-    # 'rest_auth.registration',
-    # 'allauth',
-    # 'allauth.account',
-    # 'allauth.socialaccount',
-    # 'allauth.socialaccount.providers.google',
-    # 'main.apps.MainConfig',
-    #'social_django', # <--
+    'easyaudit'
 ]
 
 # class DisableMigrations(object):
@@ -74,13 +65,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'easyaudit.middleware.easyaudit.EasyAuditMiddleware',
-    #'social_django.middleware.SocialAuthExceptionMiddleware', # <--
 ]
 
 ROOT_URLCONF = 'app.urls'
-# SOCIALACCOUNT_EMAIL_VERIFICATION = None
-# SOCIALACCOUNT_EMAIL_REQUIRED = False
-# SOCIALACCOUNT_QUERY_EMAIL = True
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -91,9 +79,7 @@ TEMPLATES = [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-                #'social_django.context_processors.backends',  # <--
-                #'social_django.context_processors.login_redirect', # <--
+                'django.contrib.messages.context_processors.messages'
             ],
         },
     },
@@ -104,14 +90,6 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
-# REST_FRAMEWORK = {
-#     'DEFAULT_PERMISSION_CLASSES': (
-#         'rest_framework.permissions.IsAuthenticated',
-#     ),
-#     'DEFAULT_AUTHENTICATION_CLASSES': (
-#        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-#     ),
-# }
 
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:8080',
@@ -191,15 +169,3 @@ STATIC_URL = '/static/'
 SCRIPTS_DIR = os.path.join(BASE_DIR,'scripts')
 CORS_ORIGIN_ALLOW_ALL = True
 EMAIL_HOST_USER = '5a.eysip2020@gmail.com'
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_USE_TLS = True
-EMAIL_PORT = 587
-EMAIL_USE_SSL = False
-'''
-LOGIN_URL = 'login'
-LOGOUT_URL = 'logout'
-LOGIN_REDIRECT_URL = 'home'
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '257717644642-ssdbt8958dphipjbd9f97u0norked40s.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'j-bzdgBu6gke8kWDjA-xRp93'
-'''
