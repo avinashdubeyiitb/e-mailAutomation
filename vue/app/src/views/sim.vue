@@ -728,7 +728,6 @@ export default {
       this.$store.commit('simisNight2', this.isNight2)
       this.isNight3 = true
       this.$store.commit('simisNight3', this.isNight3)
-
       this.axios.post('http://localhost:' + this.port + '/api/main/submit', {
         remail: this.remail,
         cc: this.cc,

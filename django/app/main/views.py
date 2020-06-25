@@ -37,7 +37,15 @@ from app.settings import EMAIL_HOST_USER,BASE_DIR,SCRIPTS_DIR
 from django.contrib.auth import authenticate, login,logout
 from django.views.decorators.csrf import csrf_exempt
 from oauth2client.client import AccessTokenCredentials
-
+import codecs
+import os
+import selenium
+from bs4 import BeautifulSoup
+from selenium import webdriver
+import time
+import pandas as pd
+import urllib.parse
+from time import sleep
 #############################################################################################################
 # from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 # from rest_auth.registration.views import SocialLoginView
@@ -347,7 +355,7 @@ def getbody(clg,obj,sta,dis):
                      clg + " , " + district + " , " + state
                 body = render_to_string(os.path.join(SCRIPTS_DIR,'a.html'),{'count':count})
             else :
-                college_name = obj[0].college_name
+                college_name = obj[0].normalised_ins_name
                 district = obj[0].district
                 state = obj[0].state
                 wo_attend = obj[0].wo_attend
@@ -694,18 +702,36 @@ def createMessageWithAttachment(
     return {'raw': base64.urlsafe_b64encode(message.as_string().encode()).decode()}
 
 def getname(name):
-    API_KEY = 'AIzaSyD9qTJmiFUe3FQWlo5Z-A3l6pigxA3s8U8'
-    url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
-    input=name
-    input.replace(" ", "%")
-    other='&inputtype=textquery&fields=name'
-    result = requests.get(url+'input='+input+other+'&key='+API_KEY)
-    collx = result.json()
-    print(collx)
-    if collx['status'] == 'REQUEST_DENIED':
-        return name
-    else:
-        return collx['candidates'][0]['name']
+    # API_KEY = 'AIzaSyD9qTJmiFUe3FQWlo5Z-A3l6pigxA3s8U8'
+    # url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
+    # input=name
+    # input.replace(" ", "%")
+    # other='&inputtype=textquery&fields=name'
+    # result = requests.get(url+'input='+input+other+'&key='+API_KEY)
+    # collx = result.json()
+    options = webdriver.ChromeOptions()
+    options.add_argument('--headless')
+    options.add_argument("--silent")
+    options.add_argument('--ignore-certificate-errors')
+    file_path = os.path.join(SCRIPTS_DIR,'chromedriver.exe')
+    driver = webdriver.Chrome(executable_path=file_path, options=options) #path to chromedriver.exe
+    def test(name):
+        q1= urllib.parse.quote(name)
+        driver.get('https://www.google.com/search?q=' + q1)#add college name to be searched in query
+        html= driver.page_source
+        soup = BeautifulSoup(html,"html.parser")
+        if soup.find('div', attrs={'data-attrid':'title'}) :
+            name = soup.find('div', attrs={'data-attrid':'title'}).span.contents
+            return name
+        else:
+            return "no data"
+    coll = test(name)
+    driver.quit()
+    return coll[0]
+    # if collx['status'] == 'REQUEST_DENIED':
+    #     return name
+    # else:
+    #     return collx['candidates'][0]['name']
 def getloc(name):
     API_KEY = 'AIzaSyBE-9YyXHa6tXkOFmZpNS3fdXkSwU2bMk8'
     url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
@@ -742,21 +768,19 @@ def store(request):
             print(tchdtl2,district,state,clg)
             coll = getname(str(var.get('cname')))
             print(coll)
-            if len(district) >0 and len(state)>0:
-                dis = getname(str(var.get('district')))
-                sta = getname(str(var.get('state')))
-            else:
-                collx = getloc(coll)
-                data = collx['candidates'][0]['formatted_address']
-                data.replace(" ", "")
-                data = data.split(",")
-                dis = "".join(filter(lambda x: not x.isdigit(), data[-3]))
-                print(dis)
-                sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
-                print(sta)
-            obj = ElsiCollegeDtls.objects.filter(college_name = clg)
-            district = dis
-            state = sta
+            # if len(district) >0 and len(state)>0:
+            #     dis = getname(str(var.get('district')))
+            #     sta = getname(str(var.get('state')))
+            # else:
+            #     collx = getloc(coll)
+            #     data = collx['candidates'][0]['formatted_address']
+            #     data.replace(" ", "")
+            #     data = data.split(",")
+            #     dis = "".join(filter(lambda x: not x.isdigit(), data[-3]))
+            #     print(dis)
+            #     sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
+            #     print(sta)
+            obj = ElsiCollegeDtls.objects.filter(normalised_ins_name = coll)
             c = ElsiCollegeDtls.objects.all()
             count=0
             for c in c.values('lab_inaugurated'):
@@ -765,7 +789,7 @@ def store(request):
             if obj.count() < 1:
                 pass
             else :
-                college_name = obj[0].college_name
+                college_name = obj[0].normalised_ins_name
                 district = obj[0].district
                 state = obj[0].state
                 wo_attend = obj[0].wo_attend
@@ -920,38 +944,38 @@ def csvapprove(request):
                     subject = row[-2]
                 else :
                     clg = row[6]
-                    obj = ElsiCollegeDtls.objects.filter(college_name = clg)
                     coll = getname(clg)
+                    obj = ElsiCollegeDtls.objects.filter(normalised_ins_name = coll)
                     print(coll)
                     fn = []
-                    if len(district) >0 and len(state)>0:
-                        dis = getname(district)
-                        sta = getname(state)
-                    else:
-                        data = collx['candidates'][0]['formatted_address']
-                        data.replace(" ", "")
-                        data = data.split(",")
-                        dis = "".join(filter(lambda x: not x.isdigit(), data[-3]))
-                        print(dis)
-                        sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
-                        print(sta)
-                        res = getbody(clg,obj,sta,dis)
-                        subject = res['subject']
-                        body = res['body']
-                        files2send2 = list(request.data.get('files2send2').split(","))
-                        print(files2send2)
-                        attachments = []
-                        for f in files2send2:
-                            if f == 'Pamphlet2020.pdf':
-                                attachments.append(os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'))
-                            elif f == 'letter-of-intent.docx':
-                                attachments.append(os.path.join(SCRIPTS_DIR,'letter-of-intent.docx'))
-                        fn = []
-                        if request.FILES :
-                            for i in request.FILES:
-                                file_name = default_storage.save(request.FILES[i].name, request.FILES[i])
-                                fn.append(file_name)
-                                attachments.append(os.path.join(BASE_DIR,file_name))
+                    # if len(district) >0 and len(state)>0:
+                    #     dis = getname(district)
+                    #     sta = getname(state)
+                    # else:
+                    #     data = collx['candidates'][0]['formatted_address']
+                    #     data.replace(" ", "")
+                    #     data = data.split(",")
+                    #     dis = "".join(filter(lambda x: not x.isdigit(), data[-3]))
+                    #     print(dis)
+                    #     sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
+                    #     print(sta)
+                    res = getbody(coll,obj,state,district)
+                    subject = res['subject']
+                    body = res['body']
+                    files2send2 = list(request.data.get('files2send2').split(","))
+                    print(files2send2)
+                    attachments = []
+                    for f in files2send2:
+                        if f == 'Pamphlet2020.pdf':
+                            attachments.append(os.path.join(SCRIPTS_DIR,'Pamphlet2020.pdf'))
+                        elif f == 'letter-of-intent.docx':
+                            attachments.append(os.path.join(SCRIPTS_DIR,'letter-of-intent.docx'))
+                    fn = []
+                    if request.FILES :
+                        for i in request.FILES:
+                            file_name = default_storage.save(request.FILES[i].name, request.FILES[i])
+                            fn.append(file_name)
+                            attachments.append(os.path.join(BASE_DIR,file_name))
                 #sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label,attachments)
                 sent = True
                 now = datetime.now()
@@ -1034,21 +1058,21 @@ def csvdraft(request):
                     subject = row[-2]
                 else :
                     clg = row[6]
-                    obj = ElsiCollegeDtls.objects.filter(college_name = clg)
                     coll = getname(clg)
+                    obj = ElsiCollegeDtls.objects.filter(normalised_ins_name = coll)
                     print(coll)
-                    if len(district) >0 and len(state)>0:
-                        dis=getname(district)
-                        sta = getname(state)
-                    else:
-                        data = collx['candidates'][0]['formatted_address']
-                        data.replace(" ", "")
-                        data = data.split(",")
-                        dis = "".join(filter(lambda x: not x.isdigit(), data[-3]))
-                        print(dis)
-                        sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
-                        print(sta)
-                    res = getbody(clg,obj,sta,dis)
+                    # if len(district) >0 and len(state)>0:
+                    #     dis=getname(district)
+                    #     sta = getname(state)
+                    # else:
+                    #     data = collx['candidates'][0]['formatted_address']
+                    #     data.replace(" ", "")
+                    #     data = data.split(",")
+                    #     dis = "".join(filter(lambda x: not x.isdigit(), data[-3]))
+                    #     print(dis)
+                    #     sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
+                    #     print(sta)
+                    res = getbody(coll,obj,state,district)
                     subject = res['subject']
                     body = res['body']
                     files2send2 = list(request.data.get('file2send2').split(","))
@@ -1141,20 +1165,20 @@ def idrequest(request):
             state = (rows['state'])
     coll = getname(var.get('cname'))
     print(coll)
-    if len(district) >0 and len(state)>0:
-        dis=getname(district)
-        sta=getname(state)
-    else:
-        collx = getloc(coll)
-        data = collx['candidates'][0]['formatted_address']
-        data.replace(" ", "")
-        data = data.split(",")
-        dis = "".join(filter(lambda x: not x.isdigit(), data[-3]))
-        print(dis)
-        sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
-        print(sta)
+    # if len(district) >0 and len(state)>0:
+    #     dis=getname(district)
+    #     sta=getname(state)
+    # else:
+    #     collx = getloc(coll)
+    #     data = collx['candidates'][0]['formatted_address']
+    #     data.replace(" ", "")
+    #     data = data.split(",")
+    #     dis = "".join(filter(lambda x: not x.isdigit(), data[-3]))
+    #     print(dis)
+    #     sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
+    #     print(sta)
     d = {'to' : rema  ,'cc' : cc,'bcc' : bcc,'subject': '','body':'','attachments':''}
-    res = getbody(clg,obj,sta,dis)
+    res = getbody(coll,obj,state,district)
     d['subject'] = res['subject']
     d['body'] = res['body']
     d['attachments'] = {'pamp':'Pamphlet2020.pdf','LoI':'letter-of-intent.docx'}
@@ -1211,20 +1235,20 @@ def submit(request):
             state = var.get('state')
             coll = getname(var.get('cname'))
             print(coll)
-            if len(district) >0 and len(state)>0:
-                dis=getname(str(var.get('district')))
-                sta=getname(str(var.get('state')))
-            else:
-                collx = getloc(coll)
-                data = collx['candidates'][0]['formatted_address']
-                data.replace(" ", "")
-                data = data.split(",")
-                dis = "".join(filter(lambda x: not x.isdigit(), data[-3]))
-                print(dis)
-                sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
-                print(sta)
-            obj = ElsiCollegeDtls.objects.filter(college_name = clg)
-            res = getbody(clg,obj,sta,dis)
+            # if len(district) >0 and len(state)>0:
+            #     dis=getname(str(var.get('district')))
+            #     sta=getname(str(var.get('state')))
+            # else:
+            #     collx = getloc(coll)
+            #     data = collx['candidates'][0]['formatted_address']
+            #     data.replace(" ", "")
+            #     data = data.split(",")
+            #     dis = "".join(filter(lambda x: not x.isdigit(), data[-3]))
+            #     print(dis)
+            #     sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
+            #     print(sta)
+            obj = ElsiCollegeDtls.objects.filter(normalised_ins_name = clg)
+            res = getbody(coll,obj,state,district)
             var['subject']=res['subject']
             var['body']=res['body']
             var['attachments'] = {'pamp':'Pamphlet2020.pdf','LoI':'letter-of-intent.docx'}
@@ -1916,7 +1940,7 @@ def headmail(request):
 @api_view(['POST'])
 def gethcn(request):
     var = JSONParser().parse(request)
-    state=getname(str(var.get('state')))
+    state=var.get('state')
     getdet = ElsiCollegeDtls.objects.filter(state = state).order_by('college_name')
     hcn = {}
     for i in range(getdet.count()):

@@ -173,7 +173,8 @@ class ElsiCollegeDtls(models.Model):
     team_verify = models.IntegerField(blank=True, null=True)
     created_at = models.TextField(blank=True, null=True)
     updated_at = models.TextField(blank=True, null=True)
-
+    normalised_ins_name = models.TextField(blank=True,null=True)
+    
     def __str__(self):
         return self.college_name
 
