@@ -1781,6 +1781,7 @@ def formdata(request):
 def sendmail(request):
     var = JSONParser().parse(request)
     user = var.get('user')
+    port = var.get('port')
     selectedworkshop = var.get('selectedworkshop')
     wrkshp = create_workshop.objects.filter(hcn = selectedworkshop)
     d = ElsiCollegeDtls.objects.filter(college_name = selectedworkshop)
@@ -1807,13 +1808,13 @@ def sendmail(request):
             bcc = ''
             subject = 'Workshop Team Selection Form'
             body = render_to_string(os.path.join(SCRIPTS_DIR,'link.html'),
-                {'uid':uuid,'wid':wrkshp[0].id,'workshop_name':wrkshp[0].hcn,
+                {'uid':uuid,'wid':wrkshp[0].id,'port':port,'workshop_name':wrkshp[0].hcn,
                 'venue_address':wrkshp[0].venueadd,'start_date':wrkshp[0].startdate,
                 'end_date':wrkshp[0].enddate})
             #sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
             sent = True
             now = datetime.now()
-            ts = now.strftime("%Y-%m-%d %H:%M:%S") 
+            ts = now.strftime("%Y-%m-%d %H:%M:%S")
             if sent:
                 sucs+=1
                 d['sent'].append(to)
@@ -1838,6 +1839,7 @@ def sendmail(request):
 def headmail(request):
     var = JSONParser().parse(request)
     user = var.get('user')
+    port = var.get('port')
     selectedworkshop = var.get('selectedworkshop')
     wrkshp = create_workshop.objects.filter(hcn = selectedworkshop)
     objs = memberdetail.objects.filter(ishead = '1')
@@ -1883,13 +1885,13 @@ def headmail(request):
                 bcc = ''
                 subject = 'Workshop Team Selection approval'
                 body = render_to_string(os.path.join(SCRIPTS_DIR,'headlink.html'),
-                    {'uid':uuid,'wid':wrkshp[0].id,'workshop_name':wrkshp[0].hcn,
+                    {'uid':uuid,'wid':wrkshp[0].id,'port':port,'workshop_name':wrkshp[0].hcn,
                     'venue_address':wrkshp[0].venueadd,'start_date':wrkshp[0].startdate,
                     'end_date':wrkshp[0].enddate})
                 #sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
                 sent = True
                 now = datetime.now()
-                ts = now.strftime("%Y-%m-%d %H:%M:%S") 
+                ts = now.strftime("%Y-%m-%d %H:%M:%S")
                 if sent:
                     sucs+=1
                     d['sent'].append(to)

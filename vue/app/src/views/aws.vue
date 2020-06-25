@@ -235,6 +235,7 @@ export default {
   },
   data () {
     return {
+      port: this.$store.getters.port,
       statedisdata: statedisdata,
       state: 'State',
       index: '',
@@ -291,7 +292,7 @@ export default {
       this.isNight3 = false
       e.preventDefault()
       const currentObj = this
-      this.axios.post('http://localhost:8081/api/main/awsedit', {
+      this.axios.post('http://localhost:' + this.port + '/api/main/awsedit', {
         selectedworkshop: this.selectedworkshop
       })
         .then(function (response) {
@@ -306,7 +307,7 @@ export default {
       this.isNight3 = true
       e.preventDefault()
       const currentObj = this
-      this.axios.post('http://localhost:8081/api/main/awssave', {
+      this.axios.post('http://localhost:' + this.port + '/api/main/awssave', {
         wid: this.reqdata.wid,
         hcn: this.reqdata.hcn,
         startdate: this.reqdata.startdate,
@@ -327,10 +328,11 @@ export default {
       e.preventDefault()
       const currentObj = this
       this.result = 'sending mails'
-      this.axios.post('http://localhost:8081/api/main/headmail', {
+      this.axios.post('http://localhost:' + this.port + '/api/main/headmail', {
         selectedworkshop: this.selectedworkshop,
         label: 'tam',
-        user: this.$store.getters.user_name
+        user: this.$store.getters.user_name,
+        port: this.port
       })
         .then(function (response) {
           currentObj.result = response.data
@@ -343,10 +345,11 @@ export default {
       e.preventDefault()
       const currentObj = this
       this.result = 'sending mails'
-      this.axios.post('http://localhost:8081/api/main/sendmail', {
+      this.axios.post('http://localhost:' + this.port + '/api/main/sendmail', {
         selectedworkshop: this.selectedworkshop,
         label: 'tsm',
-        user: this.$store.getters.user_name
+        user: this.$store.getters.user_name,
+        port: this.port
       })
         .then(function (response) {
           currentObj.result = response.data
@@ -366,7 +369,7 @@ export default {
       return currentName.includes(currentInput)
     },
     workshoplist () {
-      this.axios.post('http://localhost:8081/api/main/getwrklist', {
+      this.axios.post('http://localhost:' + this.port + '/api/main/getwrklist', {
       })
         .then(wrklist => {
           this.wrklist = wrklist.data
@@ -457,7 +460,7 @@ export default {
       this.isNight2 = true
       this.isNight3 = true
       this.result = ''
-      this.axios.post('http://localhost:8081/api/main/awssubmit', {
+      this.axios.post('http://localhost:' + this.port + '/api/main/awssubmit', {
         selectedworkshop: this.selectedworkshop,
         filldate: this.filldate,
         enddate: this.enddate,
@@ -483,7 +486,7 @@ export default {
       formData.append('label', 'aws')
       const currentObj = this
       e.preventDefault()
-      this.axios.post('http://localhost:8081/api/main/approve', formData,
+      this.axios.post('http://localhost:' + this.port + '/api/main/approve', formData,
         {
           headers: {
             'Content-Type': 'multipart/form-data'
@@ -510,7 +513,7 @@ export default {
       formData.append('subject', this.output.subject)
       e.preventDefault()
       const currentObj = this
-      this.axios.post('http://localhost:8081/api/main/gsave', formData,
+      this.axios.post('http://localhost:' + this.port + '/api/main/gsave', formData,
         {
           headers: {
             'Content-Type': 'multipart/form-data'

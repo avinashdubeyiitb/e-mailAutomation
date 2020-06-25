@@ -57,7 +57,7 @@
             console.log(selectedItems)
             axios({
                 method: 'POST',
-                url: 'http://localhost:8081/api/main/formdata',
+                url: 'http://localhost:{{port}}/api/main/formdata',
                 data: {
                     option: document.getElementById('option').value,
                     reason: document.getElementById('reason').value,

@@ -38,7 +38,7 @@
             console.log(list)
             axios({
                 method: 'POST',
-                url: 'http://localhost:8081/api/main/headresults',
+                url: 'http://localhost:{{port}}/api/main/headresults',
                 data: {
                     values: val,
                     names: list,

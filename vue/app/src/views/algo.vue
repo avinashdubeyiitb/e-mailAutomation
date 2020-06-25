@@ -131,6 +131,7 @@ export default {
   },
   data () {
     return {
+      port: this.$store.getters.port,
       key1: '',
       demo: this.$store.getters.demo,
       key2: '',
@@ -177,7 +178,7 @@ export default {
       return currentName.includes(currentInput)
     },
     workshoplist () {
-      this.axios.post('http://localhost:8081/api/main/getwrklist', {
+      this.axios.post('http://localhost:' + this.port + '/api/main/getwrklist', {
       })
         .then(wrklist => {
           this.wrklist = wrklist.data
@@ -193,7 +194,7 @@ export default {
       this.output = []
       this.$store.commit('algooutput', this.output)
       console.log(this.selectedworkshop)
-      this.axios.post('http://localhost:8081/api/main/algo', {
+      this.axios.post('http://localhost:' + this.port + '/api/main/algo', {
         selectedworkshop: this.selectedworkshop,
         willcriteria: this.willcriteria,
         availcriteria: this.availcriteria,

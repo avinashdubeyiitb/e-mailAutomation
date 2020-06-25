@@ -335,6 +335,7 @@ export default {
   },
   data () {
     return {
+      port: this.$store.getters.port,
       csvapp: this.$store.getters.csvapp,
       csvgsave: this.$store.getters.csvgsave,
       isNight: this.$store.getters.simisNight,
@@ -503,7 +504,7 @@ export default {
       this.$store.commit('simisNight3', this.isNight3)
       this.iscsvtrue = true
       this.$store.commit('iscsvtrue', this.iscsvtrue)
-      this.axios.post('http://localhost:8081/api/main/csv/submit',
+      this.axios.post('http://localhost:' + this.port + '/api/main/csv/submit',
         frmData,
         {
           headers: {
@@ -546,7 +547,7 @@ export default {
       formData.append('label', 'sim')
       formData.append('user', this.$store.getters.user_name)
       const currentObj = this
-      this.axios.post('http://localhost:8081/api/main/csv/approve', formData,
+      this.axios.post('http://localhost:' + this.port + '/api/main/csv/approve', formData,
         {
           headers: {
             'Content-Type': 'multipart/form-data'
@@ -635,7 +636,7 @@ export default {
       formData.append('list', this.selected)
       formData.append('user', this.$store.getters.user_name)
       const currentObj = this
-      this.axios.post('http://localhost:8081/api/main/csv/gsave', formData,
+      this.axios.post('http://localhost:' + this.port + '/api/main/csv/gsave', formData,
         {
           headers: {
             'Content-Type': 'multipart/form-data'
@@ -664,7 +665,7 @@ export default {
     save (e) {
       e.preventDefault()
       const currentObj = this
-      this.axios.post('http://localhost:8081/api/main/save', {
+      this.axios.post('http://localhost:' + this.port + '/api/main/save', {
         remail: this.reqdata.to,
         cc: this.reqdata.cc,
         bcc: this.reqdata.bcc,
@@ -681,7 +682,7 @@ export default {
     saveDetail (e) {
       e.preventDefault()
       const currentObj = this
-      this.axios.post('http://localhost:8081/api/main/store', {
+      this.axios.post('http://localhost:' + this.port + '/api/main/store', {
         tchdtl: this.detail,
         remail: this.output.remail,
         cc: this.output.cc,
@@ -704,7 +705,7 @@ export default {
     clickList: function (pk, i) {
       console.log('clickList fired with ' + pk)
       const currentObj = this
-      this.axios.post('http://localhost:8081/api/main/idrequest', {
+      this.axios.post('http://localhost:' + this.port + '/api/main/idrequest', {
         remail: pk,
         cname: i
       })
@@ -727,7 +728,8 @@ export default {
       this.$store.commit('simisNight2', this.isNight2)
       this.isNight3 = true
       this.$store.commit('simisNight3', this.isNight3)
-      this.axios.post('http://localhost:8081/api/main/submit', {
+
+      this.axios.post('http://localhost:' + this.port + '/api/main/submit', {
         remail: this.remail,
         cc: this.cc,
         bcc: this.bcc,
@@ -765,7 +767,7 @@ export default {
       const currentObj = this
       this.detail = ''
       this.$store.commit('detail', this.detail)
-      this.axios.post('http://localhost:8081/api/main/approve', formData,
+      this.axios.post('http://localhost:' + this.port + '/api/main/approve', formData,
         {
           headers: {
             'Content-Type': 'multipart/form-data'
@@ -810,7 +812,7 @@ export default {
       const currentObj = this
       this.detail = ''
       this.$store.commit('detail', this.detail)
-      this.axios.post('http://localhost:8081/api/main/gsave', formData,
+      this.axios.post('http://localhost:' + this.port + '/api/main/gsave', formData,
         {
           headers: {
             'Content-Type': 'multipart/form-data'
