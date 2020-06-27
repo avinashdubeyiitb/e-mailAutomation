@@ -177,7 +177,7 @@ class create_workshop(models.Model):
     def __str__(self):
         return str(self.id)
     class Meta:
-        #managed = False
+        managed = False
         db_table = 'create_workshop'
 
 class WorkshopParticipants(models.Model):

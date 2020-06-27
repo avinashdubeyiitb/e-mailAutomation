@@ -12,8 +12,6 @@ certifi==2019.11.28
 cffi==1.14.0
 chardet==3.0.4
 colorama==0.4.3
-conda==4.8.2
-conda-package-handling==1.6.0
 cryptography==2.8
 defusedxml==0.6.0
 distlib==0.3.0
@@ -48,7 +46,6 @@ jsonpickle==1.4.1
 lazy-object-proxy==1.4.3
 MarkupSafe==1.1.1
 mccabe==0.6.1
-menuinst==1.4.16
 numpy==1.19.0
 oauth2==1.9.0.post1
 oauth2client==4.1.3

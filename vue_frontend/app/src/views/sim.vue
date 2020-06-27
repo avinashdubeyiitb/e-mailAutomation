@@ -380,6 +380,11 @@ export default {
   watch: {
   },
   methods: {
+    /*
+      Function name: getfile()
+      Input: value
+      Logic: opens the file(value) in an external window
+    */
     getfile (value) {
       console.log(value)
       if (value === 'Pamphlet2020.pdf') {
@@ -388,6 +393,13 @@ export default {
         shell.openExternal(this.output.attachmentlinks.LoI)
       }
     },
+    /*
+      Function name: getClass()
+      Input: pk
+      Output: class to implement(first for approved & second for drafted & third for discarded)
+      Logic: sets the background color of the row(addressed on the basis of pk) accordingly whether it has been
+             approved or drafted or discarded
+    */
     getClass (pk) {
       if (this.aprovselected.indexOf(pk) !== -1) {
         return 'first'
@@ -399,6 +411,11 @@ export default {
         return 'third'
       }
     },
+    /*
+      Function name: select()
+      Logic: This function is called when all the csv data is selected and thus pushes all the mail ids to
+             selected variable
+    */
     select () {
       this.selected = []
       if (!this.selectAll) {
@@ -408,6 +425,10 @@ export default {
       }
       this.$store.commit('selected', this.selected)
     },
+    /*
+      Function name: discard()
+      Logic: discards the mail that was to be sent and therefore resets the variables
+    */
     discard () {
       this.popoverShow1 = false
       this.popoverShow2 = false
@@ -439,10 +460,18 @@ export default {
       this.detail = ''
       this.$store.commit('detail', this.detail)
     },
+    /*
+      Function name: handleFileUpload()
+      Logic: stores the .csv or .xlsx file uploaded which will be needed for further operations to be performed
+    */
     handleFileUpload () {
       this.file = this.$refs.file.files[0]
       this.$store.commit('file', this.file)
     },
+    /*
+      Function name: handleFileUpload1()
+      Logic: stores the multiple file uploads while sending the mail to college individually
+    */
     handleattachUpload1 () {
       for (var i = 0; i < this.$refs.upfile1.files.length; i++) {
         this.mulupfile1.push(this.$refs.upfile1.files[i])
@@ -450,6 +479,11 @@ export default {
       this.$store.commit('upfile1', this.upfile1)
       this.$store.commit('mulupfile1', this.mulupfile1)
     },
+    /*
+      Function name: handleFileUpload2()
+      Logic: stores the multiple file uploads while data to send the mail to college was uploaded thorough .csv or
+             .xlsx file
+    */
     handleattachUpload2 () {
       for (var i = 0; i < this.$refs.upfile2.files.length; i++) {
         this.mulupfile2.push(this.$refs.upfile2.files[i])
@@ -457,6 +491,10 @@ export default {
       this.$store.commit('upfile2', this.upfile2)
       this.$store.commit('mulupfile2', this.mulupfile2)
     },
+    /*
+      Function name: gobacktoform()
+      Logic: This function is called when user wants to switch to sending information mail to college individually
+    */
     gobacktoform () {
       this.isNight = true
       this.$store.commit('simisNight', this.isNight)
@@ -469,6 +507,10 @@ export default {
       this.iscsvtrue = false
       this.$store.commit('iscsvtrue', this.iscsvtrue)
     },
+    /*
+      Function name: submitFile()
+      Logic:
+    */
     submitFile () {
       const frmData = new FormData()
       frmData.append('file', this.file)
@@ -524,7 +566,11 @@ export default {
       for (var i = 0; i < this.mulupfile2.length; i++) {
         formData.append('file2[' + i + ']', this.mulupfile2[i])
       }
-      formData.append('file2send2', Object.values(this.reqdata.attachments))
+      if (this.reqdata !== '') {
+        formData.append('file2send2', Object.values(this.reqdata.attachments))
+      } else {
+        formData.append('file2send2', Object.values({ pamp: 'Pamphlet2020.pdf', LoI: 'letter-of-intent.docx' }))
+      }
       formData.append('list', this.selected)
       formData.append('label', 'sim')
       formData.append('user', this.$store.getters.user_name)
@@ -539,21 +585,23 @@ export default {
           currentObj.approvecsv = response.data
           console.log(currentObj.approvecsv)
           this.$store.commit('approvecsv', currentObj.approvecsv)
+          currentObj.reqdata = ''
+          this.$store.commit('reqdata', this.reqdata)
+          this.popoverShow3 = false
+          for (i = 0; i < this.selected.length; i++) {
+            if (this.aprovselected.indexOf(this.selected[i]) === -1) {
+              this.aprovselected.push(this.selected[i])
+            }
+          }
+          this.$store.commit('aprovselected', this.aprovselected)
+          this.csvgsave = false
+          this.$store.commit('csvgsave', this.csvgsave)
+          this.selected = []
+          this.$store.commit('selected', this.selected)
         })
         .catch(function (error) {
           console.log(error)
         })
-      this.popoverShow3 = false
-      for (i = 0; i < this.selected.length; i++) {
-        if (this.aprovselected.indexOf(this.selected[i]) === -1) {
-          this.aprovselected.push(this.selected[i])
-        }
-      }
-      this.$store.commit('aprovselected', this.aprovselected)
-      this.csvgsave = false
-      this.$store.commit('csvgsave', this.csvgsave)
-      this.selected = []
-      this.$store.commit('selected', this.selected)
     },
     selectedstate (state, index) {
       console.log(state, index)
@@ -595,6 +643,7 @@ export default {
         this.reqdata.body = ''
         this.reqdata.state = ''
         this.reqdata.district = ''
+        this.reqdata.attachments = ''
       }
       this.$store.commit('reqdata', this.reqdata)
       for (var i = 0; i < this.selected.length; i++) {
@@ -613,7 +662,11 @@ export default {
       for (var i = 0; i < this.mulupfile2.length; i++) {
         formData.append('file2[' + i + ']', this.mulupfile2[i])
       }
-      formData.append('file2send2', Object.values(this.reqdata.attachments))
+      if (this.reqdata !== '') {
+        formData.append('file2send2', Object.values(this.reqdata.attachments))
+      } else {
+        formData.append('file2send2', Object.values({ pamp: 'Pamphlet2020.pdf', LoI: 'letter-of-intent.docx' }))
+      }
       formData.append('list', this.selected)
       formData.append('user', this.$store.getters.user_name)
       const currentObj = this
@@ -627,21 +680,23 @@ export default {
           currentObj.gsavecsv = response.data
           this.$store.commit('gsavecsv', currentObj.gsavecsv)
           console.log(currentObj.gsavecsv)
+          currentObj.reqdata = ''
+          this.$store.commit('reqdata', this.reqdata)
+          this.popoverShow4 = false
+          for (i = 0; i < this.selected.length; i++) {
+            if (this.gsvselected.indexOf(this.selected[i]) === -1) {
+              this.gsvselected.push(this.selected[i])
+            }
+          }
+          this.$store.commit('gsvselected', this.gsvselected)
+          this.csvapp = false
+          this.$store.commit('csvapp', this.csvapp)
+          this.selected = []
+          this.$store.commit('selected', this.selected)
         })
         .catch(function (error) {
           console.log(error)
         })
-      this.popoverShow4 = false
-      for (i = 0; i < this.selected.length; i++) {
-        if (this.gsvselected.indexOf(this.selected[i]) === -1) {
-          this.gsvselected.push(this.selected[i])
-        }
-      }
-      this.$store.commit('gsvselected', this.gsvselected)
-      this.csvapp = false
-      this.$store.commit('csvapp', this.csvapp)
-      this.selected = []
-      this.$store.commit('selected', this.selected)
     },
     saveDetail (e) {
       e.preventDefault()
