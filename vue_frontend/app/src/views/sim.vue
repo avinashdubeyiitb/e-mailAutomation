@@ -584,20 +584,20 @@ export default {
         .then(function (response) {
           currentObj.approvecsv = response.data
           console.log(currentObj.approvecsv)
-          this.$store.commit('approvecsv', currentObj.approvecsv)
+          currentObj.$store.commit('approvecsv', currentObj.approvecsv)
           currentObj.reqdata = ''
-          this.$store.commit('reqdata', this.reqdata)
-          this.popoverShow3 = false
-          for (i = 0; i < this.selected.length; i++) {
-            if (this.aprovselected.indexOf(this.selected[i]) === -1) {
-              this.aprovselected.push(this.selected[i])
+          currentObj.$store.commit('reqdata', currentObj.reqdata)
+          currentObj.popoverShow3 = false
+          for (i = 0; i < currentObj.selected.length; i++) {
+            if (currentObj.aprovselected.indexOf(currentObj.selected[i]) === -1) {
+              currentObj.aprovselected.push(currentObj.selected[i])
             }
           }
-          this.$store.commit('aprovselected', this.aprovselected)
-          this.csvgsave = false
-          this.$store.commit('csvgsave', this.csvgsave)
-          this.selected = []
-          this.$store.commit('selected', this.selected)
+          currentObj.$store.commit('aprovselected', currentObj.aprovselected)
+          currentObj.csvgsave = false
+          currentObj.$store.commit('csvgsave', currentObj.csvgsave)
+          currentObj.selected = []
+          currentObj.$store.commit('selected', currentObj.selected)
         })
         .catch(function (error) {
           console.log(error)
@@ -678,21 +678,21 @@ export default {
         })
         .then(function (response) {
           currentObj.gsavecsv = response.data
-          this.$store.commit('gsavecsv', currentObj.gsavecsv)
+          currentObj.$store.commit('gsavecsv', currentObj.gsavecsv)
           console.log(currentObj.gsavecsv)
           currentObj.reqdata = ''
-          this.$store.commit('reqdata', this.reqdata)
-          this.popoverShow4 = false
-          for (i = 0; i < this.selected.length; i++) {
-            if (this.gsvselected.indexOf(this.selected[i]) === -1) {
-              this.gsvselected.push(this.selected[i])
+          currentObj.$store.commit('reqdata', currentObj.reqdata)
+          currentObj.popoverShow4 = false
+          for (i = 0; i < currentObj.selected.length; i++) {
+            if (currentObj.gsvselected.indexOf(currentObj.selected[i]) === -1) {
+              currentObj.gsvselected.push(currentObj.selected[i])
             }
           }
-          this.$store.commit('gsvselected', this.gsvselected)
-          this.csvapp = false
-          this.$store.commit('csvapp', this.csvapp)
-          this.selected = []
-          this.$store.commit('selected', this.selected)
+          currentObj.$store.commit('gsvselected', currentObj.gsvselected)
+          currentObj.csvapp = false
+          currentObj.$store.commit('csvapp', currentObj.csvapp)
+          currentObj.selected = []
+          currentObj.$store.commit('selected', currentObj.selected)
         })
         .catch(function (error) {
           console.log(error)
