@@ -1,0 +1,289 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Index &mdash; Email_automation  documentation</title>
+
+
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+
+
+
+
+
+
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+
+
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+
+
+  <div class="wy-grid-for-nav">
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Email_automation
+
+
+
+          </a>
+
+
+
+
+
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+        </div>
+
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+
+
+          <div class="local-toc"><ul>
+            Index
+              <ul>
+                <li><a class="reference internal" href="index.html"><span class="std std-ref">Home</span></a></li>
+                <li><a class="reference internal" href="intro.html"><span class="std std-ref">Introduction</span></a></li>
+                <li><a class="reference internal" href="install_guide.html"><span class="std std-ref">Installation Guide
+                  <ul>
+                  <li><a class="reference internal" href="#id1">Database</a></li>
+                  <li><a class="reference internal" href="#id2">Back end and Front end</a></li>
+                  </ul>
+                </span></a></li>
+                <li><a class="reference internal" href="remake.html"><span class="std std-ref">How to remake and use</span></a></li>
+              </ul>
+</ul>
+
+    </div>
+
+
+
+              <!-- Local TOC -->
+              <div class="local-toc">
+
+        </div>
+
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+
+      <nav class="wy-nav-top" aria-label="top navigation">
+
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Email_automation</a>
+
+      </nav>
+
+
+      <div class="wy-nav-content">
+
+        <div class="rst-content">
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+
+      <li>Installation Guide</li>
+
+
+      <li class="wy-breadcrumbs-aside">
+
+
+
+      </li>
+
+  </ul>
+
+
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+
+<h1 id="index">Installation Guide</h1>
+<div class="section">
+<ol>
+  <li id="id1"> <h6>Database</h6>
+  <p>You need to install the postgres and pgAdmin <a target="_blank" href="(https://www.pgadmin.org/ )">(https://www.pgadmin.org/ ) </a>for using postgres sql. For full guide on how to
+    install please refer this <a target="_blank" href="https://www.youtube.com/watch?v=d--mEqEUybA&feature=youtu.be"> link</a>. <br>
+Some important points:
+<ul>
+  <li>If you have a database in sql and want to change it to psql use this git <a target="_blank" href="https://github.com/AnatolyUss/nmig/blob/master/README.md">link </a>.</li>
+<li>If you have a csv and want to import data to pgAdmin database use psql shell with this command <br>
+\copy Public.”table _name” FROM ‘csv_file_location’ DELIMITER ‘,’ CSV HEADER null ‘null’; <br>
+Example: <br>
+ \copy Public.”elsi_college_dtls” FROM ‘C:\example\data.csv’ DELIMITER ‘,’ CSV HEADER null ‘null’;
+ <img src=".\_static\img3.png" alt="Not found:(">
+ <p>Sometimes you need to provide encoding details also of the csv file, so just provide extra parameter
+   encoding ‘UTF8’ where encoding may have any other format other
+   than UTF8 depending on the excel version and file type you are using (.csv, .xlsx).</p>
+</li>
+<li>
+If you have .pgsql file and want to import its data into pgAdmin then open command prompt with administrator rights,
+also make sure that your environment variables path are set for that particular location if not, then set the environment
+variables path. Type the following command <br>
+psql –U username dbname < dbexport.pgsql  <br>
+where username is the username of pgadmin and dbname is the database name that you want to import data into . <br>
+Example: <br>
+psql –U postgres elsi < C:\example\data.pgsql  <br>
+</li>
+</ul>
+<p> <strong>Note:</strong> Make a database named elsi in pgadmin. A folder named test_database is provided which contains
+  data.pgsql file this is the testing file which can be used for testing the app (for importing this file follow step c),
+  later on just truncate the tables and import your own data.<br>
+For setting the environment variables if not set already :<br>
+for windows 10 <br>
+<ol>
+  <li>In Search, search for and then select: System (Control Panel)</li>
+  <li>Click the <strong>Advanced system settings</strong> link.</li>
+  <li>Click <strong>Environment Variables</strong>. In the section <strong>System Variables</strong>, find the PATH environment variable
+     and select it. Click <strong>Edit</strong>. If the PATH environment variable does not exist, click New.</li>
+  <li>4.	In the <strong>Edit System Variable </strong>(or <strong>New System Variable</strong>) window, specify the value of the PATH environment variable.
+    Click <strong>OK</strong>. Close all remaining windows by clicking <strong>OK</strong>.( the path value which you need to write here will be
+     C:\Program Files\PostgreSQL\12\lib and C:\Program Files\PostgreSQL\12\bin  these locations may change depending on where
+     you have installed the PostreSOL in system).
+</li>
+<li>Reopen Command prompt window, and then run the respective command.</li>
+</ol>
+ </p>
+</p>
+</li>
+<li id="id2"> <h6>Back end and Front end</h6>
+<p>Create a new project folder and clone the git from <a target="_blank" href="https://github.com/SabanwarVivek/5_Email_Automation_and_Spatial_Analysis_A.git">here</a> .
+  For some big folders which are not present in git
+  repo. consider downloading them from this emails <u>5a.eysip2020@gmail.com </u>Google Drive and save these folders in
+  the vue_frontend/app folder. </p>
+  <p> <strong>Backend :</strong> <br>
+  The django_backend folder contains the backend system. Make sure that you have latest package of django and
+    python installed. Install all the dependencies using the command in django_backend/app folder: <br>
+    pip install -r requirements.txt <br>
+    Open the command prompt in django_backend/app folder and follow these steps: <br>
+    <ol>
+      <li>python manage.py makemigrations 	&#60;appname&#62; <br>
+      -->python manage.py makemigrations main </li>
+      <li>python manage.py migrate</li>
+      <li>for creating superuser for django admin: python manage.py createsuperuser</li>
+      <li>then finally python manage.py runserver &#60;port&#62; <br>
+      -->python manage.py runserver 8081 </li>
+    </ol>
+    The backend sever will start at localhost 8081. <br>
+To visit the django admin panel type in browser http://127.0.0.1:8081/admin and enter the superuser credentials. <br>
+<strong>Note: </strong>If you want to change localhost server on different port just change 8081 with your preferred port and provide
+the same port in settings tab present in GUI of app .
+  </p>
+  <p> <strong>Frontend :</strong> <br>
+    The vue_frontend folder contains the frontend system. Make sure
+    that you have latest package of npm installed. Install all the dependencies.  <br>
+    Open the command prompt in vue_frontend/app folder and follow these steps: <br>
+    <ol>
+      <li> npm run electron:serve</li>
+    </ol>
+    The app will start on localhost. <br>
+    <strong>Note: </strong> If you want to run the app in production environment : <br>
+    Open the command prompt in vue_frontend/app folder and follow these steps: <br>
+    <ol>
+      <li>npm run electron: build</li>
+    </ol>
+We will get an setup file and executable file with some other files in dist_electron and dist_electron/win-unpacked folder.
+</p>
+</li>
+</ol>
+</div>
+<div class="genindex-jumpbox">
+
+</div>
+
+
+           </div>
+
+          </div>
+          <footer>
+
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+
+        &copy; Copyright 2020, Eyantra
+
+    </p>
+  </div>
+
+
+
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,279 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Index &mdash; Email_automation  documentation</title>
+
+
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+
+
+
+
+
+
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+
+
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+
+
+  <div class="wy-grid-for-nav">
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Email_automation
+
+
+
+          </a>
+
+
+
+
+
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+        </div>
+
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+
+
+
+
+
+
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+                Index
+                  <ul>
+                    <li><a class="reference internal" href="index.html"><span class="std std-ref">Home</span></a></li>
+                    <li><a class="reference internal" href="intro.html"><span class="std std-ref">Introduction</span></a></li>
+                    <li><a class="reference internal" href="install_guide.html"><span class="std std-ref">Installation Guide
+                    </span></a></li>
+                    <li><a class="reference internal" href="remake.html"><span class="std std-ref">How to remake and use</span></a></li>
+                  </ul>
+    </ul>
+
+        </div>
+
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+
+      <nav class="wy-nav-top" aria-label="top navigation">
+
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Email_automation</a>
+
+      </nav>
+
+
+      <div class="wy-nav-content">
+
+        <div class="rst-content">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+
+      <li>Introduction</li>
+
+
+      <li class="wy-breadcrumbs-aside">
+
+
+
+      </li>
+
+  </ul>
+
+
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+
+<h1 id="index">Introduction</h1>
+<div class="section" id="indices-and-tables">
+  <p>The desktop app consists of developing an environment
+    which makes it easier for Elsi team to work with handling the mails and semi-automate the whole Elsi process .
+    <br>Technology stack includes:</p>
+    <ol style="margin-left:1.8em;">
+      <li>Postgres sql for database</li>
+  <li>Django for back-end</li>
+  <li>Electron-vue package for desktop front-end</li>
+  <li>REST API’s and Axios for communication</li>
+  <li>Gmail Api for working with mails</li>
+    </ol>
+    <p>The Git repository link is available <a target="_blank" href="https://github.com/SabanwarVivek/5_Email_Automation_and_Spatial_Analysis_A.git">here</a> .<br>
+This document will give further insights on how to use and reproduce.
+</p>
+<h6><strong>PROJECT STRUCTURE:</strong></h6>
+<img src=".\_static\img2.png" alt="Not found:(">
+<img src=".\_static\img1.png" alt="Not found:(">
+<p>In vue_frontend/app/source we have,</p>
+<table >
+  <thead>
+    <th style="text-align:left">views</th>
+    <th style="text-align:left">assets</th>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding-right:14em;padding-left:2em;">|----  algo.vue</td>
+      <td >|----  states-and-districts.json</td>
+    </tr>
+    <tr>
+      <td style="padding-right:14em;padding-left:2em;">|----  aws.vue</td>
+      <td >This json file contains the Indian</td>
+    </tr>
+    <tr>
+      <td style="padding-right:14em;padding-left:2em;"> |----  cws.vue	</td>
+      <td>states with their districts data in json format.</td>
+    </tr>
+    <tr>
+      <td style="padding-left:2em;">|----  ema.vue	</td>
+    </tr>
+    <tr>
+      <td style="padding-left:2em;">|----  Home.vue</td>
+    </tr>
+    <tr>
+      <td style="padding-left:2em;">|----  sim.vue</td>
+    </tr>
+  </tbody>
+</table>
+<p></p>
+<strong>Home.vue --></strong> This file is the homepage of app code of login, logout and setting functionality is provided here .<br>
+<strong>Sim.vue--></strong> This file contains code of whole implementation of send information mail part.<br>
+<strong>Aws.vue--></strong> This contains the implementation of announcing the workshop and sending mails to respective colleges, eyantra
+team members and heads. <br>
+<strong>Cws.vue--></strong> This file contains the creation of new workshop part.<br>
+<strong>Algo.vue--></strong>This file contains the whole implementation of selection of team members for workshop based on different
+ selection criteria .<br>
+<strong>Ema.vue--></strong> This file contains email analytics part.<br>
+<p></p>
+<p></p>
+<p>
+In django_backend/app/ folder we have folders :<br>
+<strong>Assets --></strong> This folder contains some important files like credentials.json which contain the gmail api
+credentials , all other files have their general respective roles.  <br>
+<strong>Static --></strong>  This folder contains all .html files .  <br>
+<strong>Main/views.py--></strong> This file contains the main logic of our backend app. <br>
+<strong>Main/models.py--></strong> This file defines the database tables structure . <br>
+<strong>Main/urls.py--></strong> This file contains redirect URI to the respective functions in views.py . <br>
+</p>
+<p>More depth knowledge of the structured frameworks and getting started guide can be found on <a target="_blank" href="https://simulatedgreg.gitbooks.io/electron-vue/content/en/">link1</a> (electron-vue)
+  and <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/skeleton_website">link2 </a>(django) . If you want to get started from beginning these links will help you do so.
+Detailed information about each function and file will be provided in the file comments itself.
+</p>
+</div>
+<div class="genindex-jumpbox">
+
+</div>
+
+
+           </div>
+
+          </div>
+          <footer>
+
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+
+        &copy; Copyright 2020, Eyantra
+
+    </p>
+  </div>
+
+
+
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+
+
+
+
+
+</body>
+</html>

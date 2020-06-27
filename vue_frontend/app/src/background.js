@@ -14,8 +14,8 @@ const {ipcMain}     	= require('electron'); // include the ipc module to communi
 
 ipcMain.on("btnclick",function (event, arg) {
   const myApiOauth = new ElectronGoogleOAuth2(
-    '257717644642-ssdbt8958dphipjbd9f97u0norked40s.apps.googleusercontent.com',
-    'j-bzdgBu6gke8kWDjA-xRp93',
+    'client_id',
+    'client_secret',
      [
         'https://www.googleapis.com/auth/gmail.readonly',
         'https://www.googleapis.com/auth/gmail.send',
