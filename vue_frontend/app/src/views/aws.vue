@@ -30,8 +30,8 @@
     <input v-model="selectedworkshop" class="dropdown-input" type="text" placeholder="Select"  @click="chngclg()"/>
       <div  v-show="selectedworkshop" class="dropdown-list" style="z-index:100; position: fixed;background: #FFFFFF">
         <div v-for="(p,i) in wrklist" v-bind:key='i' v-show="showing">
-          <div  v-for="(host,index) in p" v-bind:key='index' v-show="itemVisible(host)" @click="savehcn(host,index)" class="dropdown-item">
-            {{host}}
+          <div  v-for="(host,index) in p" v-bind:key='index' v-show="itemVisible(host[0]) && host[1] === 'True'" @click="savehcn(host[0],index)" class="dropdown-item">
+            {{host[0]}}
           </div>
         </div>
         </div>
@@ -59,12 +59,36 @@
             </div>
         </b-dropdown></p>
     </div>
+    <p id="or">-------------------------------------------------</p>
+    <strong id="hcnactivestatus">Select Workshop:</strong>
+    <div class="dropdown" id="hcnactivestatusi">
+    <input v-model="selectedworkshop1" class="dropdown-input" type="text" placeholder="Select"  @click="chngclg1()"/>
+      <div  v-show="selectedworkshop1" class="dropdown-list" style="z-index:100; position: fixed;background: #FFFFFF">
+          <div  v-for="host in wrklist.list" v-show="showing1" v-bind:key='host[0]' class="dropdown-item" @click="showing1 = !showing1;selectedworkshop1 = host[0];savestt(host[1])">
+            {{host[0]}}
+          </div>
+        </div>
+        </div>
+        <strong id="isactv">Is Active:</strong>
+          <div class="form-check" id="isactvi1">
+              <label class="form-check-label">
+                <input type="radio" :checked="isactive === 'True'" class="form-check-input" name="optradio" @click="isactive = 'True'">
+                True
+              </label>
+          </div>
+          <div class="form-check" id="isactvi2">
+              <label class="form-check-label">
+                <input type="radio" :checked="isactive === 'False'" class="form-check-input" name="optradio" @click="isactive = 'False'">
+                False
+              </label>
+          </div>
     <button id="msub" v-b-modal.modal-1>Submit</button>
     <button id="sub1" @click="sendmail">Send Mail to Team</button>
     <button id="sub2" @click="headmail">Send Approval Mails</button>
         <div id="result">{{result}}</div>
 
     </form>
+    <button id="sub4" @click="savewrkactv">Save</button>
     <button id="sub3" @click="edtalw">Edit</button>
   </div>
   <div v-show="!isNight2">
@@ -234,7 +258,9 @@ export default {
       state: 'State',
       index: '',
       wrklist: [],
+      isactive: '',
       showing: false,
+      showing1: true,
       districts: [],
       d: 'District',
       district: [],
@@ -243,6 +269,7 @@ export default {
       isNight2: true,
       isNight3: true,
       selectedworkshop: this.$store.getters.awsselectedworkshop,
+      selectedworkshop1: '',
       popoverShow1: false,
       popoverShow2: false,
       hcn: '',
@@ -251,6 +278,7 @@ export default {
       selected: [],
       selectAll: false,
       key1: '',
+      key2: '',
       key3: '',
       key4: '',
       key5: '',
@@ -268,8 +296,14 @@ export default {
   watch: {
   },
   methods: {
+    savestt (isactv) {
+      this.isactive = isactv
+    },
     chngclg () {
       this.showing = true
+    },
+    chngclg1 () {
+      this.showing1 = true
     },
     onDivInput (e) {
       this.output.body = document.getElementById('container').innerHTML
@@ -365,6 +399,23 @@ export default {
         })
         .catch(function (error) {
           this.wrklist = error
+        })
+    },
+    savewrkactv () {
+      const currentObj = this
+      this.axios.post('http://localhost:' + this.port + '/api/main/savewrkactv', {
+        isactive: this.isactive,
+        workshop: this.selectedworkshop1
+      })
+        .then(function (request) {
+          console.log(request)
+          currentObj.workshoplist()
+          if (currentObj.selectedworkshop === currentObj.selectedworkshop1 && currentObj.isactive === 'False') {
+            currentObj.selectedworkshop = ''
+          }
+        })
+        .catch(function (error) {
+          console.log(error)
         })
     },
     discard () {
@@ -701,25 +752,84 @@ position: absolute;
 left: 36%;
 top: 27%;
 }
+#hcnactivestatus{
+position: absolute;
+width: 154px;
+height: 25px;
+left: 4%;
+top: 71%;
+
+font-family: Radley;
+font-size: 17px;
+line-height: 30px;
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #000000;
+
+}
+#hcnactivestatusi{
+position: absolute;
+left: 36%;
+top: 71%;
+}
+#isactv{
+position: absolute;
+width: 154px;
+height: 25px;
+left: 4%;
+top: 81%;
+
+font-family: Radley;
+font-size: 17px;
+line-height: 30px;
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #000000;
+
+}
+#isactvi1{
+position: absolute;
+left: 36%;
+top: 81%;
+}
+#isactvi2{
+position: absolute;
+left: 36%;
+top: 85%;
+}
+#or{
+  position: absolute;
+  left:20%;
+  top: 64%;
+}
+#sub4{
+position: absolute;
+right:10%;
+top: 81%;
+}
 #msub{
 position: absolute;
 right:10%;
-top: 53%;
+top: 37%;
 }
 #sub3{
 position: absolute;
 right:40%;
-top: 53%;
+top: 37%;
 }
 #sub1{
 position: absolute;
 right:10%;
-top: 63%;
+top: 47%;
 }
 #sub2{
 position: absolute;
 right:10%;
-top: 73%;
+top: 57%;
 }
 #result{
 position: absolute;

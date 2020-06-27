@@ -1367,8 +1367,11 @@ def gsave(request):
 def cwssubmit(request):
         try:
             var = JSONParser().parse(request)
-            serializer = CreateWorkshop(data=var)
-            print(serializer.is_valid())
+            clgid = ElsiCollegeDtls.objects.filter(college_name = var.get('hcn'))[0].id
+            serializer = CreateWorkshop(data={'clgid':clgid,'hcn':var.get('hcn'),'startdate':var.get('startdate'),
+                'enddate':var.get('enddate'),'venueadd':var.get('venueadd'),'cooname':var.get('cooname'),
+                'cooemail':var.get('cooemail'),'coono':var.get('coono')})
+            #print(serializer.is_valid())
             if serializer.is_valid():
                 serializer.save()
                 print('done')
@@ -1386,11 +1389,22 @@ def getwrklist(request):
             wrklist = {}
             for i in range(obj.count()):
                 if "list" in wrklist:
-                    wrklist["list"].append(obj[i].hcn)
+                    wrklist["list"].append((obj[i].hcn,obj[i].isactive))
                 else:
-                    wrklist["list"] = [obj[i].hcn]
+                    wrklist["list"] = [(obj[i].hcn,obj[i].isactive)]
             print(wrklist)
             return JsonResponse(wrklist)
+        except ValueError as e:
+            return JsonResponse({'status':'failed','info':e.args[0]})
+
+@api_view(['POST'])
+def savewrkactv(request):
+        try:
+            var = JSONParser().parse(request)
+            obj = create_workshop.objects.filter(hcn = var.get('workshop'))
+            obj.update(isactive = var.get('isactive'))
+            print(obj.values())
+            return JsonResponse({'status':'saved'})
         except ValueError as e:
             return JsonResponse({'status':'failed','info':e.args[0]})
 

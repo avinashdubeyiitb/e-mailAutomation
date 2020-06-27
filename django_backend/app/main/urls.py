@@ -13,6 +13,7 @@ urlpatterns = [
     url(r'^api/main/cwssubmit', views.cwssubmit),
     url(r'^api/main/awssubmit', views.awssubmit),
     url(r'^api/main/getwrklist', views.getwrklist),
+    url(r'^api/main/savewrkactv', views.savewrkactv),
     url(r'^api/main/sendmail',views.sendmail),
     url(r'^api/main/getfile',views.getfile),
     url(r'^api/main/formdata',views.formdata),

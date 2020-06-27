@@ -1,8 +1,7 @@
 from django.contrib import admin
 from .models import WorkshopTeamStatus,User
-
-admin.site.register(WorkshopTeamStatus)
+from django.contrib.auth.admin import UserAdmin
 
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
+class CustomUserAdmin(UserAdmin):
     pass
