@@ -1,7 +1,5 @@
 <template>
     <div id="app">
-      <div v-show="success">
-      <button class="btn" @click="logout" id="logout">Log Out!</button>
       <div>
         <b-dropdown id="dropdown-form" text="Settings" ref="dropdown" class="m-2 settings">
           <b-dropdown-form>
@@ -17,6 +15,8 @@
           </b-dropdown-form>
         </b-dropdown>
       </div>
+      <div v-show="success">
+      <button class="btn" @click="logout" id="logout">Log Out!</button>
     </div>
   <div id="leftbar" v-show="success">
     <div id="baritem0" class="baritems">
