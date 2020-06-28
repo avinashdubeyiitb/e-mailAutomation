@@ -922,7 +922,7 @@ def csvapprove(request):
     sent = None
     user = request.data.get('user')
     label = request.data.get('label')
-    with open('scripts/info.json','r') as read:
+    with open('assets/info.json','r') as read:
         obj = json.load(read)
     file_path = obj['file_path']
     with open(file_path,'r') as csvinput:
@@ -939,43 +939,38 @@ def csvapprove(request):
                 district = (row[8])
                 state = (row[7])
                 attachmentFile = None
-                if  len(row) > 10 :
-                    body = row[-1]
-                    subject = row[-2]
-                else :
-                    clg = row[6]
-                    coll = getname(clg)
-                    obj = ElsiCollegeDtls.objects.filter(normalised_ins_name = coll)
-                    print(coll)
-                    fn = []
-                    # if len(district) >0 and len(state)>0:
-                    #     dis = getname(district)
-                    #     sta = getname(state)
-                    # else:
-                    #     data = collx['candidates'][0]['formatted_address']
-                    #     data.replace(" ", "")
-                    #     data = data.split(",")
-                    #     dis = "".join(filter(lambda x: not x.isdigit(), data[-3]))
-                    #     print(dis)
-                    #     sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
-                    #     print(sta)
-                    res = getbody(coll,obj,state,district)
-                    subject = res['subject']
-                    body = res['body']
-                    files2send2 = list(request.data.get('files2send2').split(","))
-                    print(files2send2)
-                    attachments = []
-                    for f in files2send2:
-                        if f == 'Pamphlet2020.pdf':
-                            attachments.append(os.path.join(ASSETS_DIR,'Pamphlet2020.pdf'))
-                        elif f == 'letter-of-intent.docx':
-                            attachments.append(os.path.join(ASSETS_DIR,'letter-of-intent.docx'))
-                    fn = []
-                    if request.FILES :
-                        for i in request.FILES:
-                            file_name = default_storage.save(request.FILES[i].name, request.FILES[i])
-                            fn.append(file_name)
-                            attachments.append(os.path.join(BASE_DIR,file_name))
+                clg = row[6]
+                coll = getname(clg)
+                obj = ElsiCollegeDtls.objects.filter(normalised_ins_name = coll)
+                print(coll)
+                fn = []
+                # if len(district) >0 and len(state)>0:
+                #     dis = getname(district)
+                #     sta = getname(state)
+                # else:
+                #     data = collx['candidates'][0]['formatted_address']
+                #     data.replace(" ", "")
+                #     data = data.split(",")
+                #     dis = "".join(filter(lambda x: not x.isdigit(), data[-3]))
+                #     print(dis)
+                #     sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
+                #     print(sta)
+                res = getbody(coll,obj,state,district)
+                subject = res['subject']
+                body = res['body']
+                files2send2 = list(request.data.get('file2send2').split(","))
+                print(files2send2)
+                attachments = []
+                for f in files2send2:
+                    if f == 'Pamphlet2020.pdf':
+                        attachments.append(os.path.join(ASSETS_DIR,'Pamphlet2020.pdf'))
+                    elif f == 'letter-of-intent.docx':
+                        attachments.append(os.path.join(ASSETS_DIR,'letter-of-intent.docx'))
+                if request.FILES :
+                    for i in request.FILES:
+                        file_name = default_storage.save(request.FILES[i].name, request.FILES[i])
+                        fn.append(file_name)
+                        attachments.append(os.path.join(BASE_DIR,file_name))
                 sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label,attachments)
                 now = datetime.now()
                 ts = now.strftime("%Y-%m-%d %H:%M:%S")
@@ -1033,7 +1028,7 @@ def csvapprove(request):
 def csvdraft(request):
     sent = None
     user = request.data.get('user')
-    with open('scripts/info.json','r') as read:
+    with open('assets/info.json','r') as read:
         obj = json.load(read)
     file_path = obj['file_path']
     credentials = get_credentials()
@@ -1052,42 +1047,38 @@ def csvdraft(request):
                 district = (row[8])
                 state = (row[7])
                 attachmentFile = None
-                if  len(row) > 10 :
-                    body = row[-1]
-                    subject = row[-2]
-                else :
-                    clg = row[6]
-                    coll = getname(clg)
-                    obj = ElsiCollegeDtls.objects.filter(normalised_ins_name = coll)
-                    print(coll)
-                    # if len(district) >0 and len(state)>0:
-                    #     dis=getname(district)
-                    #     sta = getname(state)
-                    # else:
-                    #     data = collx['candidates'][0]['formatted_address']
-                    #     data.replace(" ", "")
-                    #     data = data.split(",")
-                    #     dis = "".join(filter(lambda x: not x.isdigit(), data[-3]))
-                    #     print(dis)
-                    #     sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
-                    #     print(sta)
-                    res = getbody(coll,obj,state,district)
-                    subject = res['subject']
-                    body = res['body']
-                    files2send2 = list(request.data.get('file2send2').split(","))
-                    print(files2send2)
-                    attachments = []
-                    for f in files2send2:
-                        if f == 'Pamphlet2020.pdf':
-                            attachments.append(os.path.join(ASSETS_DIR,'Pamphlet2020.pdf'))
-                        elif f == 'letter-of-intent.docx':
-                            attachments.append(os.path.join(ASSETS_DIR,'letter-of-intent.docx'))
-                    fn = []
-                    if request.FILES :
-                        for i in request.FILES:
-                            file_name = default_storage.save(request.FILES[i].name, request.FILES[i])
-                            fn.append(file_name)
-                            attachments.append(os.path.join(BASE_DIR,file_name))
+                clg = row[6]
+                coll = getname(clg)
+                obj = ElsiCollegeDtls.objects.filter(normalised_ins_name = coll)
+                print(coll)
+                # if len(district) >0 and len(state)>0:
+                #     dis=getname(district)
+                #     sta = getname(state)
+                # else:
+                #     data = collx['candidates'][0]['formatted_address']
+                #     data.replace(" ", "")
+                #     data = data.split(",")
+                #     dis = "".join(filter(lambda x: not x.isdigit(), data[-3]))
+                #     print(dis)
+                #     sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
+                #     print(sta)
+                res = getbody(coll,obj,state,district)
+                subject = res['subject']
+                body = res['body']
+                files2send2 = list(request.data.get('file2send2').split(","))
+                print(files2send2)
+                attachments = []
+                for f in files2send2:
+                    if f == 'Pamphlet2020.pdf':
+                        attachments.append(os.path.join(ASSETS_DIR,'Pamphlet2020.pdf'))
+                    elif f == 'letter-of-intent.docx':
+                        attachments.append(os.path.join(ASSETS_DIR,'letter-of-intent.docx'))
+                fn = []
+                if request.FILES :
+                    for i in request.FILES:
+                        file_name = default_storage.save(request.FILES[i].name, request.FILES[i])
+                        fn.append(file_name)
+                        attachments.append(os.path.join(BASE_DIR,file_name))
                 attachmentFile = attachments
                 if attachmentFile:
                     message = createMessageWithAttachment(EMAIL_HOST_USER, to,cc,bcc, subject,body, attachmentFile)
@@ -1186,13 +1177,14 @@ def idrequest(request):
 @api_view(['POST'])
 def csvsubmit(request):
     file = request.FILES['file']
-    if os.path.getsize('scripts/info.json') :
-        with open('scripts/info.json','r') as read:
+    if os.path.getsize('assets/info.json') :
+        with open('assets/info.json','r') as read:
             obj = json.load(read)
-            os.remove(obj['file_name'])
+            if os.path.exists(obj['file_path']):
+                os.remove(obj['file_name'])
     file_name = default_storage.save(file.name,file)
     CSV_DIR = os.path.join(BASE_DIR,file_name)
-    with open('scripts/info.json','w') as write :
+    with open('assets/info.json','w') as write :
         json.dump({'file_path':CSV_DIR,'file_name':file_name},write)
     with open(file_name, newline='') as csvfile:
         reader = csv.DictReader(csvfile)
@@ -1367,8 +1359,11 @@ def gsave(request):
 def cwssubmit(request):
         try:
             var = JSONParser().parse(request)
-            serializer = CreateWorkshop(data=var)
-            print(serializer.is_valid())
+            clgid = ElsiCollegeDtls.objects.filter(college_name = var.get('hcn'))[0].id
+            serializer = CreateWorkshop(data={'clgid':clgid,'hcn':var.get('hcn'),'startdate':var.get('startdate'),
+                'enddate':var.get('enddate'),'venueadd':var.get('venueadd'),'cooname':var.get('cooname'),
+                'cooemail':var.get('cooemail'),'coono':var.get('coono')})
+            #print(serializer.is_valid())
             if serializer.is_valid():
                 serializer.save()
                 print('done')
@@ -1386,11 +1381,22 @@ def getwrklist(request):
             wrklist = {}
             for i in range(obj.count()):
                 if "list" in wrklist:
-                    wrklist["list"].append(obj[i].hcn)
+                    wrklist["list"].append((obj[i].hcn,obj[i].isactive))
                 else:
-                    wrklist["list"] = [obj[i].hcn]
+                    wrklist["list"] = [(obj[i].hcn,obj[i].isactive)]
             print(wrklist)
             return JsonResponse(wrklist)
+        except ValueError as e:
+            return JsonResponse({'status':'failed','info':e.args[0]})
+
+@api_view(['POST'])
+def savewrkactv(request):
+        try:
+            var = JSONParser().parse(request)
+            obj = create_workshop.objects.filter(hcn = var.get('workshop'))
+            obj.update(isactive = var.get('isactive'))
+            print(obj.values())
+            return JsonResponse({'status':'saved'})
         except ValueError as e:
             return JsonResponse({'status':'failed','info':e.args[0]})
 

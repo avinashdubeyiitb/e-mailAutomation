@@ -6,13 +6,15 @@ class CreateWorkshop(serializers.ModelSerializer):
     class Meta:
         model = create_workshop
         fields = (
+        'clgid',
         'hcn',
         'startdate',
         'enddate',
         'venueadd',
         'cooname',
         'cooemail',
-        'coono',)
+        'coono',
+        'isactive',)
 
 class WorkshopTeamSerializer(serializers.ModelSerializer):
 

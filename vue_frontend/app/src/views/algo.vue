@@ -27,8 +27,8 @@
   <input v-model="selectedworkshop" class="dropdown-input" type="text" placeholder="Select"  @click="chngclg()"/>
     <div  v-show="selectedworkshop" class="dropdown-list" style="z-index:100; position: fixed;background: #FFFFFF">
       <div v-for="(p,i) in wrklist" v-bind:key='i' v-show="showing">
-        <div  v-for="(host,index) in p" v-bind:key='index' v-show="itemVisible(host)" @click="savehcn(host,index)" class="dropdown-item">
-          {{host}}
+        <div  v-for="(host,index) in p" v-bind:key='index' v-show="itemVisible(host[0])" @click="savehcn(host[0],index)" class="dropdown-item">
+          {{host[0]}}
         </div>
       </div>
       </div>

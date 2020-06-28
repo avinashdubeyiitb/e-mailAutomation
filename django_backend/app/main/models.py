@@ -68,7 +68,6 @@ class DemoDtls(models.Model):
     class Meta:
         managed = False
         db_table = 'demo_dtls'
-        managed = False
 
 class WorkshopTeamStatus(models.Model):
     workshop_id = models.IntegerField(blank=False,null=False)
@@ -99,23 +98,6 @@ class WorkshopTeamStatus(models.Model):
         db_table = 'workshop_team_status'
         managed = False
 
-class create_workshop(models.Model):
-    id = models.AutoField(primary_key=True)
-    hcn = models.TextField(blank=True, null=True)
-    startdate = models.TextField(blank=True, null=True)
-    enddate = models.TextField(blank=True, null=True)
-    venueadd = models.TextField(blank=True, null=True)
-    cooname = models.TextField(blank=True, null=True)
-    cooemail = models.EmailField(blank=False,null=False)
-    coono = models.IntegerField(blank=True, null=True)
-
-    def __str__(self):
-        return str(self.id)
-    class Meta:
-        managed = False
-        db_table = 'create_workshop'
-        managed = False
-
 class WorkshopsTakenCount(models.Model):
     name = models.TextField(max_length=50,blank=False,null=False)
     active_member = models.IntegerField(blank=False,null=False)
@@ -135,7 +117,6 @@ class WorkshopsTakenCount(models.Model):
     class Meta:
         managed = False
         db_table = 'workshops_taken_count'
-        managed = False
 
 class ElsiCollegeDtls(models.Model):
     id = models.IntegerField(blank=True, null=False, primary_key=True)
@@ -181,6 +162,23 @@ class ElsiCollegeDtls(models.Model):
     class Meta:
         managed = False
         db_table = 'elsi_college_dtls'
+
+class create_workshop(models.Model):
+    id = models.AutoField(primary_key=True)
+    clgid = models.IntegerField(blank=False, null=False)
+    hcn = models.TextField(blank=True, null=True)
+    startdate = models.TextField(blank=True, null=True)
+    enddate = models.TextField(blank=True, null=True)
+    venueadd = models.TextField(blank=True, null=True)
+    cooname = models.TextField(blank=True, null=True)
+    cooemail = models.EmailField(blank=False,null=False)
+    coono = models.IntegerField(blank=True, null=True)
+    isactive = models.CharField(max_length=10,blank=False, null=False, default='True')
+    def __str__(self):
+        return str(self.id)
+    class Meta:
+        managed = False
+        db_table = 'create_workshop'
 
 class WorkshopParticipants(models.Model):
     id = models.IntegerField(blank=True, null=False,primary_key=True)
@@ -256,7 +254,7 @@ class AICTE_list(models.Model):
     full_address = models.TextField()
     latitude = models.TextField()
     longitude = models.TextField()
-
+    normalised_ins_name = models.TextField()
     class Meta:
         managed = False
         db_table = 'aicte_list'
