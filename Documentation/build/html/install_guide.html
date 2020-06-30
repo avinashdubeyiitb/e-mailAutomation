@@ -278,13 +278,13 @@ psql –U postgres elsi < C:\example\data.pgsql  <br>
 </ul>
 <p> <strong>Note:</strong> Make a database named elsi in pgadmin. A folder named test_database is provided which contains
   data.pgsql file this is the testing file which can be used for testing the app (for importing this file follow step c),
-  later on if you want to truncate the tables and import your own data, type one among these commands.<br>
+  later on if you want to truncate the tables and import your own data, type one among these commands in psql shell.<br>
   <ol>
   <li>If user wants a simple truncate to happen<br>
-    psql -U postgres -d database_name TRUNCATE table_name1,table_name2,....;
+    TRUNCATE table_name1,table_name2,....;
   </li>
   <li>If user wants not only to truncate but also reset associated sequence generator(auto-incrementing field with table)<br>
-    psql -U postgres -d database_name TRUNCATE TABLE table_name RESTART IDENTITY;
+    TRUNCATE TABLE table_name RESTART IDENTITY;
   </li>
   </ol>  
 For setting the environment variables if not set already :<br>
