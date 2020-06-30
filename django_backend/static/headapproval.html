@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div>
+       {% for data in datas%}
+       <p>Reason: {{data.reason}}</p>
+       <label for="{{ data.responder }}">{{data.responder}}</label>
+       <select id="{{ data.responder }}" onchange="save( '{{ data.responder }}' )" >
+         <option value="0" selected="selected">Select Value</option>
+         <option value="yes">Yes</option>
+         <option value="no">No</option>
+       </select><br>
+       {% endfor%}
+
+    </div>
+
+    <button  onclick="myFunction()">submit</button>
+    <p id="a"></p>
+
+    <script>
+        var list = []
+        var val = []
+        function save(id) {
+            console.log(id)
+            list.push(id)
+        }
+        //document.getElementById("btn").onclick = function() {myFunction()};
+        function myFunction() {
+            for (var idx in list) {
+                val.push(document.getElementById(list[idx]).value)
+            }
+            console.log(val)
+            console.log(list)
+            axios({
+                method: 'POST',
+                url: window.location.origin+'/api/main/headresults',
+                data: {
+                    values: val,
+                    names: list,
+                    uuid: '{{uuid}}',
+                    wid: '{{wid}}'
+                }
+            })
+            .then(function (response) {
+                console.log(response);
+                if (response.data == 'success') {
+                var x = document.getElementById("a").innerHTML = "Success";
+                setInterval(function(){ window.open('','_self').close() }, 2000);
+                }
+            })
+            .catch(function (error) {
+                console.log(error.response.data);
+                var x = document.getElementById("a").innerHTML = error;
+            });
+        }
+    </script>
+</body>
+</html>

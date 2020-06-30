@@ -83,8 +83,8 @@
                 <li><a class="reference internal" href="intro.html"><span class="std std-ref">Introduction</span></a></li>
                 <li><a class="reference internal" href="install_guide.html"><span class="std std-ref">Installation Guide
                   <ul>
+                  <li><a class="reference internal" href="#id2">QuickStart: For testing the app</a></li>
                   <li><a class="reference internal" href="#id1">Database</a></li>
-                  <li><a class="reference internal" href="#id2">Back end and Front end</a></li>
                   </ul>
                 </span></a></li>
                 <li><a class="reference internal" href="remake.html"><span class="std std-ref">How to remake and use</span></a></li>
@@ -148,11 +148,113 @@
 
 <h1 id="index">Installation Guide</h1>
 <div class="section">
+  <h6 id="id2">QuickStart: For testing the app</h6>
+  <p>Here is a quickstart guide it is highly recommanded that you first follow this guide and then make changes according to
+  your needs this guide will help you to start the app and then test with dummy data.</p>
+  <ol>
+    <li>Clone the git repo. by downloading the zip or by git command <a target="_blank" href="https://github.com/SabanwarVivek/5_Email_Automation_and_Spatial_Analysis_A.git">link</a>.<br>
+      By zip:
+      <ul>
+        <li>Just download the zip from repo. and extract it in a folder.</li>
+      </ul>
+      By git commands:
+      <ul>
+        <li>Create a Folder, name it whatever you like.</li>
+        <li>Open the terminal within that folder.</li>
+        <li>Type <br>
+          git config --global user.name "John Doe" <br>
+            git config --global user.email john@example.com <br>
+            Replace name and email with yours</li>
+        <li>Then do,
+          <ul>
+            <li>git init</li>
+            <li>git remote add origin https://github.com/SabanwarVivek/5_Email_Automation_and_Spatial_Analysis_A.git </li>
+            <li>git pull origin master</li>
+          </ul>
+            </li>
+      </ul>
+      <li>For some big folders which are not present in git repo. consider downloading them from this
+        emails <u>5a.eysip2020@gmail.com</u> Google Drive and save these folders in the vue_frontend/app folder.</li>
+     </li>
+     <li>Run command pip install virtualenv in base project directory.<br>
+      Setup your virtual environment named 'venv' by writing this command <br>
+     virtualenv venv</li>
+    <li>Switch to your virtual environment by:<br>
+    change current directory of cmd to cd venv/Scripts <br>
+    and then type activate <br>
+    Your virtualenv will get activated.
+    </li>
+    <li><p>You need to install the postgres and pgAdmin <a target="_blank" href="(https://www.pgadmin.org/ )">(https://www.pgadmin.org/ ) </a>for using postgres sql. For full guide on how to
+      install please refer this <a target="_blank" href="https://www.youtube.com/watch?v=d--mEqEUybA&feature=youtu.be"> link</a>. <br></p></li>
+      <li>After installing , open the pgAdmin by searching in search bar for pgadmin, click on it and a new window will open in browser
+      . Click on servers then right click on PostgreSQL select create and then database. Name the database whatever you like.</li>
+      <li>Now in test_database folder we have a dump file of pgsql. <br>
+        To import its data into pgAdmin open command prompt with administrator rights,
+        also make sure that your environment variables path are set for that particular location if not, then set the environment
+        variables path. Type the following command <br>
+        psql –U username dbname < dbexport.pgsql  <br>
+        where username is the username of pgadmin and dbname is the database name that you want to import data into . <br>
+        Example: <br>
+        psql –U postgres elsi < C:\example\data.pgsql  <br>
+        For setting the environment variables if not set already :<br>
+        for windows 10 <br>
+        <ul>
+          <li>In Search, search for and then select: System (Control Panel)</li>
+          <li>Click the <strong>Advanced system settings</strong> link.</li>
+          <li>Click <strong>Environment Variables</strong>. In the section <strong>System Variables</strong>, find the PATH environment variable
+             and select it. Click <strong>Edit</strong>. If the PATH environment variable does not exist, click New.</li>
+          <li>4.	In the <strong>Edit System Variable </strong>(or <strong>New System Variable</strong>) window, specify the value of the PATH environment variable.
+            Click <strong>OK</strong>. Close all remaining windows by clicking <strong>OK</strong>.( the path value which you need to write here will be
+             C:\Program Files\PostgreSQL\12\lib and C:\Program Files\PostgreSQL\12\bin  these locations may change depending on where
+             you have installed the PostreSQL in system).
+        </li>
+        <li>Reopen Command prompt window, and then run the respective command.</li>
+      </ul></li>
+      <li>Now database is ready.</li>
+      <li>Now run command `pip install -r requirements.txt` in directory django_backend/app .</li>
+      <li>In django_backend/app/app you will see the settings.py file open it. <br>
+            There you will find <br>
+             &emsp;&emsp;&emsp;&emsp;&emsp; DATABASES = { <br>
+             &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;    'default': { <br>
+             &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;        'ENGINE': 'django.db.backends.postgresql', <br>
+             &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;        'NAME': 'elsi', <br>
+             &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;        'USER':'postgres', <br>
+             &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;        'PASSWORD':'1234', <br>
+             &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;        'HOST':'localhost' <br>
+             &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;    } <br>
+             &emsp;&emsp;&emsp;&emsp;&emsp;} <br>
+         Here ENGINE depicts the database used ,NAME is the database name, USER and PASSWORD are
+         postgres pgAdmin username and password, HOST denotes server. <br>
+         Change the NAME according to database name you created and all other fileds respectively.
+       </li>
+      <li>Now in django_backend/app folder open cmd and follow with these commands<br>
+        <ol>
+          <li>python manage.py makemigrations 	&#60;appname&#62; <br>
+          -->python manage.py makemigrations main </li>
+          <li>python manage.py migrate</li>
+          <li>for creating superuser for django admin: python manage.py createsuperuser</li>
+          <li>then finally python manage.py runserver &#60;port&#62; <br>
+          -->python manage.py runserver 8081 </li>
+        </ol>
+        The backend sever will start at localhost 8081. <br>
+    To visit the django admin panel type in browser http://127.0.0.1:8081/admin and enter the superuser credentials. <br>
+    <strong>Note: </strong>If you want to change localhost server on different port just change 8081 with your preferred port
+    and provide the same port in settings tab present in GUI of app .
+        </li>
+      <li>Similarly open cmd in vue_frontend/app.</li>
+      <li>Type: npm run electron:serve. <br>
+        <strong>Note: </strong> If you want to run the app in production environment : <br>
+        Open the command prompt in vue_frontend/app folder and follow these steps: <br>
+        <ol>
+          <li>npm run electron: build</li>
+        </ol>
+    We will get an setup file and executable file with some other files in dist_electron and dist_electron/win-unpacked folder.</li>
+      <li>Test the app with login credentials sun as username and password both or use superuser credentials if you made one.</li>
+      <li>Test all the functionality of the app.</li>
+  </ol>
 <ol>
   <li id="id1"> <h6>Database</h6>
-  <p>You need to install the postgres and pgAdmin <a target="_blank" href="(https://www.pgadmin.org/ )">(https://www.pgadmin.org/ ) </a>for using postgres sql. For full guide on how to
-    install please refer this <a target="_blank" href="https://www.youtube.com/watch?v=d--mEqEUybA&feature=youtu.be"> link</a>. <br>
-Some important points:
+  <p>Some important points:
 <ul>
   <li>If you have a database in sql and want to change it to psql use this git <a target="_blank" href="https://github.com/AnatolyUss/nmig/blob/master/README.md">link </a>.</li>
 <li>If you have a csv and want to import data to pgAdmin database use psql shell with this command <br>
@@ -176,7 +278,15 @@ psql –U postgres elsi < C:\example\data.pgsql  <br>
 </ul>
 <p> <strong>Note:</strong> Make a database named elsi in pgadmin. A folder named test_database is provided which contains
   data.pgsql file this is the testing file which can be used for testing the app (for importing this file follow step c),
-  later on just truncate the tables and import your own data.<br>
+  later on if you want to truncate the tables and import your own data, type one among these commands.<br>
+  <ol>
+  <li>If user wants a simple truncate to happen<br>
+    psql -U postgres -d database_name TRUNCATE table_name1,table_name2,....;
+  </li>
+  <li>If user wants not only to truncate but also reset associated sequence generator(auto-incrementing field with table)<br>
+    psql -U postgres -d database_name TRUNCATE TABLE table_name RESTART IDENTITY;
+  </li>
+  </ol>  
 For setting the environment variables if not set already :<br>
 for windows 10 <br>
 <ol>
@@ -187,50 +297,11 @@ for windows 10 <br>
   <li>4.	In the <strong>Edit System Variable </strong>(or <strong>New System Variable</strong>) window, specify the value of the PATH environment variable.
     Click <strong>OK</strong>. Close all remaining windows by clicking <strong>OK</strong>.( the path value which you need to write here will be
      C:\Program Files\PostgreSQL\12\lib and C:\Program Files\PostgreSQL\12\bin  these locations may change depending on where
-     you have installed the PostreSOL in system).
+     you have installed the PostreSQL in system).
 </li>
 <li>Reopen Command prompt window, and then run the respective command.</li>
 </ol>
  </p>
-</p>
-</li>
-<li id="id2"> <h6>Back end and Front end</h6>
-<p>Create a new project folder and clone the git from <a target="_blank" href="https://github.com/SabanwarVivek/5_Email_Automation_and_Spatial_Analysis_A.git">here</a> .
-  For some big folders which are not present in git
-  repo. consider downloading them from this emails <u>5a.eysip2020@gmail.com </u>Google Drive and save these folders in
-  the vue_frontend/app folder. </p>
-  <p> <strong>Backend :</strong> <br>
-  The django_backend folder contains the backend system. Make sure that you have latest package of django and
-    python installed. Install all the dependencies using the command in django_backend/app folder: <br>
-    pip install -r requirements.txt <br>
-    Open the command prompt in django_backend/app folder and follow these steps: <br>
-    <ol>
-      <li>python manage.py makemigrations 	&#60;appname&#62; <br>
-      -->python manage.py makemigrations main </li>
-      <li>python manage.py migrate</li>
-      <li>for creating superuser for django admin: python manage.py createsuperuser</li>
-      <li>then finally python manage.py runserver &#60;port&#62; <br>
-      -->python manage.py runserver 8081 </li>
-    </ol>
-    The backend sever will start at localhost 8081. <br>
-To visit the django admin panel type in browser http://127.0.0.1:8081/admin and enter the superuser credentials. <br>
-<strong>Note: </strong>If you want to change localhost server on different port just change 8081 with your preferred port and provide
-the same port in settings tab present in GUI of app .
-  </p>
-  <p> <strong>Frontend :</strong> <br>
-    The vue_frontend folder contains the frontend system. Make sure
-    that you have latest package of npm installed. Install all the dependencies.  <br>
-    Open the command prompt in vue_frontend/app folder and follow these steps: <br>
-    <ol>
-      <li> npm run electron:serve</li>
-    </ol>
-    The app will start on localhost. <br>
-    <strong>Note: </strong> If you want to run the app in production environment : <br>
-    Open the command prompt in vue_frontend/app folder and follow these steps: <br>
-    <ol>
-      <li>npm run electron: build</li>
-    </ol>
-We will get an setup file and executable file with some other files in dist_electron and dist_electron/win-unpacked folder.
 </p>
 </li>
 </ol>

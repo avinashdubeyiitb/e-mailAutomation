@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div>
+            <label for="option">Willingness/Unavailability : </label>
+           <select name="" id="option" onchange="showDiv(this)">
+             <option value="0" selected="selected">Select Value</option>
+              <option value="Willingness">Willingness</option>
+              <option value="Unavailability">Unavailability</option>
+            </select><br>
+            <div id="toggle" style="display: none;">
+              <label for="reason">Reason:</label>
+             <input type="text" id="reason" >   <br>
+             <label for="check">Category of Reason:</label>
+             <div id="check">
+               <label for="eYRC">eYRC</label>
+             <input type="checkbox" value="eYRC" id="eYRC" name="reason"><br>
+             <label for="eYIC">eYIC</label>
+             <input type="checkbox" value="eYIC" id="eYIC" name="reason"><br>
+             <label for="eYRDC">eYRDC</label>
+             <input type="checkbox" value="eYRDC" id="eYRDC" name="reason"><br>
+             <label for="eLSI">eLSI</label>
+             <input type="checkbox" value="eLSI" id="eLSI" name="reason"><br>
+             <label for="web">web</label>
+             <input type="checkbox" value="web" id="web" name="reason"><br>
+             <label for="course_or_other_eyantra_work" >course_or_other_eyantra_work</label>
+             <input type="checkbox" value="course_or_other_eyantra_work" id="course_or_other_eyantra_work" name="reason"><br>
+             <label for="personal_or_any_other">personal_or_any_other</label>
+             <input type="checkbox" value="personal_or_any_other" id="personal_or_any_other" name="reason"><br>
+            </div>
+            </div>
+        <button  onclick="myFunction()">submit</button><br>
+        <p id="a"></p>
+    </div>
+    <script>
+        //document.getElementById("btn").onclick = function() {myFunction()};
+
+        function showDiv(select){
+             if(select.value == 'Unavailability'){
+              document.getElementById('toggle').style.display = "block";
+             } else{
+              document.getElementById('toggle').style.display = "none";
+             }
+          }
+        function myFunction() {
+            var items=document.getElementsByName('reason');
+            var selectedItems=[];
+            for(var i=0; i<items.length; i++){
+              if(items[i].type=='checkbox' && items[i].checked==true)
+              selectedItems.push(items[i].value);
+            }
+            console.log(window.location.port)
+            console.log(selectedItems)
+            axios({
+                method: 'POST',
+                url: window.location.origin+'/api/main/formdata',
+                data: {
+                    option: document.getElementById('option').value,
+                    reason: document.getElementById('reason').value,
+                    category: selectedItems,
+                    uuid: '{{uuid}}',
+                    wid: '{{wid}}'
+                }
+            })
+            .then(function (response) {
+                console.log(response);
+                if (response.data == 'success') {
+                var x = document.getElementById("a").innerHTML = "Success";
+                setInterval(function(){ window.open('','_self').close() }, 2000);
+                }
+            })
+            .catch(function (error) {
+                console.log(error.response.data);
+                var x = document.getElementById("a").innerHTML = error;
+            });
+        }
+    </script>
+</body>
+</html>

@@ -8799,8 +8799,9 @@ COPY public.authtoken_token (key, created, user_id) FROM stdin;
 --
 
 COPY public.create_workshop (id, hcn, startdate, enddate, venueadd, cooname, cooemail, coono) FROM stdin;
-1	Dr.C.V. Raman institute of science and technology kota Bilaspur CG	2020-06-24	2020-06-25	xyz	xyz	98dikshitajain@gmail.com	1234
 2	Rajiv Gandhi University	2020-06-04	2020-06-06	kota	aakash	aakash@aa.aa	98283733
+3	Amiraj College of Engineering & Technology	2020-06-03	2020-06-06	example	aakash	aakash@mail.com	3212332
+1	Dr.C.V. Raman institute of science and technology kota Bilaspur CG	2020-06-24	2020-06-25	xyz	xyz	98dikshitajain@gmail.com	1234
 \.
 
 
@@ -9017,6 +9018,8 @@ jsmytw7n2x9h9s6kykbot9wa2tky47h0	MDczMDQwY2YzMTI1MTE2MWQ5MDE5Y2EyZTFhYmRiZDNiM2J
 jgfermp7ustbcc34jsgoy5lt4uy8hwg1	MDczMDQwY2YzMTI1MTE2MWQ5MDE5Y2EyZTFhYmRiZDNiM2JhNzE5YTp7Il9hdXRoX3VzZXJfaWQiOiIzIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiJhYTIwZTRhZDMyY2RmNWZmZjYxMTZhNGI4NzhkMWI5ZmFkNWUwZjM2In0=	2020-07-10 02:42:24.357824+05:30
 e1g6fkncvlk0e21oo1x82npp91bqt4rx	MDczMDQwY2YzMTI1MTE2MWQ5MDE5Y2EyZTFhYmRiZDNiM2JhNzE5YTp7Il9hdXRoX3VzZXJfaWQiOiIzIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiJhYTIwZTRhZDMyY2RmNWZmZjYxMTZhNGI4NzhkMWI5ZmFkNWUwZjM2In0=	2020-07-10 03:22:30.580153+05:30
 a9dtnvelzzvw5rjdyipgu85czmvm8eqp	MDczMDQwY2YzMTI1MTE2MWQ5MDE5Y2EyZTFhYmRiZDNiM2JhNzE5YTp7Il9hdXRoX3VzZXJfaWQiOiIzIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiJhYTIwZTRhZDMyY2RmNWZmZjYxMTZhNGI4NzhkMWI5ZmFkNWUwZjM2In0=	2020-07-10 07:38:44.083449+05:30
+lwx6uevvptumfp1s2qkwp1gmg8n1s8uu	MDczMDQwY2YzMTI1MTE2MWQ5MDE5Y2EyZTFhYmRiZDNiM2JhNzE5YTp7Il9hdXRoX3VzZXJfaWQiOiIzIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiJhYTIwZTRhZDMyY2RmNWZmZjYxMTZhNGI4NzhkMWI5ZmFkNWUwZjM2In0=	2020-07-11 23:24:18.255745+05:30
+0u0g143iblptq5zpa9l05mqw7ifxpjqd	MDczMDQwY2YzMTI1MTE2MWQ5MDE5Y2EyZTFhYmRiZDNiM2JhNzE5YTp7Il9hdXRoX3VzZXJfaWQiOiIzIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiJhYTIwZTRhZDMyY2RmNWZmZjYxMTZhNGI4NzhkMWI5ZmFkNWUwZjM2In0=	2020-07-12 07:32:26.959209+05:30
 \.
 
 
@@ -9142,6 +9145,9 @@ COPY public.easyaudit_crudevent (id, event_type, object_id, object_repr, object_
 108	2	3	sun	[{"model": "main.user", "pk": 3, "fields": {"password": "pbkdf2_sha256$180000$9ygragco3Fog$XzrjzJ/n7DmAo3nDs6JrNW3EvhBUK3aPOg+gxDuhlRo=", "last_login": "2020-06-25T21:12:23.780Z", "is_superuser": true, "username": "sun", "first_name": "", "last_name": "", "email": "aakashkhandelwal56@gmail.com", "is_staff": true, "is_active": true, "date_joined": "2020-06-19T16:31:46.998Z", "photo": "", "groups": [], "user_permissions": []}}]	2020-06-26 02:42:24.288495+05:30	32	3	3	{"last_login": ["2020-06-25 00:02:54.406906", "2020-06-25 21:12:23.780565"]}
 109	2	3	sun	[{"model": "main.user", "pk": 3, "fields": {"password": "pbkdf2_sha256$180000$9ygragco3Fog$XzrjzJ/n7DmAo3nDs6JrNW3EvhBUK3aPOg+gxDuhlRo=", "last_login": "2020-06-25T21:52:30.163Z", "is_superuser": true, "username": "sun", "first_name": "", "last_name": "", "email": "aakashkhandelwal56@gmail.com", "is_staff": true, "is_active": true, "date_joined": "2020-06-19T16:31:46.998Z", "photo": "", "groups": [], "user_permissions": []}}]	2020-06-26 03:22:30.422712+05:30	32	3	3	{"last_login": ["2020-06-25 21:12:23.780565", "2020-06-25 21:52:30.163149"]}
 110	2	3	sun	[{"model": "main.user", "pk": 3, "fields": {"password": "pbkdf2_sha256$180000$9ygragco3Fog$XzrjzJ/n7DmAo3nDs6JrNW3EvhBUK3aPOg+gxDuhlRo=", "last_login": "2020-06-26T02:08:43.768Z", "is_superuser": true, "username": "sun", "first_name": "", "last_name": "", "email": "aakashkhandelwal56@gmail.com", "is_staff": true, "is_active": true, "date_joined": "2020-06-19T16:31:46.998Z", "photo": "", "groups": [], "user_permissions": []}}]	2020-06-26 07:38:43.97914+05:30	32	3	3	{"last_login": ["2020-06-25 21:52:30.163149", "2020-06-26 02:08:43.768413"]}
+111	2	3	sun	[{"model": "main.user", "pk": 3, "fields": {"password": "pbkdf2_sha256$180000$9ygragco3Fog$XzrjzJ/n7DmAo3nDs6JrNW3EvhBUK3aPOg+gxDuhlRo=", "last_login": "2020-06-27T17:54:17.655Z", "is_superuser": true, "username": "sun", "first_name": "", "last_name": "", "email": "aakashkhandelwal56@gmail.com", "is_staff": true, "is_active": true, "date_joined": "2020-06-19T16:31:46.998Z", "photo": "", "groups": [], "user_permissions": []}}]	2020-06-27 23:24:18.175736+05:30	32	3	3	{"last_login": ["2020-06-26 02:08:43.768413", "2020-06-27 17:54:17.655570"]}
+112	1	3	3	[{"model": "main.create_workshop", "pk": 3, "fields": {"hcn": "Amiraj College of Engineering & Technology", "startdate": "2020-06-03", "enddate": "2020-06-06", "venueadd": "example", "cooname": "aakash", "cooemail": "aakash@mail.com", "coono": 3212332}}]	2020-06-27 23:28:57.380054+05:30	19	\N	\N	\N
+113	2	3	sun	[{"model": "main.user", "pk": 3, "fields": {"password": "pbkdf2_sha256$180000$9ygragco3Fog$XzrjzJ/n7DmAo3nDs6JrNW3EvhBUK3aPOg+gxDuhlRo=", "last_login": "2020-06-28T02:02:26.684Z", "is_superuser": true, "username": "sun", "first_name": "", "last_name": "", "email": "aakashkhandelwal56@gmail.com", "is_staff": true, "is_active": true, "date_joined": "2020-06-19T16:31:46.998Z", "photo": "", "groups": [], "user_permissions": []}}]	2020-06-28 07:32:26.913657+05:30	32	3	3	{"last_login": ["2020-06-27 17:54:17.655570", "2020-06-28 02:02:26.684524"]}
 \.
 
 
@@ -9221,6 +9227,8 @@ COPY public.easyaudit_loginevent (id, login_type, username, datetime, user_id, r
 69	0	sun	2020-06-26 02:42:24.354314+05:30	3	127.0.0.1
 70	0	sun	2020-06-26 03:22:30.564115+05:30	3	127.0.0.1
 71	0	sun	2020-06-26 07:38:44.076548+05:30	3	127.0.0.1
+72	0	sun	2020-06-27 23:24:18.235742+05:30	3	127.0.0.1
+73	0	sun	2020-06-28 07:32:26.955207+05:30	3	127.0.0.1
 \.
 
 
@@ -9961,6 +9969,40 @@ COPY public.easyaudit_requestevent (id, url, method, query_string, remote_ip, da
 730	/api/main/login	POST		127.0.0.1	2020-06-26 07:38:43.147353+05:30	\N
 731	/api/main/gethcn	OPTIONS		127.0.0.1	2020-06-26 07:38:51.565086+05:30	\N
 732	/api/main/gethcn	POST		127.0.0.1	2020-06-26 07:38:51.599176+05:30	\N
+733	/api/main/login	OPTIONS		127.0.0.1	2020-06-27 23:24:16.527202+05:30	\N
+734	/api/main/login	POST		127.0.0.1	2020-06-27 23:24:16.884707+05:30	\N
+735	/api/main/stats	OPTIONS		127.0.0.1	2020-06-27 23:24:56.706845+05:30	\N
+736	/api/main/stats	POST		127.0.0.1	2020-06-27 23:24:56.754859+05:30	\N
+737	/api/main/getwrklist	OPTIONS		127.0.0.1	2020-06-27 23:25:10.906972+05:30	\N
+738	/api/main/getwrklist	POST		127.0.0.1	2020-06-27 23:25:10.998971+05:30	\N
+739	/api/main/algo	OPTIONS		127.0.0.1	2020-06-27 23:25:43.386526+05:30	\N
+740	/api/main/algo	POST		127.0.0.1	2020-06-27 23:25:43.422591+05:30	\N
+741	/api/main/stats	OPTIONS		127.0.0.1	2020-06-27 23:26:27.913389+05:30	\N
+742	/api/main/stats	POST		127.0.0.1	2020-06-27 23:26:27.974047+05:30	\N
+743	/api/main/getwrklist	OPTIONS		127.0.0.1	2020-06-27 23:27:07.061116+05:30	\N
+744	/api/main/getwrklist	POST		127.0.0.1	2020-06-27 23:27:07.103163+05:30	\N
+745	/api/main/gethcn	OPTIONS		127.0.0.1	2020-06-27 23:27:11.255877+05:30	\N
+746	/api/main/gethcn	POST		127.0.0.1	2020-06-27 23:27:11.387294+05:30	\N
+747	/api/main/cwssubmit	OPTIONS		127.0.0.1	2020-06-27 23:28:05.23949+05:30	\N
+748	/api/main/cwssubmit	POST		127.0.0.1	2020-06-27 23:28:05.29549+05:30	\N
+749	/api/main/cwssubmit	OPTIONS		127.0.0.1	2020-06-27 23:28:57.223207+05:30	\N
+750	/api/main/cwssubmit	POST		127.0.0.1	2020-06-27 23:28:57.356+05:30	\N
+751	/api/main/getwrklist	OPTIONS		127.0.0.1	2020-06-28 07:27:16.97693+05:30	\N
+752	/api/main/getwrklist	POST		127.0.0.1	2020-06-28 07:27:18.91684+05:30	\N
+753	/api/main/awssubmit	OPTIONS		127.0.0.1	2020-06-28 07:28:48.260325+05:30	\N
+754	/api/main/awssubmit	POST		127.0.0.1	2020-06-28 07:28:48.312134+05:30	\N
+755	/api/main/awsedit	OPTIONS		127.0.0.1	2020-06-28 07:29:18.651158+05:30	\N
+756	/api/main/awsedit	POST		127.0.0.1	2020-06-28 07:29:18.829345+05:30	\N
+757	/api/main/awssave	OPTIONS		127.0.0.1	2020-06-28 07:29:21.870783+05:30	\N
+758	/api/main/awssave	POST		127.0.0.1	2020-06-28 07:29:21.929852+05:30	\N
+759	/api/main/login	OPTIONS		127.0.0.1	2020-06-28 07:32:26.158702+05:30	\N
+760	/api/main/login	POST		127.0.0.1	2020-06-28 07:32:26.321314+05:30	\N
+761	/api/main/getwrklist	OPTIONS		127.0.0.1	2020-06-28 07:32:35.990813+05:30	\N
+762	/api/main/getwrklist	POST		127.0.0.1	2020-06-28 07:32:36.022811+05:30	\N
+763	/api/main/awssubmit	OPTIONS		127.0.0.1	2020-06-28 07:33:13.49961+05:30	\N
+764	/api/main/awssubmit	POST		127.0.0.1	2020-06-28 07:33:13.559146+05:30	\N
+765	/api/main/stats	OPTIONS		127.0.0.1	2020-06-28 07:43:40.494837+05:30	\N
+766	/api/main/stats	POST		127.0.0.1	2020-06-28 07:43:40.606545+05:30	\N
 \.
 
 
@@ -26090,7 +26132,7 @@ COPY public."user" (id, password, last_login, is_superuser, username, first_name
 2	!XwVT9No0cWEZ7Z2Jpx9Vtvza4gZHGkD0tBqUQPn2	\N	f	aakashkhandelwal56			aakashkhandelwal56@gmail.com	f	t	2020-06-19 13:11:36.678668+05:30	
 4	!MnneJCHE0SkYtK5g5xisn9xwasIH1xLRacrWU0k4	2020-06-20 01:48:38.698284+05:30	f	eysip	eYSIP	5A	5a.eysip2020@gmail.com	f	t	2020-06-20 01:48:37.923139+05:30	
 5	pbkdf2_sha256$180000$pLYxfr5oFqt3$kZA+mWtd/qaO5O2dvSFDu6ebrxum3zv482+2WcrTktU=	2020-06-23 06:58:38.193666+05:30	t	hii			intrnaakash@gmail.com	t	t	2020-06-22 23:24:27.625416+05:30	
-3	pbkdf2_sha256$180000$9ygragco3Fog$XzrjzJ/n7DmAo3nDs6JrNW3EvhBUK3aPOg+gxDuhlRo=	2020-06-26 07:38:43.768413+05:30	t	sun			aakashkhandelwal56@gmail.com	t	t	2020-06-19 22:01:46.998369+05:30	
+3	pbkdf2_sha256$180000$9ygragco3Fog$XzrjzJ/n7DmAo3nDs6JrNW3EvhBUK3aPOg+gxDuhlRo=	2020-06-28 07:32:26.684524+05:30	t	sun			aakashkhandelwal56@gmail.com	t	t	2020-06-19 22:01:46.998369+05:30	
 \.
 
 
@@ -31530,7 +31572,7 @@ SELECT pg_catalog.setval('public.auth_user_user_permissions_id_seq', 1, false);
 -- Name: create_workshop_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.create_workshop_id_seq', 2, true);
+SELECT pg_catalog.setval('public.create_workshop_id_seq', 3, true);
 
 
 --
@@ -31572,21 +31614,21 @@ SELECT pg_catalog.setval('public.django_site_id_seq', 4, true);
 -- Name: easyaudit_crudevent_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.easyaudit_crudevent_id_seq', 110, true);
+SELECT pg_catalog.setval('public.easyaudit_crudevent_id_seq', 113, true);
 
 
 --
 -- Name: easyaudit_loginevent_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.easyaudit_loginevent_id_seq', 71, true);
+SELECT pg_catalog.setval('public.easyaudit_loginevent_id_seq', 73, true);
 
 
 --
 -- Name: easyaudit_requestevent_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.easyaudit_requestevent_id_seq', 732, true);
+SELECT pg_catalog.setval('public.easyaudit_requestevent_id_seq', 766, true);
 
 
 --
