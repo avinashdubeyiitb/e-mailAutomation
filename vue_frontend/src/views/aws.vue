@@ -40,7 +40,7 @@
     <input id="filldatei" type="date" v-model="filldate"><br>
     <strong id="recipientstate">Recipient State:</strong>
     <div id="recipientstatei">
-        <b-dropdown  v-bind:text="state" >
+        <b-dropdown  v-bind:text="state" class="dropsize">
           <div v-for="(p,i) in statedisdata" v-bind:key='i' >
             <div v-for="(sta,index) in p" v-bind:key='index' >
               <b-dropdown-item @click='selectedstate(sta.state,index)' v-model="state">{{sta.state}}</b-dropdown-item>
@@ -51,7 +51,7 @@
     <strong id="recipientdis">Recipient District:</strong>
     <div id="recipientdisi">
       <p>{{district}}
-        <b-dropdown  v-bind:text="d" >
+        <b-dropdown  v-bind:text="d" class="dropsize">
           <div v-for="(dis,i) in districts" v-bind:key='i'>
             <div v-for="(diss,i) in dis" v-bind:key='i' >
               <b-dropdown-item  @click='selecteddistrict(diss)'>{{diss}}</b-dropdown-item>
@@ -522,7 +522,7 @@ export default {
       formData.append('label', 'aws')
       const currentObj = this
       e.preventDefault()
-      this.axios.post(this.url + '/api/main/approve', formData,
+      this.axios.post(this.url + '/api/main/aws/approve', formData,
         {
           headers: {
             'Content-Type': 'multipart/form-data'
@@ -549,7 +549,7 @@ export default {
       formData.append('subject', this.output.subject)
       e.preventDefault()
       const currentObj = this
-      this.axios.post(this.url + '/api/main/gsave', formData,
+      this.axios.post(this.url + '/api/main/aws/gsave', formData,
         {
           headers: {
             'Content-Type': 'multipart/form-data'

@@ -37,14 +37,14 @@
     <td>{{value.user}}</td>
     <td>{{data.label}}</td>
     <td>{{data.count}}
-      <b-dropdown>
+      <b-dropdown class="dropsize">
               <div v-for="(id,idx) in data.clist" v-bind:key='idx' >
                 <b-dropdown-item>{{id}}</b-dropdown-item>
               </div>
       </b-dropdown>
       </td>
     <td>{{data.failed}}
-      <b-dropdown>
+      <b-dropdown class="dropsize">
               <div v-for="(id,idx) in data.flist" v-bind:key='idx' >
                 <b-dropdown-item>{{id}}</b-dropdown-item>
               </div>
@@ -67,14 +67,14 @@ Draft
     <td>{{data.user}}</td>
     <td>
       {{data.Data.count}}
-      <b-dropdown>
+      <b-dropdown class="dropsize">
               <div v-for="(id,idx) in data.Data.clist" v-bind:key='idx' >
                 <b-dropdown-item>{{id}}</b-dropdown-item>
               </div>
       </b-dropdown>
       </td>
     <td>{{data.Data.failed}}
-      <b-dropdown>
+      <b-dropdown class="dropsize">
               <div v-for="(id,idx) in data.Data.flist" v-bind:key='idx' >
                 <b-dropdown-item>{{id}}</b-dropdown-item>
               </div>
@@ -97,7 +97,7 @@ Inbox
     <td>{{value.user}}</td>
     <td>{{data.label}}</td>
     <td>{{data.count}}
-      <b-dropdown>
+      <b-dropdown class="dropsize">
               <div v-for="(id,idx) in data.clist" v-bind:key='idx' >
                 <b-dropdown-item>{{id}}</b-dropdown-item>
               </div>
