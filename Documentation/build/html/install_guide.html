@@ -283,8 +283,8 @@ psql –U postgres elsi < C:\example\data.pgsql  <br>
   <li>If user wants a simple truncate to happen<br>
     TRUNCATE table_name1,table_name2,....;
   </li>
-  <li>If user wants not only to truncate but also reset associated sequence generator(auto-incrementing field with table)<br>
-    TRUNCATE TABLE table_name RESTART IDENTITY;
+  <li>If user wants not only to truncate but also reset associated sequence generator(auto-incrementing field of the table)<br>
+    TRUNCATE TABLE table_name1,table_name2 RESTART IDENTITY;
   </li>
   </ol>  
 For setting the environment variables if not set already :<br>
