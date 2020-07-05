@@ -1,135 +1,14 @@
-from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import get_object_or_404
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from apiclient import errors, discovery
-from email.mime.image import MIMEImage
-from email.mime.audio import MIMEAudio
-from email.mime.base import MIMEBase
-from rest_framework.parsers import JSONParser
-from django.core.mail import EmailMessage
-from django.http.response import JsonResponse
-from django.core.files.storage import default_storage
-from django.shortcuts import render
-from django.template.loader import render_to_string
-from django.http import FileResponse,HttpResponse
-from datetime import datetime
-from django.utils.encoding import escape_uri_path
-import smtplib
-import json
-import operator
-import pickle
-import os.path
-import httplib2
-import base64
-import mimetypes
-import email.encoders
-import csv
-from .serializers import *
-from .models import *
-from app.settings import EMAIL_HOST_USER,BASE_DIR,STATIC_DIR,ASSETS_DIR,TEMP_FILES_DIR
-from django.contrib.auth import authenticate, login,logout
-from django.views.decorators.csrf import csrf_exempt
-from oauth2client.client import AccessTokenCredentials
-import codecs
-import os
-import selenium
-from bs4 import BeautifulSoup
-from selenium import webdriver
-import time
-import pandas as pd
-import urllib.parse
-from time import sleep
 
-def trial(request):
-    return render(request,'trial.html')
-
-#############################################################################################################
-# from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
-# from rest_auth.registration.views import SocialLoginView
-#
-#
-# class GoogleLogin(SocialLoginView):
-#     adapter_class = GoogleOAuth2Adapter
-    #client_class = OAuth2Client
-
-def get_user_info(credentials):
-  """Send a request to the UserInfo API to retrieve the user's information.
-
-  Args:
-    credentials: oauth2client.client.OAuth2Credentials instance to authorize the
-                 request.
-  Returns:
-    User information as a dict.
-  """
-  access_token = credentials['access_token']
-  # url = 'https://www.googleapis.com/oauth2/v3/tokeninfo?access_token={0}'.format(access_token)
-  # r = requests.get(url)
-  # data = r.json()
-  # print(data,'data')
-  credentials = AccessTokenCredentials(access_token, "MyAgent/1.0", None)
-  print(credentials)
-  file_path = os.path.join(ASSETS_DIR,'pickle.token')
-  with open(file_path, 'wb') as token:
-      pickle.dump(credentials, token)
-  # if os.path.exists(file_path):
-  #   with open(file_path, 'rb') as token:
-  #       creds = pickle.load(token)
-  #       print(creds,'1')
-          # If there are no (valid) credentials available, let the user log in.
-  # if not creds:
-  #       if creds and creds.expired and creds.refresh_token:
-  #           creds.refresh(Request())
-  #       else:
-  #           flow = InstalledAppFlow.from_client_secrets_file(
-  #           credentials_path, SCOPES)
-  #           creds = flow.run_local_server(host='127.0.0.1',port=8081)
-            # Save the credentials for the next run
-  #
-  # user_info_service = build('oauth2', 'v2', credentials=credentials)
-  # user_info = None
-  # try:
-  #   user_info = user_info_service.userinfo().get().execute()
-  # except errors.HttpError:
-  #   logging.error('An error occurred: %s', errors.HttpError)
-  # if user_info and user_info.get('id'):
-  #   return user_info
-  # else:
-  return 'done'
-
-def check(credentials):
-     access_token = credentials['access_token']
-     url = 'https://www.googleapis.com/oauth2/v3/tokeninfo?access_token={0}'.format(access_token)
-     r = requests.get(url)
-     data = r.json()
-     print(data,'data')
-     return data['email_verified']
-
-
-@csrf_exempt
-def gauthlogin(request):
-    var = JSONParser().parse(request)
-    toke = var.get('token')
-    print(toke)
-    # x = get_user_info(toke)
-    # print(x)
-    s = check(toke)
-    if s:
-        return JsonResponse({'status':'success'})
-    else:
-        return JsonResponse({'status':'failed'})
-    # letshope = get_user_info(toke)
-    # print(letshope)
-    # if
-
-@csrf_exempt
 def authlogin(request):
+    """Authenticates the user trying to login.
+
+     Args:
+      username(Json-obj): The login credential username.
+      password(Json-obj): The login credential password.
+
+     Returns:
+      JsonResponse returning the status of login.
+    """
     var = JSONParser().parse(request)
     name = var.get('username')
     passw = var.get('password')
@@ -165,45 +44,23 @@ def authlogin(request):
         print('5')
     return JsonResponse({'status':'Check method'})
 
-@csrf_exempt
+
 def authlogout(request):
+    """ logout the current logged in user.
+
+     Returns:
+      JsonResponse containing the status.
+    """
     logout(request)
     #print(User.objects.filter(logged_in = 'True').values())
     return JsonResponse({'status':'logged out'})
 
-############################################################################################################################
-import googlemaps
-import requests
-#
-# API_KEY = 'AIzaSyD9qTJmiFUe3FQWlo5Z-A3l6pigxA3s8U8'
-# gmaps = googlemaps.Client(key = API_KEY)
-# print(gmaps)
-# url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
-# input='mbm Raj.'
-# other='&inputtype=textquery&fields=name'
-# result = requests.get(url+'input='+input+other+'&key='+API_KEY)
-# x = result.json()
-# print(x)
-
-############################################################################################################################
-
-# result = requests.get('https://api.foursquare.com/v2/venues/search'+'&client_id='+'JXAUNDUQSLCQVQRJER3CHDXY2SYR3EVCB5UT3D3Q340JWJJI'
-#  + '&client_secret=' + '4SCOWU5XHQIG2RYIDEI1HRBV32A11EJ4YFQKCJO2G4DZISRF')
-# x = result.json()
-# print(x)
-
-###########################################################################################################################
-# If modifying these scopes, delete the file token.pickle.
-SCOPES = [
-    'https://www.googleapis.com/auth/gmail.readonly',
-    'https://www.googleapis.com/auth/gmail.send',
-    'https://www.googleapis.com/auth/gmail.compose',
-    'https://www.googleapis.com/auth/gmail.modify',
-]
-###############################
-# common functions
-@api_view(['POST'])
 def stats(request):
+    """This function is used to return the statistical data to Email Analytics page.
+
+     Returns:
+      JsonResponse containing the data about which user send the mails to whom about what(label), saved drafts.
+    """
     obj = ssn_detail.objects.all()
     dct = {'Sent':[],'Inbox':[],'Draft':[]}
     lbl = []
@@ -327,23 +184,22 @@ def ListMessagesWithLabels(service, user_id, label_ids=[]):
   except errors.HttpError as error:
     print('An error occurred: %s' % error)
 
-@api_view(['POST'])
-def getfile(request):
-    print('hii')
-    var = JSONParser().parse(request)
-    v = var.get('value')
-    if v == 'Pamphlet2020.pdf':
-        with open(os.path.join(ASSETS_DIR,'Pamphlet2020.pdf'), 'rb') as fh:
-            response = HttpResponse(fh.read(), content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-            response['Content-Disposition'] = "attachment; filename={}".format(escape_uri_path('Pamphlet2020.pdf'))
-            return response
-    else:
-        with open(os.path.join(ASSETS_DIR,'letter-of-intent.docx'), 'rb') as fh:
-            response = HttpResponse(fh.read(), content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-            response['Content-Disposition'] = "attachment; filename={}".format(escape_uri_path('letter-of-intent.docx'))
-            return response
 
 def getbody(clg,obj,sta,dis):
+        """ Creates the subject, body for send information mail part.
+
+         Args:
+          clg: It contains the given college name.
+          obj: It contains the given college name details.
+          sta: It contains the state of the college.
+          dis: It contains the district of the college.
+
+         Returns:
+          subject: the subject content that is to be sent.
+          body: the body content that is to be sent.
+          subdiv: denotes the type of body content.
+          tchdtl: contains the teacher details of the given college.
+        """
         try:
             district = dis
             state = sta
@@ -738,24 +594,11 @@ def getname(name):
     #     return name
     # else:
     #     return collx['candidates'][0]['name']
-def getloc(name):
-    API_KEY = 'AIzaSyBE-9YyXHa6tXkOFmZpNS3fdXkSwU2bMk8'
-    url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
-    input=name
-    input.replace(" ", "%")
-    other='&inputtype=textquery&fields=formatted_address'
-    result = requests.get(url+'input='+input+other+'&key='+API_KEY)
-    collx = result.json()
-    print(collx)
-    if collx['status'] == 'REQUEST_DENIED':
-        return name
-    else:
-        return collx
 ################################
 
 ################################
 # send information mail
-@api_view(['POST'])
+
 def store(request):
         try:
             var = JSONParser().parse(request)
@@ -923,7 +766,7 @@ def store(request):
         except ValueError as e:
             return JsonResponse({'status':'failed','info':e.args[0]})
 
-@api_view(['POST'])
+
 def csvapprove(request):
     sent = None
     user = request.data.get('user')
@@ -1030,7 +873,7 @@ def csvapprove(request):
         os.remove(os.path.join(BASE_DIR,file_name))
     return JsonResponse(re)
 
-@api_view(['POST'])
+
 def csvdraft(request):
     sent = None
     user = request.data.get('user')
@@ -1143,7 +986,7 @@ def csvdraft(request):
         os.remove(os.path.join(BASE_DIR,file_name))
     return JsonResponse(re)
 
-@api_view(['POST'])
+
 def idrequest(request):
     var = JSONParser().parse(request)
     clg = var.get('cname')
@@ -1180,7 +1023,7 @@ def idrequest(request):
     d['attachmentlinks'] = {'pamp':'https://www.e-yantra.org/img/Pamphlet2020.pdf','LoI':'http://elsi.e-yantra.org/eyrtc/downloads/loi'}
     return JsonResponse(d)
 
-@api_view(['POST'])
+
 def csvsubmit(request):
     file = request.FILES['file']
     if os.path.getsize('assets/info.json') :
@@ -1199,7 +1042,7 @@ def csvsubmit(request):
             clist = clist + [(rows['cname'],rows['remail'])]
         return JsonResponse(dict(clist))
 
-@api_view(['POST'])
+
 def submit(request):
         try:
             var = JSONParser().parse(request)
@@ -1232,243 +1075,8 @@ def submit(request):
         except ValueError as e:
             return JsonResponse({'status':'failed','info':e.args[0]})
 
-@api_view(['POST'])
+
 def approve(request):
-        try:
-            #print(request.data.get('file1'))
-            #print(request.data.get('file2'))
-            user = request.data.get('user')
-            if request.user.is_authenticated:
-                print({'status':'already logged in'})
-            to = request.data.get('remail')
-            label = request.data.get('label')
-            # if type(request.data.get('cc')) == list:
-            #     cc = ','.join(map(str,request.data.get('cc') ))
-            # else:
-            cc = request.data.get('cc')
-            # if type(request.data.get('bcc')) == list:
-            #     bcc = ','.join(map(str,request.data.get('bcc') ))
-            # else:
-            bcc = request.data.get('bcc')
-            subject = request.data.get('subject')
-            body = request.data.get('body')
-            sent = None
-            files2send1 = list(request.data.get('files2send1').split(","))
-            print(files2send1)
-            attachments = []
-            for f in files2send1:
-                if f == 'Pamphlet2020.pdf':
-                    attachments.append(os.path.join(ASSETS_DIR,'Pamphlet2020.pdf'))
-                elif f == 'letter-of-intent.docx':
-                    attachments.append(os.path.join(ASSETS_DIR,'letter-of-intent.docx'))
-            fn = []
-            if request.FILES :
-                for i in request.FILES:
-                    file_name = default_storage.save(request.FILES[i].name, request.FILES[i])
-                    fn.append(file_name)
-                    attachments.append(os.path.join(BASE_DIR,file_name))
-            print(attachments)
-            sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label,attachments)
-            now = datetime.now()
-            ts = now.strftime("%Y-%m-%d %H:%M:%S")
-            if 'file1' in request.FILES :
-                os.remove(os.path.join(BASE_DIR,file_name))
-            if sent :
-                serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
-                        'timestamp' : ts,'mail_label' : 'SENT,'+label,'rcptmailid' : to,
-                        'delegated_access':'0','dcprovider':'None'})
-                if serializer.is_valid():
-                    serializer.save()
-                else :
-                    print(serializer.errors)
-                print(serializer)
-                for i in range(len(fn)):
-                    os.remove(os.path.join(BASE_DIR,fn[i]))
-                return JsonResponse({'status':'success','info':'mail sent successfully'})
-            else :
-                serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
-                        'timestamp' : ts,'mail_label' : label,'rcptmailid' : to,
-                        'delegated_access':'0','dcprovider':'None'})
-                if serializer.is_valid():
-                    serializer.save()
-                else :
-                    print(serializer.errors)
-                print(serializer)
-                for i in range(len(fn)):
-                    os.remove(os.path.join(BASE_DIR,fn[i]))
-                return JsonResponse({'status':'failure','info':'mail was not sent'})
-        except ValueError as e:
-            return Response(e.args[0],status.HTTP_400_BAD_REQUEST)
-
-@api_view(['POST'])
-def gsave(request):
-    to = request.data.get('remail')
-    user = request.data.get('user')
-    # if type(request.data.get('cc')) == list:
-    #     cc = ','.join(map(str,request.data.get('cc') ))
-    # else:
-    cc = request.data.get('cc')
-    # if type(request.data.get('bcc')) == list:
-    #     bcc = ','.join(map(str,request.data.get('bcc') ))
-    # else:
-    bcc = request.data.get('bcc')
-    subject = request.data.get('subject')
-    body = request.data.get('body')
-    sent = None
-    files2send1 = list(request.data.get('files2send1').split(","))
-    print(files2send1)
-    attachments = []
-    for f in files2send1:
-        if f == 'Pamphlet2020.pdf':
-            attachments.append(os.path.join(ASSETS_DIR,'Pamphlet2020.pdf'))
-        elif f == 'letter-of-intent.docx':
-            attachments.append(os.path.join(ASSETS_DIR,'letter-of-intent.docx'))
-    fn = []
-    if request.FILES :
-        for i in request.FILES:
-            file_name = default_storage.save(request.FILES[i].name, request.FILES[i])
-            fn.append(file_name)
-            attachments.append(os.path.join(BASE_DIR,file_name))
-    print(attachments)
-    credentials = get_credentials()
-    attachmentFile=attachments
-    result = None
-    service = build('gmail', 'v1', credentials=credentials)
-    if attachmentFile:
-        message = createMessageWithAttachment(EMAIL_HOST_USER, to,cc,bcc, subject, body, attachmentFile)
-    else:
-        message = CreateMessageHtml(EMAIL_HOST_USER, to, cc, bcc, subject, body)
-    result = CreateDraft(service,"me",message)
-    now = datetime.now()
-    ts = now.strftime("%Y-%m-%d %H:%M:%S")
-    if result:
-        serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
-                        'timestamp' : ts,'mail_label' : 'DRAFT','rcptmailid' : to,
-                        'delegated_access':'0','dcprovider':'None'})
-    else:
-        serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
-                        'timestamp' : ts,'mail_label' : '','rcptmailid' : to,
-                        'delegated_access':'0','dcprovider':'None'})
-    if serializer.is_valid():
-        serializer.save()
-    else :
-        print(serializer.errors)
-    print(serializer)
-    for i in range(len(fn)):
-        os.remove(os.path.join(BASE_DIR,fn[i]))
-    return JsonResponse({'status':'saved to draft'})
-######################
-
-######################
-#workshop announcement
-@api_view(['POST'])
-def cwssubmit(request):
-        try:
-            var = JSONParser().parse(request)
-            x = var.get('coono')
-            print(x)
-            clgid = ElsiCollegeDtls.objects.filter(college_name = var.get('hcn'))[0].id
-            serializer = CreateWorkshop(data={'clgid':clgid,'hcn':var.get('hcn'),'startdate':var.get('startdate'),
-                'enddate':var.get('enddate'),'venueadd':var.get('venueadd'),'cooname':var.get('cooname'),
-                'cooemail':var.get('cooemail'),'coono':var.get('coono')})
-            #print(serializer.is_valid())
-            if serializer.is_valid():
-                serializer.save()
-                print('done')
-                return JsonResponse({'status': 'Created Successfully'})
-            else:
-                print('failure')
-                return JsonResponse({'status': 'Problem in Serializing'})
-        except ValueError as e:
-            return JsonResponse({'status':'failed','info':e.args[0]})
-
-@api_view(['POST'])
-def getwrklist(request):
-        try:
-            obj = create_workshop.objects.all()
-            wrklist = {}
-            for i in range(obj.count()):
-                if "list" in wrklist:
-                    wrklist["list"].append((obj[i].hcn,obj[i].isactive))
-                else:
-                    wrklist["list"] = [(obj[i].hcn,obj[i].isactive)]
-            print(wrklist)
-            return JsonResponse(wrklist)
-        except ValueError as e:
-            return JsonResponse({'status':'failed','info':e.args[0]})
-
-@api_view(['POST'])
-def savewrkactv(request):
-        try:
-            var = JSONParser().parse(request)
-            obj = create_workshop.objects.filter(hcn = var.get('workshop'))
-            obj.update(isactive = var.get('isactive'))
-            print(obj.values())
-            return JsonResponse({'status':'saved'})
-        except ValueError as e:
-            return JsonResponse({'status':'failed','info':e.args[0]})
-
-@api_view(['POST'])
-def awssubmit(request):
-        try:
-            var = JSONParser().parse(request)
-            selectedworkshop = var.get('selectedworkshop')
-            wrkdet = create_workshop.objects.filter(hcn = selectedworkshop)
-            dict={}
-            clist=[]
-            hcn = wrkdet[0].hcn
-            getdet = ElsiCollegeDtls.objects.filter(college_name = hcn)
-            startdate = wrkdet[0].startdate
-            enddate = wrkdet[0].enddate
-            filldate = var.get('filldate')
-            startdate = datetime.strptime(startdate, '%Y-%m-%d')
-            day1 = startdate.strftime("%A")
-            startdate = datetime.strftime(startdate,'%B %d, %Y')
-            enddate = datetime.strptime(enddate, '%Y-%m-%d')
-            day2 = enddate.strftime("%A")
-            enddate = datetime.strftime(enddate,'%B %d, %Y')
-            filldate = datetime.strptime(filldate, '%Y-%m-%d')
-            filldate = datetime.strftime(filldate,'%B %d, %Y')
-            venueadd = wrkdet[0].venueadd
-            cooname = wrkdet[0].cooname
-            cooemail = wrkdet[0].cooemail
-            coono = wrkdet[0].coono
-            state = var.get('state')
-            districts = var.get('district')
-            c = ElsiCollegeDtls.objects.all()
-            count=0
-            for c in c.values('lab_inaugurated'):
-                if c.get('lab_inaugurated') == 1:
-                    count=count+1
-            obj1 = ElsiCollegeDtls.objects.filter(state = state)
-            if obj1.count() >= 1:
-                for district in districts:
-                    obj2 = ElsiCollegeDtls.objects.filter(district = district)
-                    if obj2.count() >= 1:
-                        for rows in list(obj2.values()) :
-                            clist = clist + [(rows['college_name'])]
-                if len(clist) == 0:
-                    return JsonResponse({'key':'nodata'})
-                else:
-                    dict['bcc'] = clist
-                    print(dict)
-                    subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): +\
-                     Invitation to Attend the Two Day Workshop at " + hcn +", " + getdet[0].district +", " + getdet[0].state
-                    body = render_to_string(os.path.join(STATIC_DIR,'announce_workshop.html'),
-                    {'venueadd':venueadd,'cooname': cooname,'cooemail':cooemail, 'coono':coono, 'hcn':hcn ,'hcnstate':getdet[0].state,
-                        'hcndistrict':getdet[0].district,'count':count,'startdate':startdate,'enddate':enddate,'day1':day1,'day2':day2,'filldate':filldate})
-                    dict['subject']=subject
-                    dict['body']=body
-                    dict['attachments'] = {'pamp':'Pamphlet2020.pdf','LoI':'letter-of-intent.docx'}
-                    dict['attachmentlinks'] = {'pamp':'https://www.e-yantra.org/img/Pamphlet2020.pdf','LoI':'http://elsi.e-yantra.org/eyrtc/downloads/loi'}
-                    return JsonResponse(dict)
-            else:
-                return JsonResponse({'key':'nodata'})
-        except ValueError as e:
-            return JsonResponse({'status':'failed','info':e.args[0]})
-
-@api_view(['POST'])
-def awsapprove(request):
         try:
             #print(request.data.get('file1'))
             #print(request.data.get('file2'))
@@ -1535,8 +1143,8 @@ def awsapprove(request):
         except ValueError as e:
             return Response(e.args[0],status.HTTP_400_BAD_REQUEST)
 
-@api_view(['POST'])
-def awsgsave(request):
+
+def gsave(request):
     to = request.data.get('remail')
     user = request.data.get('user')
     if type(request.data.get('cc')) == list:
@@ -1592,9 +1200,115 @@ def awsgsave(request):
     for i in range(len(fn)):
         os.remove(os.path.join(BASE_DIR,fn[i]))
     return JsonResponse({'status':'saved to draft'})
+######################
+
+######################
+#workshop announcement
+
+def cwssubmit(request):
+        try:
+            var = JSONParser().parse(request)
+            clgid = ElsiCollegeDtls.objects.filter(college_name = var.get('hcn'))[0].id
+            serializer = CreateWorkshop(data={'clgid':clgid,'hcn':var.get('hcn'),'startdate':var.get('startdate'),
+                'enddate':var.get('enddate'),'venueadd':var.get('venueadd'),'cooname':var.get('cooname'),
+                'cooemail':var.get('cooemail'),'coono':var.get('coono')})
+            #print(serializer.is_valid())
+            if serializer.is_valid():
+                serializer.save()
+                print('done')
+                return JsonResponse({'status': 'Created Successfully'})
+            else:
+                print('failure')
+                return JsonResponse({'status': 'Problem in Serializing'})
+        except ValueError as e:
+            return JsonResponse({'status':'failed','info':e.args[0]})
 
 
-@api_view(['POST'])
+def getwrklist(request):
+        try:
+            obj = create_workshop.objects.all()
+            wrklist = {}
+            for i in range(obj.count()):
+                if "list" in wrklist:
+                    wrklist["list"].append((obj[i].hcn,obj[i].isactive))
+                else:
+                    wrklist["list"] = [(obj[i].hcn,obj[i].isactive)]
+            print(wrklist)
+            return JsonResponse(wrklist)
+        except ValueError as e:
+            return JsonResponse({'status':'failed','info':e.args[0]})
+
+
+def savewrkactv(request):
+        try:
+            var = JSONParser().parse(request)
+            obj = create_workshop.objects.filter(hcn = var.get('workshop'))
+            obj.update(isactive = var.get('isactive'))
+            print(obj.values())
+            return JsonResponse({'status':'saved'})
+        except ValueError as e:
+            return JsonResponse({'status':'failed','info':e.args[0]})
+
+
+def awssubmit(request):
+        try:
+            var = JSONParser().parse(request)
+            selectedworkshop = var.get('selectedworkshop')
+            wrkdet = create_workshop.objects.filter(hcn = selectedworkshop)
+            dict={}
+            clist=[]
+            hcn = wrkdet[0].hcn
+            getdet = ElsiCollegeDtls.objects.filter(college_name = hcn)
+            startdate = wrkdet[0].startdate
+            enddate = wrkdet[0].enddate
+            filldate = var.get('filldate')
+            startdate = datetime.strptime(startdate, '%Y-%m-%d')
+            day1 = startdate.strftime("%A")
+            startdate = datetime.strftime(startdate,'%B %d, %Y')
+            enddate = datetime.strptime(enddate, '%Y-%m-%d')
+            day2 = enddate.strftime("%A")
+            enddate = datetime.strftime(enddate,'%B %d, %Y')
+            filldate = datetime.strptime(filldate, '%Y-%m-%d')
+            filldate = datetime.strftime(filldate,'%B %d, %Y')
+            venueadd = wrkdet[0].venueadd
+            cooname = wrkdet[0].cooname
+            cooemail = wrkdet[0].cooemail
+            coono = wrkdet[0].coono
+            state = var.get('state')
+            districts = var.get('district')
+            c = ElsiCollegeDtls.objects.all()
+            count=0
+            for c in c.values('lab_inaugurated'):
+                if c.get('lab_inaugurated') == 1:
+                    count=count+1
+            obj1 = ElsiCollegeDtls.objects.filter(state = state)
+            if obj1.count() >= 1:
+                for district in districts:
+                    obj2 = ElsiCollegeDtls.objects.filter(district = district)
+                    if obj2.count() >= 1:
+                        for rows in list(obj2.values()) :
+                            clist = clist + [(rows['college_name'])]
+                if len(clist) == 0:
+                    return JsonResponse({'key':'nodata'})
+                else:
+                    dict['bcc'] = clist
+                    print(dict)
+                    subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): +\
+                     Invitation to Attend the Two Day Workshop at " + hcn +", " + getdet[0].district +", " + getdet[0].state
+                    body = render_to_string(os.path.join(STATIC_DIR,'announce_workshop.html'),
+                    {'venueadd':venueadd,'cooname': cooname,'cooemail':cooemail, 'coono':coono, 'hcn':hcn ,'hcnstate':getdet[0].state,
+                        'hcndistrict':getdet[0].district,'count':count,'startdate':startdate,'enddate':enddate,'day1':day1,'day2':day2,'filldate':filldate})
+                    dict['subject']=subject
+                    dict['body']=body
+                    dict['attachments'] = {'pamp':'Pamphlet2020.pdf','LoI':'letter-of-intent.docx'}
+                    dict['attachmentlinks'] = {'pamp':'https://www.e-yantra.org/img/Pamphlet2020.pdf','LoI':'http://elsi.e-yantra.org/eyrtc/downloads/loi'}
+                    return JsonResponse(dict)
+            else:
+                return JsonResponse({'key':'nodata'})
+        except ValueError as e:
+            return JsonResponse({'status':'failed','info':e.args[0]})
+
+
 def awsedit(request):
     var = JSONParser().parse(request)
     sw = var.get('selectedworkshop')
@@ -1607,7 +1321,7 @@ def awsedit(request):
     }
     return JsonResponse(data)
 
-@api_view(['POST'])
+
 def awssave(request):
     var = JSONParser().parse(request)
     data = create_workshop.objects.filter(id = var.get('wid'))
@@ -1623,25 +1337,6 @@ def awssave(request):
 
 ######################
 # workshop team algo
-
-@api_view(['POST'])
-def getlang(request):
-    try:
-        obj = memberdetail.objects.all()
-        lang = {}
-        for i in range(obj.count()):
-            if obj[i].language:
-                x = list((obj[i].language).split(','))
-                for i in x:
-                    if "list" in lang:
-                        if i not in lang['list']:
-                            lang["list"].append(i)
-                    else:
-                        lang["list"] = [i]
-        print(lang)
-        return JsonResponse(lang)
-    except ValueError as e:
-        return JsonResponse({'status':'failed','info':e.args[0]})
 
 def algo_for_available_mem(spl_mem_available,workshop_lead,ranked_data,availcriteria,lang,tcntt):
     print('here are available members')
@@ -1710,7 +1405,7 @@ def algo_for_available_mem(spl_mem_available,workshop_lead,ranked_data,availcrit
 
     return workshop_lead,ranked_data,msg
 
-@api_view(['POST'])
+
 def algo_for_willing_mem(request):
     var = JSONParser().parse(request)
     lang = var.get('lang')
@@ -1839,7 +1534,7 @@ def algo_for_willing_mem(request):
 
 
 
-@api_view(['POST'])
+
 def mailids(request):
     objs = memberdetail.objects.filter(team = '1')
     print(objs)
@@ -1887,7 +1582,7 @@ def headapproval(request,uid,wid):
             data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,personal_or_any_other = '1')
     return render(request,'headapproval.html',context={'uuid':uid,'wid':wid,'datas':data})
 
-@api_view(['POST'])
+
 def headresults(request):
     var = JSONParser().parse(request)
     print(var.get('uuid'),var.get('wid'),var.get('values'),var.get('names'))
@@ -1917,8 +1612,21 @@ def headresults(request):
             obj.update(approval_personal_or_any_other = values[idx])
     return Response('success')
 
-@api_view(['POST'])
+
 def formdata(request):
+    """This function updates the database with new data filled by the respective Eyantra members for their willingness/unavailability
+    .
+
+     Args:
+      uuid: .
+      wid: .
+      category: .
+      reason:
+      option:
+
+     Returns:
+      Response stating the success of database update.
+    """
     var = JSONParser().parse(request)
     print(var.get('uuid'),var.get('wid'),var.get('category'))
     wrkshp = create_workshop.objects.filter(id = var.get('wid'))
@@ -1938,8 +1646,18 @@ def formdata(request):
         personal_or_any_other = feedreason[6])
     return Response('success')
 
-@api_view(['POST'])
+
 def sendmail(request):
+    """Send mails to respective members of Eyantra team.
+
+     Args:
+      user(Json-obj): The person logged in who is trying to send the mail.
+      selectedworkshop(Json-obj): The college name selected to announce the workshop.
+      label(Json-obj): Denotes the category of label of mail that is being sent.
+
+     Returns:
+      JsonResponse stating the mail was sent successfully or not.
+    """
     var = JSONParser().parse(request)
     user = var.get('user')
     selectedworkshop = var.get('selectedworkshop')
@@ -1994,8 +1712,18 @@ def sendmail(request):
     d['failure'] = flr
     return JsonResponse(d)
 
-@api_view(['POST'])
+
 def headmail(request):
+    """Send mails to respective #eYRC,eYIC,eYRDC,eLSI,web,Course/Other e-Yantra Work,Personal/Any Other heads.
+
+     Args:
+      user(Json-obj): The person logged in who is trying to send the mail.
+      selectedworkshop(Json-obj): The college name selected to announce the workshop.
+      label(Json-obj): Denotes the category of label of mail that is being sent.
+
+     Returns:
+      JsonResponse stating the mail was sent successfully or not.
+    """
     var = JSONParser().parse(request)
     user = var.get('user')
     selectedworkshop = var.get('selectedworkshop')
@@ -2070,8 +1798,16 @@ def headmail(request):
     return JsonResponse(d)
 
 ######################
-@api_view(['POST'])
+
 def gethcn(request):
+    """Get the list of colleges from selected state for hosting the workshop.
+
+     Args:
+      state(Json-obj): Contains the selected state for choosing a host college for workshop.
+
+     Returns:
+      JsonResponse containing the college names of a particular state.
+    """
     var = JSONParser().parse(request)
     state=var.get('state')
     getdet = ElsiCollegeDtls.objects.filter(state = state).order_by('college_name')

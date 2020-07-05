@@ -30,9 +30,9 @@
     <strong id="rid" >Recipient Email ID:</strong>
     <input id="ridi" type="email" v-model="remail" @change="$store.commit('remail', remail)"><br>
     <strong id="cc">CC:</strong>
-    <input id="cci" type="email" v-model="cc" @change="$store.commit('cc', cc)"><br>
+    <input id="cci" type="email" v-model="cc" @change="$store.commit('cc', cc)" multiple><br>
     <strong id="bcc">BCC:</strong>
-    <input id="bcci" type="email" v-model="bcc" @change="$store.commit('bcc', bcc)"><br>
+    <input id="bcci" type="email" v-model="bcc" @change="$store.commit('bcc', bcc)" multiple><br>
     <strong id="name">Name:</strong>
     <input id="namei" type="text" v-model="name" @change="$store.commit('name', name)"><br>
     <strong id="desig">Designation:</strong>
@@ -42,7 +42,7 @@
     <strong id="cname">College Name:</strong>
     <input id="cnamei" type="text" v-model="cname" @change="$store.commit('cname', cname)"><br>
     <div id="recipientstatei">
-        <b-dropdown  v-bind:text="state" >
+        <b-dropdown  v-bind:text="state" class="dropsize">
           <div v-for="(p,i) in statedisdata" v-bind:key='i' >
             <div v-for="(sta,index) in p" v-bind:key='index' >
               <b-dropdown-item @click='selectedstate(sta.state,index)' v-model="state">{{sta.state}}</b-dropdown-item>
@@ -51,7 +51,7 @@
         </b-dropdown>
     </div>
     <div id="recipientdisi">
-        <b-dropdown  v-bind:text="d" >
+        <b-dropdown  v-bind:text="d" class="dropsize">
           <div v-for="(dis,i) in districts" v-bind:key='i'>
             <div v-for="(diss,i) in dis" v-bind:key='i' >
               <b-dropdown-item  @click='selecteddistrict(diss)'>{{diss}}</b-dropdown-item>
@@ -60,7 +60,7 @@
         </b-dropdown>
         </div>
     <strong id="cno">Contact No.:</strong>
-    <input id="cnoi" type="tel" v-model="cno" @change="$store.commit('cno', cno)"><br>
+    <input id="cnoi" type="tel" v-model="cno" @change="$store.commit('cno', cno)" @input="acceptNumber"><br>
     <button id="msub">Submit</button>
     </form>
     <p id="or">-----------------------or------------------------</p>
@@ -185,7 +185,7 @@
    </label><br>
   <div v-if="output.subdiv !== 'A'">
     {{output.subdiv}}
-    <b-dropdown  v-bind:text="detailprop" >
+    <b-dropdown  v-bind:text="detailprop" class="dropsize">
           <div v-for="(dtl,i) in output.tchdtl" v-bind:key='i'>
               <b-dropdown-item @click="chooseDetails(dtl,i)">{{dtl}}</b-dropdown-item>
             </div>
@@ -354,6 +354,7 @@ export default {
       department: this.$store.getters.department,
       cname: this.$store.getters.cname,
       cno: this.$store.getters.cno,
+      scno: '',
       output: this.$store.getters.output,
       items: this.$store.getters.items,
       selected: this.$store.getters.selected,
@@ -757,7 +758,7 @@ export default {
         cname: this.cname,
         state: this.state,
         district: this.district,
-        cno: this.cno
+        cno: this.scno
       })
         .then(output => {
           this.output = output.data
@@ -846,6 +847,11 @@ export default {
           console.log(currentObj.output)
         })
       this.popoverShow2 = false
+    },
+    acceptNumber () {
+      const x = this.cno.replace(/\D/g, '').match(/(\d{0,2})(\d{0,3})(\d{0,3})(\d{0,4})/)
+      this.cno = !x[3] ? (!x[2] ? x[1] : '(' + '+' + x[1] + ')' + ' ' + x[2]) : '(' + '+' + x[1] + ')' + ' ' + x[2] + '-' + x[3] + (x[4] ? '-' + x[4] : '')
+      this.scno = x[1] + x[2] + x[3] + x[4]
     }
   }
 }
@@ -1264,6 +1270,7 @@ top: 52%;
   top:80%;
   left:30%;
 }
+
 tr ,td,thead,table,th{
   padding:0px;
   padding-left:6px;

@@ -84,11 +84,11 @@ white-space:nowrap;
   width: 180px;
 }
 #baritem2{
-top: 150px;
+top: 220px;
 white-space:nowrap
 }
 #baritem3{
-top: 220px;
+top: 150px;
 white-space:nowrap
 }
 #baritem0{
@@ -111,5 +111,9 @@ white-space:nowrap
 a.router-link-exact-active {
   color: #42b983;
 }
-
+.dropsize .dropdown-menu {
+  max-height: 160px;
+  overflow-y: auto;
+  z-index:5;
+}
 </style>

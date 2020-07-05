@@ -155,7 +155,7 @@ class ElsiCollegeDtls(models.Model):
     created_at = models.TextField(blank=True, null=True)
     updated_at = models.TextField(blank=True, null=True)
     normalised_ins_name = models.TextField(blank=True,null=True)
-    
+
     def __str__(self):
         return self.college_name
 
@@ -172,7 +172,7 @@ class create_workshop(models.Model):
     venueadd = models.TextField(blank=True, null=True)
     cooname = models.TextField(blank=True, null=True)
     cooemail = models.EmailField(blank=False,null=False)
-    coono = models.IntegerField(blank=True, null=True)
+    coono = models.TextField(blank=True, null=True)
     isactive = models.CharField(max_length=10,blank=False, null=False, default='True')
     def __str__(self):
         return str(self.id)

@@ -92,10 +92,11 @@ export default new Vuex.Store({
       tcntt: 4,
       selectedworkshop: '',
       wrklist: [],
+      lang: [],
       algoshowing: 'false',
       willcriteria: ['Count of Willingness in Past Running Year', 'Highest Count of Workshop in Past Running Year', 'Linguistics Criteria', 'Count of Total Workshop'],
       availcriteria: ['Highest Count of Workshop in Past Running Year', 'Linguistics Criteria', 'Count of Total Workshop'],
-      lang: '',
+      selectedlang: '',
       algooutput: ''
     }
   },
@@ -355,6 +356,9 @@ export default new Vuex.Store({
     wrklist: state => {
       return state.user.wrklist
     },
+    lang: state => {
+      return state.user.lang
+    },
     algoshowing: state => {
       return state.user.algoshowing
     },
@@ -364,8 +368,8 @@ export default new Vuex.Store({
     availcriteria: state => {
       return state.user.availcriteria
     },
-    lang: state => {
-      return state.user.lang
+    selectedlang: state => {
+      return state.user.selectedlang
     },
     algooutput: state => {
       return state.user.algooutput
@@ -624,6 +628,9 @@ export default new Vuex.Store({
     wrklist (state, payload) {
       state.user.wrklist = payload
     },
+    lang (state, payload) {
+      state.user.lang = payload
+    },
     algoshowing (state, payload) {
       state.user.algoshowing = payload
     },
@@ -633,8 +640,8 @@ export default new Vuex.Store({
     availcriteria (state, payload) {
       state.user.availcriteria = payload
     },
-    lang (state, payload) {
-      state.user.lang = payload
+    selectedlang (state, payload) {
+      state.user.selectedlang = payload
     },
     algooutput (state, payload) {
       state.user.algooutput = payload

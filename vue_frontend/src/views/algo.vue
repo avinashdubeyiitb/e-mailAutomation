@@ -26,17 +26,25 @@
     <div class="dropdown" id="wrki">
   <input v-model="selectedworkshop" class="dropdown-input" type="text" placeholder="Select"  @click="chngclg()"/>
     <div  v-show="selectedworkshop" class="dropdown-list" style="z-index:100; position: fixed;background: #FFFFFF">
-      <div v-for="(p,i) in wrklist" v-bind:key='i' v-show="showing">
-        <div  v-for="(host,index) in p" v-bind:key='index' v-show="itemVisible(host[0])" @click="savehcn(host[0],index)" class="dropdown-item">
+      <div v-for="(p,i) in wrklist" v-bind:key='i' v-show="showing1">
+        <div  v-for="(host,index) in p" v-bind:key='index' v-show="itemVisible1(host[0])" @click="savehcn(host[0],index)" class="dropdown-item">
           {{host[0]}}
         </div>
       </div>
       </div>
   </div>
   <strong id="lang">Preferred Language:</strong>
-  <input id="langi" type="text" v-model="lang" @change="$store.commit('lang', lang)"><br>
+  <div class="dropdown" id="langi">
+    <input  type="text" v-model="selectedlang" class="dropdown-input" @click="chnglang()" placeholder="Select"><br>
+  <div  v-show="selectedlang" class="dropdown-list" style="z-index:100; position: fixed;background: #FFFFFF">
+    <div v-show="showing2" v-for="(p,i) in lang" v-bind:key='i'>
+      <div  v-for="(host,index) in p" v-bind:key='index' v-show="itemVisible2(host[0])" @click="savelang(host[0],index)" class="dropdown-item">
+        {{host}}
+      </div>
+    </div>
+    </div>
+</div>
   <strong id="lwilldrag" >Selection of workshop team from willing members : (Ascending order)</strong><br>
-
   <label id="id1"><strong>&#187; Demo is clear for atleast </strong>
     <label>
   <input v-if = "key1" v-model = "demo"
@@ -117,6 +125,7 @@ export default {
   mounted () {
     console.log('Component mounted.')
     this.workshoplist()
+    this.getlang()
   },
   computed: {
     dragOptions () {
@@ -138,19 +147,36 @@ export default {
       key3: '',
       tcntt: this.$store.getters.tcntt,
       selectedworkshop: this.$store.getters.selectedworkshop,
+      selectedlang: this.$store.getters.selectedlang,
       wrklist: this.$store.getters.wrklist,
-      showing: false,
+      lang: this.$store.getters.lang,
+      showing1: false,
+      showing2: false,
       willcriteria: this.$store.getters.willcriteria,
       availcriteria: this.$store.getters.availcriteria,
-      lang: this.$store.getters.lang,
       output: this.$store.getters.algooutput
     }
   },
   watch: {
   },
   methods: {
+    getlang () {
+      this.axios.post(this.url + '/api/main/getlang', {
+      })
+        .then(lang => {
+          this.lang = lang.data
+          console.log(this.lang)
+          this.$store.commit('lang', this.lang)
+        })
+        .catch(function (error) {
+          this.lang = error
+        })
+    },
     chngclg () {
-      this.showing = true
+      this.showing1 = true
+    },
+    chnglang () {
+      this.showing2 = true
     },
     willupdate (event) {
       this.willcriteria.splice(event.newIndex, 0, this.willcriteria.splice(event.oldIndex, 1)[0])
@@ -166,12 +192,23 @@ export default {
       console.log(host, index)
       this.selectedworkshop = host
       this.$store.commit('selectedworkshop', this.selectedworkshop)
-      this.showing = !this.showing
-      this.$store.commit('algoshowing', this.showing)
+      this.showing1 = !this.showing1
+      this.$store.commit('algoshowing', this.showing1)
     },
-    itemVisible (item) {
+    itemVisible1 (item) {
       const currentName = item.toLowerCase()
       const currentInput = this.selectedworkshop.toLowerCase()
+      return currentName.includes(currentInput)
+    },
+    savelang (host, index) {
+      console.log(host, index)
+      this.selectedlang = host
+      this.$store.commit('selectedlang', this.selectedlang)
+      this.showing2 = !this.showing2
+    },
+    itemVisible2 (item) {
+      const currentName = item.toLowerCase()
+      const currentInput = this.selectedlang.toLowerCase()
       return currentName.includes(currentInput)
     },
     workshoplist () {

@@ -27,7 +27,7 @@
     <form @submit="formSubmit">
       <strong id="hcnstatel">Hcn State:</strong>
       <div id="hcnstate">
-          <b-dropdown  v-bind:text="state" >
+          <b-dropdown  v-bind:text="state" class="dropsize">
             <div v-for="(p,i) in statedisdata" v-bind:key='i' >
               <div v-for="(sta,index) in p" v-bind:key='index' >
                 <b-dropdown-item @click='selectedstate(sta.state,index)' v-model="state">{{sta.state}}</b-dropdown-item>
@@ -52,7 +52,7 @@
     <strong id="startdate">Start Date:</strong>
     <input id="startdatei" type="date" v-model="startdate"><br>
     <strong id="enddate">End Date:</strong>
-    <input id="enddatei" type="date" v-model="enddate"><br>
+    <input id="enddatei" type="date" v-model="enddate" :min=startdate><br>
     <strong id="venueadd">Venue Address:</strong>
     <input id="venueaddi" type="text" v-model="venueadd"><br>
     <strong id="cooname">Coordinator Name:</strong>
@@ -60,13 +60,13 @@
     <strong id="cooemail">Coordinator Email:</strong>
     <input id="cooemaili" type="email" v-model="cooemail"><br>
     <strong id="coono">Coordinator Cont.:</strong>
-    <input id="coonoi" type="tel" v-model="coono"><br>
+    <input id="coonoi" type="tel" v-model="coono" @input="acceptNumber" required><br>
 
     <button id="msub">Submit</button>
     </form>
   </div>
 
-<button id="nsub" @click="discard">New</button>
+<button id="nsub" @click="discard">Clear</button>
 
 <div v-show="success" id="rmsg">
   <p>{{output.status}}</p>
@@ -115,6 +115,7 @@ export default {
       cooname: '',
       cooemail: '',
       coono: '',
+      scoono: '',
       output: '',
       selectedhcn: this.$store.getters.selectedhcn,
       hcn: [],
@@ -171,6 +172,7 @@ export default {
     formSubmit (e) {
       e.preventDefault()
       const currentObj = this
+      console.log(this.scoono)
       this.axios.post('http://localhost:8081/api/main/cwssubmit', {
         hcn: this.selectedhcn,
         startdate: this.startdate,
@@ -178,10 +180,11 @@ export default {
         venueadd: this.venueadd,
         cooname: this.cooname,
         cooemail: this.cooemail,
-        coono: this.coono
+        coono: this.scoono
       })
         .then(output => {
           this.output = output.data
+          console.log(this.output)
           if (this.output.status === 'Created Successfully') {
             this.success = true
           }
@@ -189,6 +192,11 @@ export default {
         .catch(function (error) {
           currentObj.output = error
         })
+    },
+    acceptNumber () {
+      const x = this.coono.replace(/\D/g, '').match(/(\d{0,2})(\d{0,3})(\d{0,3})(\d{0,4})/)
+      this.coono = !x[3] ? (!x[2] ? x[1] : '(' + '+' + x[1] + ')' + ' ' + x[2]) : '(' + '+' + x[1] + ')' + ' ' + x[2] + '-' + x[3] + (x[4] ? '-' + x[4] : '')
+      this.scoono = x[1] + x[2] + x[3] + x[4]
     }
   }
 }
