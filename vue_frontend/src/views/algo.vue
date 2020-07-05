@@ -401,4 +401,9 @@ table, th, td {
   padding:3px;
   padding-left:6px;
 }
+.dropdown-list{
+  max-height: 160px;
+  overflow-y: auto;
+  z-index:5;
+}
 </style>
