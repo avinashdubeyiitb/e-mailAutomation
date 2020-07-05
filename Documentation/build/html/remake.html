@@ -181,9 +181,16 @@
                     generated and the mails will then be sent with the new email provided (For in-depth reference
                     visit this <a target="_blank" href="https://developers.google.com/gmail/api/quickstart/python?authuser=1">link</a> )
                      .</li>
-                     <li>To truncate a table in pgAdmin open the pgAdmin and click on database, then Schemas and then tables ,Then
-                       right click on table which you want to truncate and then select truncate from options. The data will be removed.
-                     Now you can import new data from csv or sql file.</li>
+                     <li>To truncate the tables and import your own data, type one among these commands in psql shell.<br>
+                     <ol>
+                     <li>If user wants a simple truncate to happen<br>
+                       TRUNCATE table_name1,table_name2,....;
+                     </li>
+                     <li>If user wants not only to truncate but also reset associated sequence generator(auto-incrementing field of the table)<br>
+                       TRUNCATE TABLE table_name RESTART IDENTITY;
+                     </li>
+                     </ol>
+                    </li>
                </ol>
              </div>
 
