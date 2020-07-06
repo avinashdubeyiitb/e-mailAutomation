@@ -38,7 +38,7 @@
     <input  type="text" v-model="selectedlang" class="dropdown-input" @click="chnglang()" placeholder="Select"><br>
   <div  v-show="selectedlang" class="dropdown-list" style="z-index:100; position: fixed;background: #FFFFFF">
     <div v-show="showing2" v-for="(p,i) in lang" v-bind:key='i'>
-      <div  v-for="(host,index) in p" v-bind:key='index' v-show="itemVisible2(host[0])" @click="savelang(host[0],index)" class="dropdown-item">
+      <div  v-for="(host,index) in p" v-bind:key='index' v-show="itemVisible2(host)" @click="savelang(host,index)" class="dropdown-item">
         {{host}}
       </div>
     </div>
@@ -101,6 +101,8 @@
     </label><br>
   </div>
   <button id="msub" @click="formSubmit">Submit</button>
+  <button id="nsub" @click="savealgo">Confirm changes!</button>
+
 <p id="rep"> {{output.msg}}</p>
 <table id="rmsg">
   <thead>
@@ -126,6 +128,7 @@ export default {
     console.log('Component mounted.')
     this.workshoplist()
     this.getlang()
+    this.getalgodetail()
   },
   computed: {
     dragOptions () {
@@ -154,12 +157,30 @@ export default {
       showing2: false,
       willcriteria: this.$store.getters.willcriteria,
       availcriteria: this.$store.getters.availcriteria,
-      output: this.$store.getters.algooutput
+      output: this.$store.getters.algooutput,
+      out: '',
+      algodetail: ''
     }
   },
   watch: {
   },
   methods: {
+    getalgodetail () {
+      this.axios.post(this.url + '/api/main/getalgodetail', {
+      })
+        .then(algodetail => {
+          this.algodetail = algodetail.data
+          console.log(this.algodetail)
+          this.$store.commit('demo', this.algodetail.demo)
+          this.$store.commit('tcnt', this.algodetail.tcnt)
+          this.$store.commit('tcntt', this.algodetail.tcntt)
+          this.$store.commit('willcriteria', this.algodetail.willcriteria)
+          this.$store.commit('availcriteria', this.algodetail.availcriteria)
+        })
+        .catch(function (error) {
+          this.algodetail = error
+        })
+    },
     getlang () {
       this.axios.post(this.url + '/api/main/getlang', {
       })
@@ -221,6 +242,23 @@ export default {
         })
         .catch(function (error) {
           this.wrklist = error
+        })
+    },
+    savealgo () {
+      this.axios.post(this.url + '/api/main/savealgo', {
+        willcriteria: this.willcriteria,
+        availcriteria: this.availcriteria,
+        lang: this.lang,
+        tcnt: this.tcnt,
+        tcntt: this.tcntt,
+        demo: this.demo
+      })
+        .then(out => {
+          this.out = out.data
+          console.log(this.out)
+        })
+        .catch(function (error) {
+          this.out = error
         })
     },
     formSubmit (e) {
@@ -373,8 +411,8 @@ color: #000000;
 }
 #msub{
 position: absolute;
-left:47%;
-top: 25%;
+left:49%;
+top: 93%;
 }
 #langi{
 position: absolute;
@@ -395,6 +433,11 @@ top: 15%;
   width:25px;
   height:22px;
 }
+#nsub{
+  position: absolute;
+  left:37%;
+  top: 93%;
+}
 table, th, td {
   border: 1px solid black;
   border-collapse: collapse;
@@ -404,6 +447,6 @@ table, th, td {
 .dropdown-list{
   max-height: 160px;
   overflow-y: auto;
-  z-index:5;
+  z-index:10000;
 }
 </style>
