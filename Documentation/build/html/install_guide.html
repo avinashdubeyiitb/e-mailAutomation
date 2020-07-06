@@ -148,7 +148,8 @@
 <div class="section">
   <h6 id="id2">QuickStart: For testing the app</h6>
   <p>Here is a quickstart guide it is highly recommanded that you first follow this guide and then make changes according to
-  your needs this guide will help you to start the app and then test with dummy data.</p>
+  your needs this guide will help you to start the app and then test with dummy data.Few steps will be different for Linux 
+  and Windows, so they are accordingly provided.</p>
   <ol>
     <li>Clone the git repo. by downloading the zip or by git command <a target="_blank" href="https://github.com/SabanwarVivek/5_Email_Automation_and_Spatial_Analysis_A.git">link</a>.<br>
       By zip:
@@ -157,6 +158,8 @@
       </ul>
       By git commands:
       <ul>
+        <li>To install git on your machine, follow refer this<br>
+           <a target="_blank" href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git">Install Git</a></li>
         <li>Create a Folder, name it whatever you like.</li>
         <li>Open the terminal within that folder.</li>
         <li>Type <br>
@@ -171,9 +174,8 @@
           </ul>
             </li>
       </ul>
-      <li>For some big folders which are not present in git repo. consider downloading them from this
-        emails <u>5a.eysip2020@gmail.com</u> Google Drive and save these folders in the vue_frontend/app folder.</li>
-     </li>
+      <li><b>For Windows --></b></li>
+      <li>To install python, refer this <a target="_blank" href="https://www.python.org/downloads/">Download Python</a></li>
      <li>Run command pip install virtualenv in base project directory.<br>
       Setup your virtual environment named 'venv' by writing this command <br>
      virtualenv venv</li>
@@ -182,11 +184,27 @@
     and then type activate <br>
     Your virtualenv will get activated.
     </li>
-    <li><p>You need to install the postgres and pgAdmin <a target="_blank" href="(https://www.pgadmin.org/ )">(https://www.pgadmin.org/ ) </a>for using postgres sql. For full guide on how to
+    <li><b>For Linux --></b></li>
+    <li>To install python, refer this<a target="_blank" href="https://docs.python-guide.org/starting/install3/linux/">Download Python</a></li>
+    <li>Run the command sudo pip install virtualenv in base project directory.<br>
+      Setup your virtual environment named 'venv' by writing this command <br>
+     virtualenv venv
+    </li>
+    <li>Switch to your virtual environment by:<br>
+      type the following command in base project directory <br>
+      source venv/bin/activate<br>
+      Your virtualenv will get activated.
+      </li>
+    <li><p>You need to install the postgres and pgAdmin <a target="_blank" href="https://www.pgadmin.org/">(https://www.pgadmin.org/ ) </a>for using postgres sql. For full guide on how to
       install please refer this <a target="_blank" href="https://www.youtube.com/watch?v=d--mEqEUybA&feature=youtu.be"> link</a>. <br></p></li>
-      <li>After installing , open the pgAdmin by searching in search bar for pgadmin, click on it and a new window will open in browser
+      <li><b>For Windows --></b> After installing , open the pgAdmin by searching in search bar for pgadmin, click on it and a new window will open in browser
       . Click on servers then right click on PostgreSQL select create and then database. Name the database whatever you like.</li>
-      <li>Now in test_database folder we have a dump file of pgsql. <br>
+      <li><b>For Linux --></b> Start the pgadmin server by typing $pgadmin4 in the terminal within the developed virtual
+      environment and then choose to create a server, there in fill the required details of name of server, username
+      , password, host and then save the changes.This will create a server and then expand the tabs and then choose
+      create the database. Name the database whatever you like</li>
+      <li>Now in test_database folder we have a dump file of pgsql.</li>
+      <li><b>For Windows --> </b>
         To import its data into pgAdmin open command prompt with administrator rights,
         also make sure that your environment variables path are set for that particular location if not, then set the environment
         variables path. Type the following command <br>
@@ -208,9 +226,14 @@
         </li>
         <li>Reopen Command prompt window, and then run the respective command.</li>
       </ul></li>
+      <li><b>For Linux --> </b>Type the command :<br>
+        psql -U username -h host dbname < dbexport.pgsql <br>
+        Example: <br>
+        psql -U posgtres -h localhost elsi < data.pgsql
+      </li>
       <li>Now database is ready.</li>
-      <li>Now run command `pip install -r requirements.txt` in directory django_backend/app .</li>
-      <li>In django_backend/app/app you will see the settings.py file open it. <br>
+      <li>Now run command `pip install -r requirements.txt` in directory django_backend .</li>
+      <li>In django_backend/app you will see the settings.py file open it. <br>
             There you will find <br>
              &emsp;&emsp;&emsp;&emsp;&emsp; DATABASES = { <br>
              &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;    'default': { <br>
@@ -225,24 +248,26 @@
          postgres pgAdmin username and password, HOST denotes server. <br>
          Change the NAME according to database name you created and all other fileds respectively.
        </li>
-      <li>Now in django_backend/app folder open cmd and follow with these commands<br>
+      <li>Now in django_backend folder open cmd and follow with these commands<br>
         <ol>
           <li>python manage.py makemigrations 	&#60;appname&#62; <br>
           -->python manage.py makemigrations main </li>
-          <li>python manage.py migrate</li>
+          <li>python manage.py migrate main</li>
           <li>for creating superuser for django admin: python manage.py createsuperuser</li>
           <li>then finally python manage.py runserver &#60;port&#62; <br>
           -->python manage.py runserver 8081 </li>
         </ol>
-        The backend sever will start at localhost 8081. <br>
+        The backend sever will start at localhost:8081. <br>
     To visit the django admin panel type in browser http://127.0.0.1:8081/admin and enter the superuser credentials. <br>
     <strong>Note: </strong>If you want to change localhost server on different port just change 8081 with your preferred port
     and provide the same port in settings tab present in GUI of app .
         </li>
-      <li>Similarly open cmd in vue_frontend/app.</li>
-      <li>Type: npm run electron:serve. <br>
+      <li>Now open cmd in vue_frontend.(install nodejs and npm first for Windows -> <a target="_blank" href="https://nodejs.org/en/download/">link</a> and for Linux -> 
+        <a target="_blank" href="https://websiteforstudents.com/how-to-install-node-js-and-npm-on-ubuntu-16-04-18-04-via-apt-and-snap/">link</a>)</li>
+      <li>Type: npm install ,this will install all the dependencies</li>
+      <li>And then type: npm run electron:serve. <br>
         <strong>Note: </strong> If you want to run the app in production environment : <br>
-        Open the command prompt in vue_frontend/app folder and follow these steps: <br>
+        Open the command prompt in vue_frontend folder and follow these steps: <br>
         <ol>
           <li>npm run electron: build</li>
         </ol>
@@ -281,7 +306,7 @@ psql –U postgres elsi < C:\example\data.pgsql  <br>
   <li>If user wants a simple truncate to happen<br>
     TRUNCATE table_name1,table_name2,....;
   </li>
-  <li>If user wants not only to truncate but also reset associated sequence generator(auto-incrementing field with table)<br>
+  <li>If user wants not only to truncate but also reset associated sequence generator(auto-incrementing field of the table)<br>
     TRUNCATE TABLE table_name RESTART IDENTITY;
   </li>
   </ol>
