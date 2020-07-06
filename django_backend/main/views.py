@@ -1639,8 +1639,8 @@ def getalgodetail(request):
 @api_view(['POST'])
 def savealgo(request):
     var = JSONParser().parse(request)
-    willcriteria = var.get('willcriteria')
-    availcriteria = var.get('availcriteria')
+    willcriteria = ','.join(var.get('willcriteria'))
+    availcriteria = ','.join(var.get('availcriteria'))
     lang = var.get('lang')
     tcnt = var.get('tcnt')
     tcntt = var.get('tcntt')
@@ -1655,8 +1655,8 @@ def savealgo(request):
             availcriteria = availcriteria)
     else:
         serializer = AlgoDetailSerializer(data = {'demo_module_cnt': 4,'will_ttl_wrkshp_cnt' : 4,
-                    'aval_ttl_wrkshp_cnt' : 4, 'willcriteria' : 'Count of Willingness in Past Running Year, Highest Count of Workshop in Past Running Year, Linguistics Criteria, Count of Total Workshop'
-,'availcriteria' : 'Highest Count of Workshop in Past Running Year, Linguistics Criteria, Count of Total Workshop'})
+                    'aval_ttl_wrkshp_cnt' : 4, 'willcriteria' : 'Count of Willingness in Past Running Year,Highest Count of Workshop in Past Running Year,Linguistics Criteria,Count of Total Workshop'
+,'availcriteria' : 'Highest Count of Workshop in Past Running Year,Linguistics Criteria,Count of Total Workshop'})
         print(serializer)
         if serializer.is_valid():
             serializer.save()
@@ -1767,6 +1767,7 @@ def algo_for_willing_mem(request):
     demo = int(var.get('demo'))
     tcnt = int(var.get('tcnt'))
     tcntt = int(var.get('tcntt'))
+    print(tcntt)
     for i in willcriteria:
         if i == 'Count of Willingness in Past Running Year':
             willctr.append(2)

@@ -49,8 +49,7 @@
     <label>
   <input v-if = "key1" v-model = "demo"
   @blur= "key1 = false; $emit('update')"
-  @keyup.enter = "key1=false; $emit('update')" id="inp"
-  @change="$store.commit('demo', demo)">
+  @keyup.enter = "key1=false; $emit('update')" id="inp">
     <label v-else @click = "key1 = true;"> {{demo}}</label>
     <strong> modules .</strong>
   </label>
@@ -71,8 +70,7 @@
       <label>
     <input v-if = "key2" v-model = "tcnt"
     @blur= "key2 = false; $emit('update')"
-    @keyup.enter = "key2=false; $emit('update')" id="inp"
-    @change="$store.commit('tcnt', tcnt)">
+    @keyup.enter = "key2=false; $emit('update')" id="inp">
       <label v-else @click = "key2 = true;"> {{tcnt}}</label>
       <strong> .</strong>
     </label>
@@ -93,8 +91,7 @@
       <label>
     <input v-if = "key3" v-model = "tcntt"
     @blur= "key3 = false; $emit('update')"
-    @keyup.enter = "key3=false; $emit('update')" id="inp"
-    @change="$store.commit('tcntt', tcntt)">
+    @keyup.enter = "key3=false; $emit('update')" id="inp">
       <label v-else @click = "key3 = true;"> {{tcntt}}</label>
       <strong> .</strong>
     </label>
@@ -144,19 +141,19 @@ export default {
     return {
       url: this.$store.getters.url,
       key1: '',
-      demo: this.$store.getters.demo,
+      demo: '',
       key2: '',
-      tcnt: this.$store.getters.tcnt,
+      tcnt: '',
       key3: '',
-      tcntt: this.$store.getters.tcntt,
+      tcntt: '',
       selectedworkshop: this.$store.getters.selectedworkshop,
       selectedlang: this.$store.getters.selectedlang,
       wrklist: this.$store.getters.wrklist,
       lang: this.$store.getters.lang,
       showing1: false,
       showing2: false,
-      willcriteria: this.$store.getters.willcriteria,
-      availcriteria: this.$store.getters.availcriteria,
+      willcriteria: [],
+      availcriteria: [],
       output: this.$store.getters.algooutput,
       out: '',
       algodetail: ''
@@ -171,11 +168,11 @@ export default {
         .then(algodetail => {
           this.algodetail = algodetail.data
           console.log(this.algodetail)
-          this.$store.commit('demo', this.algodetail.demo)
-          this.$store.commit('tcnt', this.algodetail.tcnt)
-          this.$store.commit('tcntt', this.algodetail.tcntt)
-          this.$store.commit('willcriteria', this.algodetail.willcriteria)
-          this.$store.commit('availcriteria', this.algodetail.availcriteria)
+          this.demo = this.algodetail.demo
+          this.tcnt = this.algodetail.tcnt
+          this.tcntt = this.algodetail.tcntt
+          this.willcriteria = this.algodetail.willcriteria
+          this.availcriteria = this.algodetail.availcriteria
         })
         .catch(function (error) {
           this.algodetail = error
@@ -201,12 +198,10 @@ export default {
     },
     willupdate (event) {
       this.willcriteria.splice(event.newIndex, 0, this.willcriteria.splice(event.oldIndex, 1)[0])
-      this.$store.commit('willcriteria', this.willcriteria)
       console.log(this.willcriteria)
     },
     availupdate (event) {
       this.availcriteria.splice(event.newIndex, 0, this.availcriteria.splice(event.oldIndex, 1)[0])
-      this.$store.commit('availcriteria', this.availcriteria)
       console.log(this.availcriteria)
     },
     savehcn (host, index) {
@@ -265,7 +260,7 @@ export default {
       e.preventDefault()
       this.output = []
       this.$store.commit('algooutput', this.output)
-      console.log(this.selectedworkshop)
+      console.log(this.tcnt)
       this.axios.post(this.url + '/api/main/algo', {
         selectedworkshop: this.selectedworkshop,
         willcriteria: this.willcriteria,
