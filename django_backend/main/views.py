@@ -46,9 +46,8 @@ import time
 import pandas as pd
 import urllib.parse
 from time import sleep
-
-def trial(request):
-    return render(request,'trial.html')
+import platform
+from pathlib import Path
 
 #############################################################################################################
 # from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
@@ -202,7 +201,42 @@ SCOPES = [
 ]
 ###############################
 # common functions
-import email
+
+@api_view(['POST'])
+def download(request):
+    var = JSONParser().parse(request)
+    mid = var.get('messageid')
+    credentials = get_credentials()
+    service = build('gmail', 'v1', credentials=credentials)
+    msg = service.users().messages().get(userId='me', id=mid,format = 'full').execute()
+    tmp = msg.get("payload").get("headers")
+    downloads_path = str(Path.home() / "Downloads")
+    print(downloads_path)
+    attachments = []
+    for idx in range(len(tmp)):
+        if tmp[idx]['name'] == 'Subject' or  tmp[idx]['name'] == 'subject':
+            subject = tmp[idx]['value']
+    for part in msg['payload'].get('parts'):
+        if part['filename']:
+            file_name = part['filename']
+            idx = file_name.rindex(".")
+            now = str(datetime.now())[:19]
+            now = now.replace(":","_")
+            file_name = file_name[:idx]+"_"+str(now)+file_name[idx:]
+            attachments.append(file_name)
+            if 'data' in part['body']:
+                data=part['body']['data']
+            else:
+                att_id=part['body']['attachmentId']
+                att=service.users().messages().attachments().get(userId='me', messageId=mid,id=att_id).execute()
+                data=att['data']
+            file_data = base64.urlsafe_b64decode(data.encode('UTF-8'))
+            path = os.path.join(downloads_path,file_name)
+            with open(path, 'wb') as f:
+                f.write(file_data)
+    print(attachments)
+    return JsonResponse({'status':'downloaded'})
+
 @api_view(['POST'])
 def getmdtl(request):
     var = JSONParser().parse(request)
@@ -226,7 +260,7 @@ def getmdtl(request):
                 pass
     if var.get('type') == 'inbox' :
         body = msg.get("payload").get("parts")[1].get('body')
-        if not body:
+        if body.get('attachmentId'):
             body = msg.get("payload").get("parts")[0].get('parts')[1].get('body')
     else :
         body = msg.get("payload").get("parts")[0].get('body')
@@ -752,7 +786,10 @@ def getname(name):
     options.add_argument('--headless')
     options.add_argument("--silent")
     options.add_argument('--ignore-certificate-errors')
-    file_path = os.path.join(ASSETS_DIR,'chromedriver.exe')
+    if platform.system() == 'Windows':
+        file_path = os.path.join(ASSETS_DIR,'chromedriver.exe')
+    else :
+        file_path = os.path.join(ASSETS_DIR,'chromedriver')
     driver = webdriver.Chrome(executable_path=file_path, options=options) #path to chromedriver.exe
     def test(name):
         q1= urllib.parse.quote(name)

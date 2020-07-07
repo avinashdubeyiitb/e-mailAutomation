@@ -152,7 +152,8 @@ export default {
       success: false,
       showing: true,
       wrklist: [],
-      selectedworkshop1: ''
+      selectedworkshop1: '',
+      isactive: ''
     }
   },
   watch: {
@@ -178,6 +179,7 @@ export default {
           currentObj.workshoplist()
           if (currentObj.selectedworkshop === currentObj.selectedworkshop1 && currentObj.isactive === 'False') {
             currentObj.selectedworkshop = ''
+            this.$store.commit('awsselectedworkshop', '')
           }
         })
         .catch(function (error) {
@@ -260,6 +262,7 @@ export default {
           if (this.output.status === 'Created Successfully') {
             this.success = true
           }
+          this.workshoplist()
         })
         .catch(function (error) {
           currentObj.output = error

@@ -320,7 +320,7 @@ export default {
       this.result = 'sending mails'
       this.axios.post(this.url + '/api/main/headmail', {
         selectedworkshop: this.selectedworkshop,
-        label: 'tam',
+        label: 'willingness-unavailability',
         user: this.$store.getters.user_name
       })
         .then(function (response) {
@@ -336,7 +336,7 @@ export default {
       this.result = 'sending mails'
       this.axios.post(this.url + '/api/main/sendmail', {
         selectedworkshop: this.selectedworkshop,
-        label: 'tsm',
+        label: 'willingness-unavailability',
         user: this.$store.getters.user_name
       })
         .then(function (response) {
@@ -472,7 +472,7 @@ export default {
       formData.append('bcc', this.output.bcc)
       formData.append('body', this.output.body)
       formData.append('subject', this.output.subject)
-      formData.append('label', 'aws')
+      formData.append('label', 'invite-for-workshop')
       const currentObj = this
       e.preventDefault()
       this.axios.post(this.url + '/api/main/aws/approve', formData,

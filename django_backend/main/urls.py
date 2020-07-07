@@ -3,7 +3,6 @@ from main import views
 from django.urls import path
 from django.contrib import admin
 urlpatterns = [
-    url(r'^api/notmain',views.trial),
     url(r'^api/main/submit', views.submit),
     url(r'^api/main/approve', views.approve),
     url(r'^api/main/gsave', views.gsave),
@@ -35,6 +34,7 @@ urlpatterns = [
     url(r'^api/main/logout',views.authlogout),
     url(r'^api/main/stats',views.stats),
     url(r'^api/main/getmdtl',views.getmdtl),
+    url(r'^api/main/download',views.download),
     # url(r'^api/public/', views.public),
     # url(r'^api/private/', views.private),
     # url(r'^api/main/google', views.GoogleLogin),

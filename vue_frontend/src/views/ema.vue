@@ -53,6 +53,7 @@
                   <div v-show="reqdata.attachments === 'loading'">{{reqdata.attachments}}</div>
                 </b-container>
                 <b-button @click="$bvModal.hide('msent'+idx)">OK</b-button>
+                <b-button @click="download('sent',id[1])" class="float-right">Download</b-button>
                 </b-modal>
               </div>
       </b-dropdown>
@@ -97,6 +98,7 @@ Draft
                   <div v-show="reqdata.attachments === 'loading'">{{reqdata.attachments}}</div>
                 </b-container>
                 <b-button @click="$bvModal.hide('mdraft'+idx)">OK</b-button>
+                <b-button @click="download('draft',id[1])" class="float-right">Download</b-button>
                 </b-modal>
               </div>
       </b-dropdown>
@@ -141,6 +143,7 @@ Inbox
                   <div v-show="reqdata.attachments === 'loading'">{{reqdata.attachments}}</div>
                 </b-container>
                 <b-button @click="$bvModal.hide('minbox'+idx)">OK</b-button>
+                <b-button @click="download('inbox',id[1])" class="float-right">Download</b-button>
                 </b-modal>
               </div>
       </b-dropdown>
@@ -173,6 +176,18 @@ export default {
     }
   },
   methods: {
+    download (label, mid) {
+      this.axios.post(this.url + '/api/main/download', {
+        messageid: mid,
+        type: label
+      })
+        .then(function (response) {
+          console.log('Downloaded')
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    },
     getmdtl (label, mid) {
       if (this.reqdata !== '') {
         this.reqdata.subject = 'loading'

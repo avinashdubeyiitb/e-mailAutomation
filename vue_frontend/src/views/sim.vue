@@ -573,7 +573,7 @@ export default {
         formData.append('file2send2', Object.values({ pamp: 'Pamphlet2020.pdf', LoI: 'letter-of-intent.docx' }))
       }
       formData.append('list', this.selected)
-      formData.append('label', 'sim')
+      formData.append('label', 'information-mail')
       formData.append('user', this.$store.getters.user_name)
       const currentObj = this
       this.axios.post(this.url + '/api/main/csv/approve', formData,
@@ -780,7 +780,7 @@ export default {
       formData.append('bcc', this.output.bcc)
       formData.append('body', this.output.body)
       formData.append('subject', this.output.subject)
-      formData.append('label', 'sim')
+      formData.append('label', 'information-mail')
       formData.append('user', this.$store.getters.user_name)
       e.preventDefault()
       const currentObj = this
