@@ -334,6 +334,7 @@ def stats(request):
                 if m[i]['threadId'] == msg[j]['threadId']:
                     tmp = service.users().messages().get(userId='me', id=msg[j]['id']).execute()
                     #print(tmp)
+                    f = None;t = None
                     for l in range(len(tmp['payload']['headers'])):
                         if tmp['payload']['headers'][l]['name'] == 'From':
                             print(lbl[idx],tmp['payload']['headers'][l]['value'])
@@ -346,19 +347,20 @@ def stats(request):
                             if t.find('<') != -1:
                                 t = t[t.index('<')+1:t.index('>')]
                             break
-                    for a in range(len(dct['Inbox'])):
-                        if dct['Inbox'][a]['user'] == t:
-                            break
-                    else:
-                        a = len(dct['Inbox'])
-                        dct['Inbox'].append({'user':t,'Data':[]})
-                    for b in range(len(dct['Inbox'][a]['Data'])):
-                        if dct['Inbox'][a]['Data'][b]['label'] == lbl[idx]:
-                            dct['Inbox'][a]['Data'][b]['count'] +=1
-                            dct['Inbox'][a]['Data'][b]['clist'].append((f,tmp['id']))
-                            break
-                    else:
-                        dct['Inbox'][a]['Data'].append({'label':lbl[idx],'count':1,'clist':[(f,tmp['id'])]})
+                    if f and t :
+                        for a in range(len(dct['Inbox'])):
+                            if dct['Inbox'][a]['user'] == t:
+                                break
+                        else:
+                            a = len(dct['Inbox'])
+                            dct['Inbox'].append({'user':t,'Data':[]})
+                        for b in range(len(dct['Inbox'][a]['Data'])):
+                            if dct['Inbox'][a]['Data'][b]['label'] == lbl[idx]:
+                                dct['Inbox'][a]['Data'][b]['count'] +=1
+                                dct['Inbox'][a]['Data'][b]['clist'].append((f,tmp['id']))
+                                break
+                        else:
+                            dct['Inbox'][a]['Data'].append({'label':lbl[idx],'count':1,'clist':[(f,tmp['id'])]})
     print(dct)
     return JsonResponse(dct)
 
