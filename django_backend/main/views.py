@@ -1658,6 +1658,47 @@ def awssave(request):
 # workshop team algo
 
 @api_view(['POST'])
+def getalgodetail(request):
+    obj = algo_detail.objects.all()
+    algodetail = {}
+    algodetail['demo'] = obj[0].demo_module_cnt
+    algodetail['tcnt'] = obj[0].will_ttl_wrkshp_cnt
+    algodetail['tcntt'] = obj[0].aval_ttl_wrkshp_cnt
+    algodetail['willcriteria'] = obj[0].willcriteria.split(',')
+    algodetail['availcriteria'] = obj[0].availcriteria.split(',')
+    print(algodetail)
+    return JsonResponse(algodetail)
+
+@api_view(['POST'])
+def savealgo(request):
+    var = JSONParser().parse(request)
+    willcriteria = ','.join(var.get('willcriteria'))
+    availcriteria = ','.join(var.get('availcriteria'))
+    lang = var.get('lang')
+    tcnt = var.get('tcnt')
+    tcntt = var.get('tcntt')
+    demo = var.get('demo')
+    print(willcriteria)
+    obj = algo_detail.objects.all()
+    if obj.count() :
+        obj.update(demo_module_cnt = demo,
+            will_ttl_wrkshp_cnt = tcnt,
+            aval_ttl_wrkshp_cnt = tcntt,
+            willcriteria = willcriteria,
+            availcriteria = availcriteria)
+    else:
+        serializer = AlgoDetailSerializer(data = {'demo_module_cnt': 4,'will_ttl_wrkshp_cnt' : 4,
+                    'aval_ttl_wrkshp_cnt' : 4, 'willcriteria' : 'Count of Willingness in Past Running Year,Highest Count of Workshop in Past Running Year,Linguistics Criteria,Count of Total Workshop'
+,'availcriteria' : 'Highest Count of Workshop in Past Running Year,Linguistics Criteria,Count of Total Workshop'})
+        print(serializer)
+        if serializer.is_valid():
+            serializer.save()
+        else :
+            print(serializer.errors)
+    print(obj.values())
+    return JsonResponse({'status':'success'})
+
+@api_view(['POST'])
 def getlang(request):
     try:
         obj = memberdetail.objects.all()
@@ -1759,6 +1800,7 @@ def algo_for_willing_mem(request):
     demo = int(var.get('demo'))
     tcnt = int(var.get('tcnt'))
     tcntt = int(var.get('tcntt'))
+    print(tcntt)
     for i in willcriteria:
         if i == 'Count of Willingness in Past Running Year':
             willctr.append(2)

@@ -1,5 +1,16 @@
 from rest_framework import serializers
-from main.models import create_workshop,WorkshopTeamStatus,User,ssn_detail
+from main.models import create_workshop,WorkshopTeamStatus,User,ssn_detail,algo_detail
+
+class AlgoDetailSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = algo_detail
+        fields = (
+        'demo_module_cnt',
+    'will_ttl_wrkshp_cnt',
+    'aval_ttl_wrkshp_cnt',
+    'willcriteria',
+    'availcriteria')
 
 class CreateWorkshop(serializers.ModelSerializer):
 

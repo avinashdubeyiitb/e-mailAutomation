@@ -87,15 +87,10 @@ export default new Vuex.Store({
       awsupfile1: [],
       awsupfile2: '',
       result: '',
-      demo: 4, // algo
-      tcnt: 4,
-      tcntt: 4,
       selectedworkshop: '',
       wrklist: [],
       lang: [],
       algoshowing: 'false',
-      willcriteria: ['Count of Willingness in Past Running Year', 'Highest Count of Workshop in Past Running Year', 'Linguistics Criteria', 'Count of Total Workshop'],
-      availcriteria: ['Highest Count of Workshop in Past Running Year', 'Linguistics Criteria', 'Count of Total Workshop'],
       selectedlang: '',
       algooutput: ''
     }
@@ -341,15 +336,6 @@ export default new Vuex.Store({
     result: state => {
       return state.user.result
     },
-    demo: state => {
-      return state.user.demo
-    }, // algo
-    tcnt: state => {
-      return state.user.tcnt
-    },
-    tcntt: state => {
-      return state.user.tcntt
-    },
     selectedworkshop: state => {
       return state.user.selectedworkshop
     },
@@ -361,12 +347,6 @@ export default new Vuex.Store({
     },
     algoshowing: state => {
       return state.user.algoshowing
-    },
-    willcriteria: state => {
-      return state.user.willcriteria
-    },
-    availcriteria: state => {
-      return state.user.availcriteria
     },
     selectedlang: state => {
       return state.user.selectedlang
@@ -613,15 +593,6 @@ export default new Vuex.Store({
     result (state, payload) {
       state.user.result = payload
     },
-    demo (state, payload) {
-      state.user.demo = payload
-    }, // algo
-    tcnt (state, payload) {
-      state.user.tcnt = payload
-    },
-    tcntt (state, payload) {
-      state.user.tcntt = payload
-    },
     selectedworkshop (state, payload) {
       state.user.selectedworkshop = payload
     },
@@ -633,12 +604,6 @@ export default new Vuex.Store({
     },
     algoshowing (state, payload) {
       state.user.algoshowing = payload
-    },
-    willcriteria (state, payload) {
-      state.user.willcriteria = payload
-    },
-    availcriteria (state, payload) {
-      state.user.availcriteria = payload
     },
     selectedlang (state, payload) {
       state.user.selectedlang = payload

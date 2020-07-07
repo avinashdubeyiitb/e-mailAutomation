@@ -31,7 +31,8 @@ class algo_detail(models.Model):
     demo_module_cnt = models.IntegerField(blank=False,null=False)
     will_ttl_wrkshp_cnt = models.IntegerField(blank=False,null=False)
     aval_ttl_wrkshp_cnt = models.IntegerField(blank=False,null=False)
-
+    willcriteria = models.TextField(blank=False,null=False)
+    availcriteria = models.TextField(blank=False,null=False)
     class Meta:
         managed = False
         db_table = 'algo_detail'

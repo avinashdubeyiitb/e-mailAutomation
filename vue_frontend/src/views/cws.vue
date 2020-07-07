@@ -22,6 +22,33 @@
     </div>
     <h1>Create Workshop </h1>
   <div id="col1inner" >
+    <div>
+      <strong id="hcnactivestatus">Select Workshop:</strong>
+      <div class="dropdown" id="hcnactivestatusi" >
+      <input v-model="selectedworkshop1" class="dropdown-input" type="text" placeholder="Select"  @click="chngclg1()"/>
+        <div  v-show="selectedworkshop1" class="dropdown-list" style="z-index:100; position: fixed;background: #FFFFFF">
+          <div v-show="showing1">
+            <div  v-for="host in wrklist.list" v-show="itemVisible1(host[0])" v-bind:key='host[0]' class="dropdown-item" @click="showing1 = !showing1;selectedworkshop1 = host[0];savestt(host[1])">
+              {{host[0]}}
+            </div>
+          </div>
+          </div>
+          </div>
+          <strong id="isactv">Is Active:</strong>
+            <div class="form-check" id="isactvi1">
+                <label class="form-check-label">
+                  <input type="radio" :checked="isactive === 'True'" class="form-check-input" name="optradio" @click="isactive = 'True'">
+                  True
+                </label>
+            </div>
+            <div class="form-check" id="isactvi2">
+                <label class="form-check-label">
+                  <input type="radio" :checked="isactive === 'False'" class="form-check-input" name="optradio" @click="isactive = 'False'">
+                  False
+                </label>
+            </div>
+            <button id="sub4" @click="savewrkactv">Save</button>
+    </div>
     <div >
     <strong><p id="fd">Fill details:</p></strong>
     <form @submit="formSubmit">
@@ -93,6 +120,7 @@
   </table>
 </label>
 </div>
+
 </div>
   </div>
 </template>
@@ -100,6 +128,7 @@
 export default {
   mounted () {
     console.log('Component mounted.')
+    this.workshoplist()
   },
   computed: {
   },
@@ -109,6 +138,7 @@ export default {
       statedisdata: this.$store.getters.statedisdata,
       state: 'State',
       index: '',
+      showing1: true,
       startdate: '',
       enddate: '',
       venueadd: '',
@@ -120,14 +150,50 @@ export default {
       selectedhcn: this.$store.getters.selectedhcn,
       hcn: [],
       success: false,
-      showing: true
+      showing: true,
+      wrklist: [],
+      selectedworkshop1: ''
     }
   },
   watch: {
   },
   methods: {
+    savestt (isactv) {
+      this.isactive = isactv
+    },
+    chngclg1 () {
+      this.showing1 = true
+    },
     chngclg () {
       this.showing = true
+    },
+    savewrkactv () {
+      const currentObj = this
+      this.axios.post(this.url + '/api/main/savewrkactv', {
+        isactive: this.isactive,
+        workshop: this.selectedworkshop1
+      })
+        .then(function (request) {
+          console.log(request)
+          currentObj.workshoplist()
+          if (currentObj.selectedworkshop === currentObj.selectedworkshop1 && currentObj.isactive === 'False') {
+            currentObj.selectedworkshop = ''
+          }
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    },
+    workshoplist () {
+      this.axios.post(this.url + '/api/main/getwrklist', {
+      })
+        .then(wrklist => {
+          this.wrklist = wrklist.data
+          console.log(this.wrklist)
+        })
+        .catch(function (error) {
+          this.wrklist = error
+        })
     },
     discard () {
       this.state = 'State'
@@ -163,6 +229,12 @@ export default {
       this.$store.commit('awsselectedworkshop', this.selectedhcn)
       this.$store.commit('selectedworkshop', this.selectedhcn)
       this.showing = !this.showing
+    },
+    itemVisible1 (item) {
+      console.log(item)
+      const currentName = item.toLowerCase()
+      const currentInput = this.selectedworkshop1.toLowerCase()
+      return currentName.includes(currentInput)
     },
     itemVisible (item) {
       const currentName = item.toLowerCase()
@@ -469,18 +541,18 @@ top: 57%;
 }*/
 #msub{
 position: absolute;
-right:10%;
-top: 53%;
+left:45%;
+top: 58%;
 }
 #nsub{
 position: absolute;
-right:5%;
-top: 53%;
+left:52%;
+top: 58%;
 }
 #rmsg{
   position: absolute;
-  left:10%;
-  top: 60%;
+  left:5%;
+  top: 65%;
 }
 /*
 #or{
@@ -564,6 +636,65 @@ table, th, td {
   border-collapse: collapse;
   padding:0px;
   padding-left:6px;
+}
+#hcnactivestatus{
+position: absolute;
+width: 154px;
+height: 25px;
+left: 59%;
+top: 11%;
 
+font-family: Radley;
+font-size: 17px;
+line-height: 30px;
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #000000;
+
+}
+#hcnactivestatusi{
+position: absolute;
+left: 77%;
+top: 10%;
+}
+#isactv{
+position: absolute;
+width: 154px;
+height: 25px;
+left: 59%;
+top: 19%;
+
+font-family: Radley;
+font-size: 17px;
+line-height: 30px;
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #000000;
+
+}
+#isactvi1{
+position: absolute;
+left: 77%;
+top: 19%;
+}
+#isactvi2{
+position: absolute;
+left: 77%;
+top: 23%;
+}
+
+#sub4{
+position: absolute;
+right:10%;
+top: 27%;
+}
+.dropdown-list{
+  max-height: 160px;
+  overflow-y: auto;
+  z-index:5;
 }
 </style>

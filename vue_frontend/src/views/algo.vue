@@ -38,7 +38,7 @@
     <input  type="text" v-model="selectedlang" class="dropdown-input" @click="chnglang()" placeholder="Select"><br>
   <div  v-show="selectedlang" class="dropdown-list" style="z-index:100; position: fixed;background: #FFFFFF">
     <div v-show="showing2" v-for="(p,i) in lang" v-bind:key='i'>
-      <div  v-for="(host,index) in p" v-bind:key='index' v-show="itemVisible2(host[0])" @click="savelang(host[0],index)" class="dropdown-item">
+      <div  v-for="(host,index) in p" v-bind:key='index' v-show="itemVisible2(host)" @click="savelang(host,index)" class="dropdown-item">
         {{host}}
       </div>
     </div>
@@ -49,8 +49,7 @@
     <label>
   <input v-if = "key1" v-model = "demo"
   @blur= "key1 = false; $emit('update')"
-  @keyup.enter = "key1=false; $emit('update')" id="inp"
-  @change="$store.commit('demo', demo)">
+  @keyup.enter = "key1=false; $emit('update')" id="inp">
     <label v-else @click = "key1 = true;"> {{demo}}</label>
     <strong> modules .</strong>
   </label>
@@ -71,8 +70,7 @@
       <label>
     <input v-if = "key2" v-model = "tcnt"
     @blur= "key2 = false; $emit('update')"
-    @keyup.enter = "key2=false; $emit('update')" id="inp"
-    @change="$store.commit('tcnt', tcnt)">
+    @keyup.enter = "key2=false; $emit('update')" id="inp">
       <label v-else @click = "key2 = true;"> {{tcnt}}</label>
       <strong> .</strong>
     </label>
@@ -93,14 +91,15 @@
       <label>
     <input v-if = "key3" v-model = "tcntt"
     @blur= "key3 = false; $emit('update')"
-    @keyup.enter = "key3=false; $emit('update')" id="inp"
-    @change="$store.commit('tcntt', tcntt)">
+    @keyup.enter = "key3=false; $emit('update')" id="inp">
       <label v-else @click = "key3 = true;"> {{tcntt}}</label>
       <strong> .</strong>
     </label>
     </label><br>
   </div>
   <button id="msub" @click="formSubmit">Submit</button>
+  <button id="nsub" @click="savealgo">Confirm changes!</button>
+
 <p id="rep"> {{output.msg}}</p>
 <table id="rmsg">
   <thead>
@@ -126,6 +125,7 @@ export default {
     console.log('Component mounted.')
     this.workshoplist()
     this.getlang()
+    this.getalgodetail()
   },
   computed: {
     dragOptions () {
@@ -141,25 +141,43 @@ export default {
     return {
       url: this.$store.getters.url,
       key1: '',
-      demo: this.$store.getters.demo,
+      demo: '',
       key2: '',
-      tcnt: this.$store.getters.tcnt,
+      tcnt: '',
       key3: '',
-      tcntt: this.$store.getters.tcntt,
+      tcntt: '',
       selectedworkshop: this.$store.getters.selectedworkshop,
       selectedlang: this.$store.getters.selectedlang,
       wrklist: this.$store.getters.wrklist,
       lang: this.$store.getters.lang,
       showing1: false,
       showing2: false,
-      willcriteria: this.$store.getters.willcriteria,
-      availcriteria: this.$store.getters.availcriteria,
-      output: this.$store.getters.algooutput
+      willcriteria: [],
+      availcriteria: [],
+      output: this.$store.getters.algooutput,
+      out: '',
+      algodetail: ''
     }
   },
   watch: {
   },
   methods: {
+    getalgodetail () {
+      this.axios.post(this.url + '/api/main/getalgodetail', {
+      })
+        .then(algodetail => {
+          this.algodetail = algodetail.data
+          console.log(this.algodetail)
+          this.demo = this.algodetail.demo
+          this.tcnt = this.algodetail.tcnt
+          this.tcntt = this.algodetail.tcntt
+          this.willcriteria = this.algodetail.willcriteria
+          this.availcriteria = this.algodetail.availcriteria
+        })
+        .catch(function (error) {
+          this.algodetail = error
+        })
+    },
     getlang () {
       this.axios.post(this.url + '/api/main/getlang', {
       })
@@ -180,12 +198,10 @@ export default {
     },
     willupdate (event) {
       this.willcriteria.splice(event.newIndex, 0, this.willcriteria.splice(event.oldIndex, 1)[0])
-      this.$store.commit('willcriteria', this.willcriteria)
       console.log(this.willcriteria)
     },
     availupdate (event) {
       this.availcriteria.splice(event.newIndex, 0, this.availcriteria.splice(event.oldIndex, 1)[0])
-      this.$store.commit('availcriteria', this.availcriteria)
       console.log(this.availcriteria)
     },
     savehcn (host, index) {
@@ -223,11 +239,28 @@ export default {
           this.wrklist = error
         })
     },
+    savealgo () {
+      this.axios.post(this.url + '/api/main/savealgo', {
+        willcriteria: this.willcriteria,
+        availcriteria: this.availcriteria,
+        lang: this.lang,
+        tcnt: this.tcnt,
+        tcntt: this.tcntt,
+        demo: this.demo
+      })
+        .then(out => {
+          this.out = out.data
+          console.log(this.out)
+        })
+        .catch(function (error) {
+          this.out = error
+        })
+    },
     formSubmit (e) {
       e.preventDefault()
       this.output = []
       this.$store.commit('algooutput', this.output)
-      console.log(this.selectedworkshop)
+      console.log(this.tcnt)
       this.axios.post(this.url + '/api/main/algo', {
         selectedworkshop: this.selectedworkshop,
         willcriteria: this.willcriteria,
@@ -373,8 +406,8 @@ color: #000000;
 }
 #msub{
 position: absolute;
-left:47%;
-top: 25%;
+left:49%;
+top: 93%;
 }
 #langi{
 position: absolute;
@@ -395,10 +428,20 @@ top: 15%;
   width:25px;
   height:22px;
 }
+#nsub{
+  position: absolute;
+  left:37%;
+  top: 93%;
+}
 table, th, td {
   border: 1px solid black;
   border-collapse: collapse;
   padding:3px;
   padding-left:6px;
+}
+.dropdown-list{
+  max-height: 160px;
+  overflow-y: auto;
+  z-index:10000;
 }
 </style>
