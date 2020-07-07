@@ -16,6 +16,7 @@
     "@getstation/electron-google-oauth2": "^2.1.0",
     "auth0-js": "^9.13.2",
     "axios": "^0.19.2",
+    "base64url": "^3.0.1",
     "bootstrap-vue": "^2.14.0",
     "core-js": "^3.6.4",
     "custom-electron-titlebar": "^3.2.2-hotfix62",

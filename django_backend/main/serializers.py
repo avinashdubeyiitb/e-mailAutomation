@@ -38,4 +38,4 @@ class SsnSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ssn_detail
-        fields = ('ssn_id','user','timestamp','mail_label','rcptmailid','delegated_access','dcprovider')
+        fields = ('ssn_id','user','timestamp','mail_label','rcptmailid','delegated_access','dcprovider','messageid')

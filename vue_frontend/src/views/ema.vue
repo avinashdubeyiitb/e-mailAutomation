@@ -39,14 +39,28 @@
     <td>{{data.count}}
       <b-dropdown class="dropsize">
               <div v-for="(id,idx) in data.clist" v-bind:key='idx' >
-                <b-dropdown-item>{{id}}</b-dropdown-item>
+                <b-dropdown-item v-b-modal="'msent'+idx" @click="getmdtl('sent',id[1])">{{id[0]}}</b-dropdown-item>
+                <b-modal :id="'msent'+idx" size="lg" title="Mail Details" hide-footer >
+                <b-container class="px-2" >
+                  <b>Subject : </b> <br>
+                  {{reqdata.subject}}<br>
+                  <b>Body : </b> <br>
+                <span v-html="reqdata.body"></span><br>
+                  <b>Attachments : </b> <br>
+                  <div v-for='(data,idx) in reqdata.attachments' v-bind:key='idx' v-show="reqdata.attachments !== 'loading'">
+                    <button>{{data}}</button>
+                  </div>
+                  <div v-show="reqdata.attachments === 'loading'">{{reqdata.attachments}}</div>
+                </b-container>
+                <b-button @click="$bvModal.hide('msent'+idx)">OK</b-button>
+                </b-modal>
               </div>
       </b-dropdown>
       </td>
     <td>{{data.failed}}
       <b-dropdown class="dropsize">
               <div v-for="(id,idx) in data.flist" v-bind:key='idx' >
-                <b-dropdown-item>{{id}}</b-dropdown-item>
+                <b-dropdown-item>{{id[0]}}</b-dropdown-item>
               </div>
       </b-dropdown>
       </td>
@@ -69,14 +83,28 @@ Draft
       {{data.Data.count}}
       <b-dropdown class="dropsize">
               <div v-for="(id,idx) in data.Data.clist" v-bind:key='idx' >
-                <b-dropdown-item>{{id}}</b-dropdown-item>
+                <b-dropdown-item v-b-modal="'mdraft'+idx" @click="getmdtl('draft',id[1])">{{id[0]}}</b-dropdown-item>
+                <b-modal :id="'mdraft'+idx" size="lg" title="Mail Details" hide-footer >
+                <b-container class="px-2" >
+                  <b>Subject : </b> <br>
+                  {{reqdata.subject}}<br>
+                  <b>Body : </b> <br>
+                <span v-html="reqdata.body"></span><br>
+                  <b>Attachments : </b> <br>
+                  <div v-for='(data,idx) in reqdata.attachments' v-bind:key='idx' v-show="reqdata.attachments !== 'loading'">
+                    <button>{{data}}</button>
+                  </div>
+                  <div v-show="reqdata.attachments === 'loading'">{{reqdata.attachments}}</div>
+                </b-container>
+                <b-button @click="$bvModal.hide('mdraft'+idx)">OK</b-button>
+                </b-modal>
               </div>
       </b-dropdown>
       </td>
     <td>{{data.Data.failed}}
       <b-dropdown class="dropsize">
               <div v-for="(id,idx) in data.Data.flist" v-bind:key='idx' >
-                <b-dropdown-item>{{id}}</b-dropdown-item>
+                <b-dropdown-item >{{id[0]}}</b-dropdown-item>
               </div>
       </b-dropdown>
       </td>
@@ -99,7 +127,21 @@ Inbox
     <td>{{data.count}}
       <b-dropdown class="dropsize">
               <div v-for="(id,idx) in data.clist" v-bind:key='idx' >
-                <b-dropdown-item>{{id}}</b-dropdown-item>
+                <b-dropdown-item v-b-modal="'minbox'+idx" @click="getmdtl('inbox',id[1])">{{id[0]}}</b-dropdown-item>
+                <b-modal :id="'minbox'+idx" size="lg" title="Mail Details" hide-footer >
+                <b-container class="px-2" >
+                  <b>Subject : </b> <br>
+                  {{reqdata.subject}}<br>
+                  <b>Body : </b> <br>
+                <span v-html="reqdata.body"></span><br>
+                  <b>Attachments : </b> <br>
+                  <div v-for='(data,idx) in reqdata.attachments' v-bind:key='idx' v-show="reqdata.attachments !== 'loading'">
+                    <button>{{data}}</button>
+                  </div>
+                  <div v-show="reqdata.attachments === 'loading'">{{reqdata.attachments}}</div>
+                </b-container>
+                <b-button @click="$bvModal.hide('minbox'+idx)">OK</b-button>
+                </b-modal>
               </div>
       </b-dropdown>
       </td>
@@ -121,7 +163,8 @@ export default {
   data () {
     return {
       output: '',
-      url: this.$store.getters.url
+      url: this.$store.getters.url,
+      reqdata: { subject: 'loading', body: 'loading', attachments: 'loading' }
       // isget: false,
       // issend: false,
       // selected: [],
@@ -130,6 +173,24 @@ export default {
     }
   },
   methods: {
+    getmdtl (label, mid) {
+      if (this.reqdata !== '') {
+        this.reqdata.subject = 'loading'
+        this.reqdata.body = 'loading'
+        this.reqdata.attachments = 'loading'
+      }
+      this.axios.post(this.url + '/api/main/getmdtl', {
+        messageid: mid,
+        type: label
+      })
+        .then(reqdata => {
+          this.reqdata = reqdata.data
+          console.log('SUCCESS')
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    },
     stats () {
       this.axios.post(this.url + '/api/main/stats', {
       })
