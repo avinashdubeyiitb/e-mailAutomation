@@ -256,6 +256,7 @@ class AICTE_list(models.Model):
     latitude = models.TextField()
     longitude = models.TextField()
     normalised_ins_name = models.TextField()
+    email = models.TextField()
     class Meta:
         managed = False
         db_table = 'aicte_list'

@@ -106,6 +106,12 @@ Inbox
   </tr>
 </tbody>
 </table>
+<div id="loader" v-show="loader">
+<b-button variant="danger" disabled>
+  <b-spinner small ></b-spinner>
+  Loading...
+</b-button>
+</div>
   </div>
   </div>
 </template>
@@ -121,12 +127,13 @@ export default {
   data () {
     return {
       output: '',
-      url: this.$store.getters.url
+      url: this.$store.getters.url,
       // isget: false,
       // issend: false,
       // selected: [],
       // result: '',
       // sent: []
+      loader: true
     }
   },
   methods: {
@@ -136,6 +143,7 @@ export default {
         .then(output => {
           this.output = output.data
           console.log('SUCCESS')
+          this.loader = false
         })
         .catch(function (error) {
           console.log(error)
@@ -214,5 +222,10 @@ top: 70%;
 tr ,td,thead,table,th{
   padding:0px;
   padding-left:6px;
+}
+#loader{
+  position: absolute;
+  top:45%;
+  left:45%;
 }
 </style>

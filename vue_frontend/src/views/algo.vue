@@ -57,7 +57,7 @@
 
     <div id ="willdrag">
       <strong >&#187; Solve conflicts in order :</strong>
-      <draggable v-model="willcriteria" v-on:change="willupdate(willcriteria)" v-bind="dragOptions">
+      <draggable v-model="willcriteria" v-on:change="willupdate(willcriteria)" v-bind="dragOptions1">
           <transition-group>
               <div v-for="element in willcriteria" :key="element" id="dragele">
                   {{element}}
@@ -79,7 +79,7 @@
     <strong id="lavaildrag" > Selection of workshow team from available members : (Descending order)</strong>
     <div id ="availdrag">
       <strong >&#187; Solve conflicts in order :</strong>
-      <draggable v-model="availcriteria" v-on:change="availupdate(availcriteria)" v-bind="dragOptions">
+      <draggable v-model="availcriteria" v-on:change="availupdate(availcriteria)" v-bind="dragOptions2">
           <transition-group>
               <div v-for="element in availcriteria" :key="element" id="dragele">
                   {{element}}
@@ -128,10 +128,18 @@ export default {
     this.getalgodetail()
   },
   computed: {
-    dragOptions () {
+    dragOptions1 () {
       return {
         animation: 500,
-        group: 'description',
+        group: 'willcriteria',
+        disabled: false,
+        ghostClass: 'ghost'
+      }
+    },
+    dragOptions2 () {
+      return {
+        animation: 500,
+        group: 'availcriteria',
         disabled: false,
         ghostClass: 'ghost'
       }

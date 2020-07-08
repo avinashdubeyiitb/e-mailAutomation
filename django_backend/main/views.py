@@ -46,6 +46,7 @@ import time
 import pandas as pd
 import urllib.parse
 from time import sleep
+import re
 
 def trial(request):
     return render(request,'trial.html')
@@ -1205,7 +1206,13 @@ def submit(request):
             var = JSONParser().parse(request)
             clg = var.get('cname')
             district = var.get('district')
+            if '(' in district:
+                district = re.sub(r'\([^)]*\)', '', district)[0:-1]
+            print(district)
             state = var.get('state')
+            if '(' in state:
+                state = re.sub(r'\([^)]*\)', '', state)[0:-1]
+            print(state)
             coll = getname(var.get('cname'))
             print(coll)
             # if len(district) >0 and len(state)>0:
@@ -1434,22 +1441,31 @@ def awssubmit(request):
             cooemail = wrkdet[0].cooemail
             coono = wrkdet[0].coono
             state = var.get('state')
+            if '(' in state:
+                state = re.sub(r'\([^)]*\)', '', state)[0:-1]
+            print(state)
             districts = var.get('district')
             c = ElsiCollegeDtls.objects.all()
             count=0
             for c in c.values('lab_inaugurated'):
                 if c.get('lab_inaugurated') == 1:
                     count=count+1
-            obj1 = ElsiCollegeDtls.objects.filter(state = state)
+            obj1 = AICTE_list.objects.filter(state__iexact = state)
+            print(obj1)
             if obj1.count() >= 1:
                 for district in districts:
-                    obj2 = ElsiCollegeDtls.objects.filter(district = district)
+                    if '(' in district:
+                        district = re.sub(r'\([^)]*\)', '', district)[0:-1]
+                    print(district)
+                    obj2 = AICTE_list.objects.filter(district__iexact = district)
                     if obj2.count() >= 1:
                         for rows in list(obj2.values()) :
-                            clist = clist + [(rows['college_name'])]
+                            clist = clist + [(rows['email'])]
                 if len(clist) == 0:
+                    print(clist)
                     return JsonResponse({'key':'nodata'})
                 else:
+                    print(clist)
                     dict['bcc'] = clist
                     print(dict)
                     subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): +\
@@ -2116,7 +2132,10 @@ def headmail(request):
 def gethcn(request):
     var = JSONParser().parse(request)
     state=var.get('state')
-    getdet = ElsiCollegeDtls.objects.filter(state = state).order_by('college_name')
+    if '(' in state:
+        state = re.sub(r'\([^)]*\)', '', state)[0:-1]
+    print(state)
+    getdet = ElsiCollegeDtls.objects.filter(state__iexact = state).order_by('college_name')
     hcn = {}
     for i in range(getdet.count()):
         if "host" in hcn:
