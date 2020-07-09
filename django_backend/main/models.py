@@ -77,7 +77,7 @@ class WorkshopTeamStatus(models.Model):
     district = models.CharField(max_length=50,blank=False,null=False)
     responder = models.CharField(max_length=50,blank=False,null=False)
     willingness_or_unavailability = models.CharField(max_length=50,blank=True,null=True,default='None')
-    reason = models.CharField(max_length=100,blank=True,null=True)
+    reason = models.TextField(max_length=500,blank=True,null=True)
     eYRC = models.CharField(max_length=50,blank=False,null=True,default='0')
     eYIC = models.CharField(max_length=50,blank=False,null=True,default='0')
     eYRDC = models.CharField(max_length=50,blank=False,null=True,default='0')
