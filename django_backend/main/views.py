@@ -130,6 +130,15 @@ def gauthlogin(request):
 
 @csrf_exempt
 def authlogin(request):
+    """Authenticates the user trying to login.
+
+    Args:
+        username(Json-obj): The login credential username.
+        password(Json-obj): The login credential password.
+
+    Returns:
+        JsonResponse returning the status of login.
+    """
     var = JSONParser().parse(request)
     name = var.get('username')
     passw = var.get('password')
@@ -167,6 +176,11 @@ def authlogin(request):
 
 @csrf_exempt
 def authlogout(request):
+    """logout the current logged in user.
+
+    Returns:
+        JsonResponse containing the status.
+    """
     logout(request)
     #print(User.objects.filter(logged_in = 'True').values())
     return JsonResponse({'status':'logged out'})
@@ -205,165 +219,198 @@ SCOPES = [
 
 @api_view(['POST'])
 def download(request):
-    var = JSONParser().parse(request)
-    mid = var.get('messageid')
-    credentials = get_credentials()
-    service = build('gmail', 'v1', credentials=credentials)
-    msg = service.users().messages().get(userId='me', id=mid,format = 'full').execute()
-    tmp = msg.get("payload").get("headers")
-    downloads_path = str(Path.home() / "Downloads")
-    print(downloads_path)
-    attachments = []
-    for idx in range(len(tmp)):
-        if tmp[idx]['name'] == 'Subject' or  tmp[idx]['name'] == 'subject':
-            subject = tmp[idx]['value']
-    for part in msg['payload'].get('parts'):
-        if part['filename']:
-            file_name = part['filename']
-            idx = file_name.rindex(".")
-            now = str(datetime.now())[:19]
-            now = now.replace(":","_")
-            file_name = file_name[:idx]+"_"+str(now)+file_name[idx:]
-            attachments.append(file_name)
-            if 'data' in part['body']:
-                data=part['body']['data']
-            else:
-                att_id=part['body']['attachmentId']
-                att=service.users().messages().attachments().get(userId='me', messageId=mid,id=att_id).execute()
-                data=att['data']
-            file_data = base64.urlsafe_b64decode(data.encode('UTF-8'))
-            path = os.path.join(downloads_path,file_name)
-            with open(path, 'wb') as f:
-                f.write(file_data)
-    print(attachments)
-    return JsonResponse({'status':'downloaded'})
+    """Searches for message within gmail and downloads the attachments accordingly.
+
+    Args:
+        messageid(Json-obj): message id of the mail(message).
+
+    Returns:
+        JsonResponse returning either status of successfull download or error if any.
+    """
+    try:
+        var = JSONParser().parse(request)
+        mid = var.get('messageid')
+        credentials = get_credentials()
+        service = build('gmail', 'v1', credentials=credentials)
+        msg = service.users().messages().get(userId='me', id=mid,format = 'full').execute()
+        tmp = msg.get("payload").get("headers")
+        downloads_path = str(Path.home() / "Downloads")
+        print(downloads_path)
+        attachments = []
+        for idx in range(len(tmp)):
+            if tmp[idx]['name'] == 'Subject' or  tmp[idx]['name'] == 'subject':
+                subject = tmp[idx]['value']
+        for part in msg['payload'].get('parts'):
+            if part['filename']:
+                file_name = part['filename']
+                idx = file_name.rindex(".")
+                now = str(datetime.now())[:19]
+                now = now.replace(":","_")
+                file_name = file_name[:idx]+"_"+str(now)+file_name[idx:]
+                attachments.append(file_name)
+                if 'data' in part['body']:
+                    data=part['body']['data']
+                else:
+                    att_id=part['body']['attachmentId']
+                    att=service.users().messages().attachments().get(userId='me', messageId=mid,id=att_id).execute()
+                    data=att['data']
+                file_data = base64.urlsafe_b64decode(data.encode('UTF-8'))
+                path = os.path.join(downloads_path,file_name)
+                with open(path, 'wb') as f:
+                    f.write(file_data)
+        print(attachments)
+        return JsonResponse({'status':'downloaded'})
+    except errors.HttpError as error:
+        print('An error occurred: %s' % error)
+        return JsonResponse({'status':error})
 
 @api_view(['POST'])
 def getmdtl(request):
-    var = JSONParser().parse(request)
-    mid = var.get('messageid')
-    credentials = get_credentials()
-    service = build('gmail', 'v1', credentials=credentials)
-    msg = service.users().messages().get(userId='me', id=mid,format = 'full').execute()
-    #print(msg)
-    tmp = msg.get("payload").get("headers")
-    attachments = []
-    for idx in range(len(tmp)):
-        if tmp[idx]['name'] == 'Subject' or  tmp[idx]['name'] == 'subject':
-            subject = tmp[idx]['value']
-    for part in msg['payload'].get('parts'):
-        if part['filename']:
-            attachments.append(part['filename'])
+    """Searches for message within gmail and gather details like subject, body and attachments.
+
+    Args:
+        messageid: message id of the mail.
+        type: under sent, draft or inbox type.
+    Returns:
+        JsonResponse returning either subject, body and attachments of the message or error any any.
+    """
+    try:
+        var = JSONParser().parse(request)
+        mid = var.get('messageid')
+        credentials = get_credentials()
+        service = build('gmail', 'v1', credentials=credentials)
+        msg = service.users().messages().get(userId='me', id=mid,format = 'full').execute()
+        #print(msg)
+        tmp = msg.get("payload").get("headers")
+        attachments = []
+        for idx in range(len(tmp)):
+            if tmp[idx]['name'] == 'Subject' or  tmp[idx]['name'] == 'subject':
+                subject = tmp[idx]['value']
+        for part in msg['payload'].get('parts'):
+            if part['filename']:
+                attachments.append(part['filename'])
+            else :
+                if var.get('type') == 'inbox':
+                    pass
+                else:
+                    pass
+        if var.get('type') == 'inbox' :
+            body = msg.get("payload").get("parts")[1].get('body')
+            if body.get('attachmentId'):
+                body = msg.get("payload").get("parts")[0].get('parts')[1].get('body')
         else :
-            if var.get('type') == 'inbox':
-                pass
-            else:
-                pass
-    if var.get('type') == 'inbox' :
-        body = msg.get("payload").get("parts")[1].get('body')
-        if body.get('attachmentId'):
-            body = msg.get("payload").get("parts")[0].get('parts')[1].get('body')
-    else :
-        body = msg.get("payload").get("parts")[0].get('body')
-        if not body['size']:
-            body = msg.get("payload").get("parts")[0].get('parts')[0].get('parts')[0].get('body')
-    bodydata = base64.urlsafe_b64decode(body.get("data").encode("ASCII")).decode("utf-8")
-    return JsonResponse({'subject':subject,'body':bodydata,'attachments':attachments})
+            body = msg.get("payload").get("parts")[0].get('body')
+            if not body['size']:
+                body = msg.get("payload").get("parts")[0].get('parts')[0].get('parts')[0].get('body')
+        bodydata = base64.urlsafe_b64decode(body.get("data").encode("ASCII")).decode("utf-8")
+        return JsonResponse({'subject':subject,'body':bodydata,'attachments':attachments})
+    except errors.HttpError as error:
+        print('An error occurred: %s' % error)
+        return JsonResponse({'status':error})
 
 @api_view(['POST'])
 def stats(request):
-    obj = ssn_detail.objects.all()
-    dct = {'Sent':[],'Inbox':[],'Draft':[]}
-    lbl = []
-    for idx in range(obj.count()):
-        lst = obj[idx].mail_label.split(',')
-        if 'DRAFT' in lst or not len(lst):
-            for i in range(len(dct['Draft'])):
-                if dct['Draft'][i]['user'] == obj[idx].user:
-                    if len(lst):
-                        dct['Draft'][i]['Data']['count']+=1
-                        dct['Draft'][i]['Data']['clist'].append((obj[idx].rcptmailid,obj[idx].messageid))
-                    else:
-                        dct['Draft'][i]['Data']['failed']+=1
-                        dct['Draft'][i]['Data']['flist'].append((obj[idx].rcptmailid,obj[idx].messageid))
-                    break
-            else:
-                if len(lst):
-                    dct['Draft'].append({'user':obj[idx].user,'Data':{'count':1,'failed':0,'clist':[(obj[idx].rcptmailid,obj[idx].messageid)],'flist':[]}})
+    """This function is used to return the statistical data to Email Analytics page.
+
+    Returns:
+        JsonResponse containing the data about which user send the mails to whom about what(label), saved drafts and inbox responses.
+    """
+    try:
+        obj = ssn_detail.objects.all()
+        dct = {'Sent':[],'Inbox':[],'Draft':[]}
+        lbl = []
+        for idx in range(obj.count()):
+            lst = obj[idx].mail_label.split(',')
+            if 'DRAFT' in lst or not len(lst):
+                for i in range(len(dct['Draft'])):
+                    if dct['Draft'][i]['user'] == obj[idx].user:
+                        if len(lst):
+                            dct['Draft'][i]['Data']['count']+=1
+                            dct['Draft'][i]['Data']['clist'].append((obj[idx].rcptmailid,obj[idx].messageid))
+                        else:
+                            dct['Draft'][i]['Data']['failed']+=1
+                            dct['Draft'][i]['Data']['flist'].append((obj[idx].rcptmailid,obj[idx].messageid))
+                        break
                 else:
-                    dct['Draft'].append({'user':obj[idx].user,'Data':{'count':0,'failed':1,'clist':[],'flist':[(obj[idx].rcptmailid,obj[idx].messageid)]}})
-        else:
-            for i in range(len(dct['Sent'])):
-                if dct['Sent'][i]['user'] == obj[idx].user:
-                    break
+                    if len(lst):
+                        dct['Draft'].append({'user':obj[idx].user,'Data':{'count':1,'failed':0,'clist':[(obj[idx].rcptmailid,obj[idx].messageid)],'flist':[]}})
+                    else:
+                        dct['Draft'].append({'user':obj[idx].user,'Data':{'count':0,'failed':1,'clist':[],'flist':[(obj[idx].rcptmailid,obj[idx].messageid)]}})
             else:
-                i = len(dct['Sent'])
-                dct['Sent'].append({'user':obj[idx].user,'Data':[]})
-            for j in range(len(dct['Sent'][i]['Data'])):
-                if dct['Sent'][i]['Data'][j]['label'] in lst:
+                for i in range(len(dct['Sent'])):
+                    if dct['Sent'][i]['user'] == obj[idx].user:
+                        break
+                else:
+                    i = len(dct['Sent'])
+                    dct['Sent'].append({'user':obj[idx].user,'Data':[]})
+                for j in range(len(dct['Sent'][i]['Data'])):
+                    if dct['Sent'][i]['Data'][j]['label'] in lst:
+                        if len(lst) == 1:
+                            dct['Sent'][i]['Data'][j]['failed'] +=1
+                            dct['Sent'][i]['Data'][j]['flist'].append((obj[idx].rcptmailid,obj[idx].messageid))
+                        else :
+                            dct['Sent'][i]['Data'][j]['count'] +=1
+                            dct['Sent'][i]['Data'][j]['clist'].append((obj[idx].rcptmailid,obj[idx].messageid))
+                        break
+                else:
                     if len(lst) == 1:
-                        dct['Sent'][i]['Data'][j]['failed'] +=1
-                        dct['Sent'][i]['Data'][j]['flist'].append((obj[idx].rcptmailid,obj[idx].messageid))
+                        lbl.append(lst[0])
+                        dct['Sent'][i]['Data'].append({'label':lst[0],'count':0,'failed':1,'clist':[],'flist':[(obj[idx].rcptmailid,obj[idx].messageid)]})
                     else :
-                        dct['Sent'][i]['Data'][j]['count'] +=1
-                        dct['Sent'][i]['Data'][j]['clist'].append((obj[idx].rcptmailid,obj[idx].messageid))
-                    break
-            else:
-                if len(lst) == 1:
-                    lbl.append(lst[0])
-                    dct['Sent'][i]['Data'].append({'label':lst[0],'count':0,'failed':1,'clist':[],'flist':[(obj[idx].rcptmailid,obj[idx].messageid)]})
-                else :
-                    lbl.append(lst[1])
-                    dct['Sent'][i]['Data'].append({'label':lst[1],'count':1,'failed':0,'clist':[(obj[idx].rcptmailid,obj[idx].messageid)],'flist':[]})
-    print(dct)
-    lbl = list(set(lbl))
-    print(lbl)
-    ids = []
-    credentials = get_credentials()
-    print(credentials,'credentials')
-    service = build('gmail', 'v1', credentials=credentials)
-    labels = ListLabels(service,'me')
-    for val in labels:
-        if val['name'] in lbl:
-            ids.append(val['id'])
-    msg = ListMessagesWithLabels(service,'me',['INBOX'])
-    #print(msg)
-    for idx in range(len(ids)):
-        m = ListMessagesWithLabels(service,'me',[ids[idx]])
-        for i in range(len(m)):
-            for j in range(len(msg)):
-                if m[i]['threadId'] == msg[j]['threadId']:
-                    tmp = service.users().messages().get(userId='me', id=msg[j]['id']).execute()
-                    #print(tmp)
-                    f = None;t = None
-                    for l in range(len(tmp['payload']['headers'])):
-                        if tmp['payload']['headers'][l]['name'] == 'From':
-                            print(lbl[idx],tmp['payload']['headers'][l]['value'])
-                            f = tmp['payload']['headers'][l]['value']
-                            if f.find('<') != -1:
-                                f = f[f.index('<')+1:f.index('>')]
-                        if tmp['payload']['headers'][l]['name'] == 'To':
-                            print(lbl[idx],tmp['payload']['headers'][l]['value'])
-                            t = tmp['payload']['headers'][l]['value']
-                            if t.find('<') != -1:
-                                t = t[t.index('<')+1:t.index('>')]
-                            break
-                    if f and t :
-                        for a in range(len(dct['Inbox'])):
-                            if dct['Inbox'][a]['user'] == t:
+                        lbl.append(lst[1])
+                        dct['Sent'][i]['Data'].append({'label':lst[1],'count':1,'failed':0,'clist':[(obj[idx].rcptmailid,obj[idx].messageid)],'flist':[]})
+        print(dct)
+        lbl = list(set(lbl))
+        print(lbl)
+        ids = []
+        credentials = get_credentials()
+        print(credentials,'credentials')
+        service = build('gmail', 'v1', credentials=credentials)
+        labels = ListLabels(service,'me')
+        for val in labels:
+            if val['name'] in lbl:
+                ids.append(val['id'])
+        msg = ListMessagesWithLabels(service,'me',['INBOX'])
+        #print(msg)
+        for idx in range(len(ids)):
+            m = ListMessagesWithLabels(service,'me',[ids[idx]])
+            for i in range(len(m)):
+                for j in range(len(msg)):
+                    if m[i]['threadId'] == msg[j]['threadId']:
+                        tmp = service.users().messages().get(userId='me', id=msg[j]['id']).execute()
+                        #print(tmp)
+                        f = None;t = None
+                        for l in range(len(tmp['payload']['headers'])):
+                            if tmp['payload']['headers'][l]['name'] == 'From':
+                                print(lbl[idx],tmp['payload']['headers'][l]['value'])
+                                f = tmp['payload']['headers'][l]['value']
+                                if f.find('<') != -1:
+                                    f = f[f.index('<')+1:f.index('>')]
+                            if tmp['payload']['headers'][l]['name'] == 'To':
+                                print(lbl[idx],tmp['payload']['headers'][l]['value'])
+                                t = tmp['payload']['headers'][l]['value']
+                                if t.find('<') != -1:
+                                    t = t[t.index('<')+1:t.index('>')]
                                 break
-                        else:
-                            a = len(dct['Inbox'])
-                            dct['Inbox'].append({'user':t,'Data':[]})
-                        for b in range(len(dct['Inbox'][a]['Data'])):
-                            if dct['Inbox'][a]['Data'][b]['label'] == lbl[idx]:
-                                dct['Inbox'][a]['Data'][b]['count'] +=1
-                                dct['Inbox'][a]['Data'][b]['clist'].append((f,tmp['id']))
-                                break
-                        else:
-                            dct['Inbox'][a]['Data'].append({'label':lbl[idx],'count':1,'clist':[(f,tmp['id'])]})
-    print(dct)
-    return JsonResponse(dct)
+                        if f and t :
+                            for a in range(len(dct['Inbox'])):
+                                if dct['Inbox'][a]['user'] == t:
+                                    break
+                            else:
+                                a = len(dct['Inbox'])
+                                dct['Inbox'].append({'user':t,'Data':[]})
+                            for b in range(len(dct['Inbox'][a]['Data'])):
+                                if dct['Inbox'][a]['Data'][b]['label'] == lbl[idx]:
+                                    dct['Inbox'][a]['Data'][b]['count'] +=1
+                                    dct['Inbox'][a]['Data'][b]['clist'].append((f,tmp['id']))
+                                    break
+                            else:
+                                dct['Inbox'][a]['Data'].append({'label':lbl[idx],'count':1,'clist':[(f,tmp['id'])]})
+        print(dct)
+        return JsonResponse(dct)
+    except errors.HttpError as error:
+        print('An error occurred: %s' % error)
+        return JsonResponse({'status':error})
 
 def ListMessagesWithLabels(service, user_id, label_ids=[]):
   """List all Messages of the user's mailbox with label_ids applied.
@@ -396,7 +443,7 @@ def ListMessagesWithLabels(service, user_id, label_ids=[]):
     return messages
   except errors.HttpError as error:
     print('An error occurred: %s' % error)
-
+'''
 @api_view(['POST'])
 def getfile(request):
     print('hii')
@@ -412,8 +459,22 @@ def getfile(request):
             response = HttpResponse(fh.read(), content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
             response['Content-Disposition'] = "attachment; filename={}".format(escape_uri_path('letter-of-intent.docx'))
             return response
-
+'''
 def getbody(clg,obj,sta,dis):
+        """ Creates the subject, body for send information mail part.
+
+        Args:
+            clg: It contains the given college name.
+            obj: It contains the given college name details.
+            sta: It contains the state of the college.
+            dis: It contains the district of the college.
+
+        Returns:
+            subject: the subject content that is to be sent.
+            body: the body content that is to be sent.
+            subdiv: denotes the type of body content.
+            tchdtl: contains the teacher details of the given college.
+        """
         try:
             district = dis
             state = sta
@@ -644,6 +705,7 @@ def ListLabels(service, user_id):
     print('An error occurred: %s' % error)
 
 def SendMessage(sender, to, cc, bcc, subject, body,label,attachmentFile=None):
+
     credentials = get_credentials()
     print(credentials,'credentials')
     service = build('gmail', 'v1', credentials=credentials)
@@ -1711,7 +1773,7 @@ def awssave(request):
 
 ######################
 # workshop team algo
-
+catlist = ['eYRC','eYIC','eYRDC','eLSI','web','course_or_other_eyantra_work','personal_or_any_other']
 @api_view(['POST'])
 def kavi_sir_mail(request):
     var = JSONParser().parse(request)
@@ -1720,6 +1782,13 @@ def kavi_sir_mail(request):
     wrkshp = create_workshop.objects.filter(hcn = selectedworkshop)
     d = ElsiCollegeDtls.objects.filter(college_name = selectedworkshop)
     label = var.get('label')
+    tm = var.get('team')
+    print(tm)
+    team = []
+    for idx in range(len(tm)):
+        cnt = WorkshopsTakenCount.objects.filter(name = tm[idx])[0].total_count
+        sts = WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop,responder = tm[idx])[0].willingness_or_unavailability
+        team.append({'name':tm[idx],'count':cnt,'status':sts})
     district = d[0].district
     state = d[0].state
     stat = WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop)
@@ -1733,84 +1802,6 @@ def kavi_sir_mail(request):
     end_date = wrkshp[0].enddate
     end_date = datetime.strptime(end_date, '%Y-%m-%d')
     end_date = datetime.strftime(end_date,'%B %d, %Y')
-    data = {}
-    print(stat.count())
-    rsnd = [{'eYRC':[]},{'eYIC':[]},{'eYRDC':[]},{'eLSI':[]},{'web':[]},
-        {'course_or_other_eyantra_work':[]},{'personal_or_any_other':[]}]
-    for idx in range(stat.count()):
-        if stat[idx].eYRC == '1':
-            rsnd[0]['eYRC'].append(stat[idx].responder)
-        if stat[idx].eYIC == '1':
-            rsnd[1]['eYIC'].append(stat[idx].responder)
-        if stat[idx].eYRDC == '1':
-            rsnd[2]['eYRDC'].append(stat[idx].responder)
-        if stat[idx].eLSI == '1':
-            rsnd[3]['eLSI'].append(stat[idx].responder)
-        if stat[idx].web == '1':
-            rsnd[4]['web'].append(stat[idx].responder)
-        if stat[idx].course_or_other_eyantra_work == '1':
-            rsnd[5]['course_or_other_eyantra_work'].append(stat[idx].responder)
-        if stat[idx].personal_or_any_other == '1':
-            rsnd[6]['personal_or_any_other'].append(stat[idx].responder)
-    for i in range(stat.count()):
-        catapprove = []
-        head = ''
-        if stat[i].approval_eYRC == 'yes':
-            catapprove.append('eYRC approved')
-        if stat[i].approval_eYIC == 'yes':
-            catapprove.append('eYIC approved')
-        if stat[i].approval_eYRDC == 'yes':
-            catapprove.append('eYRDC approved')
-        if stat[i].approval_eLSI == 'yes':
-            catapprove.append('eLSI approved')
-        if stat[i].approval_web == 'yes':
-            catapprove.append('web approved')
-        if stat[i].approval_course_or_other_eyantra_work == 'yes':
-            catapprove.append('course_or_other_eyantra_work approved')
-        if stat[i].approval_personal_or_any_other == 'yes':
-            catapprove.append('personal_or_any_other approved')
-        if stat[i].approval_eYRC == 'no':
-            catapprove.append('eYRC rejected')
-        if stat[i].approval_eYIC == 'no':
-            catapprove.append('eYIC rejected')
-        if stat[i].approval_eYRDC == 'no':
-            catapprove.append('eYRDC rejected')
-        if stat[i].approval_eLSI == 'no':
-            catapprove.append('eLSI rejected')
-        if stat[i].approval_web == 'no':
-            catapprove.append('web rejected')
-        if stat[i].approval_course_or_other_eyantra_work == 'no':
-            catapprove.append('course_or_other_eyantra_work rejected')
-        if stat[i].approval_personal_or_any_other == 'no':
-            catapprove.append('personal_or_any_other rejected')
-        if stat[i].approval_eYRC == 'None' and stat[i].eYRC == '1':
-            catapprove.append('no feedback')
-        if stat[i].approval_eYIC == 'None' and stat[i].eYIC == '1':
-            catapprove.append('no feedback')
-        if stat[i].approval_eYRDC == 'None' and stat[i].eYRDC == '1':
-            catapprove.append('no feedback')
-        if stat[i].approval_eLSI == 'None' and stat[i].eLSI == '1':
-            catapprove.append('no feedback')
-        if stat[i].approval_web == 'None' and stat[i].web == '1':
-            catapprove.append('no feedback')
-        if stat[i].approval_course_or_other_eyantra_work == 'None' and stat[i].course_or_other_eyantra_work == '1':
-            catapprove.append('no feedback')
-        if stat[i].approval_personal_or_any_other == 'None' and stat[i].personal_or_any_other == '1':
-            catapprove.append('no feedback')
-        li = ','.join(catapprove)
-        for idx in range(app.count()):
-            for j in range(len(rsnd)):
-                if app[idx].head in list(rsnd[j].keys())[0] and len(list(rsnd[j].values())[0]):
-                    if app[idx].name in list(rsnd[j].values())[0]:
-                        cohead = memberdetail.objects.filter(iscohead = '1',cohead = list(rsnd[j].keys())[0])
-                        print(cohead[0].name)
-                        head = cohead[0].name
-                    else :
-                        print(list(rsnd[j].values()))
-                        head = app[idx].name
-                        print(app[idx].name)
-        data['flood' + str(i)] = [wrkshp[0].hcn,dte,district,stat[i].responder,stat[i].willingness_or_unavailability,stat[i].reason,li,head]
-    print(data)
     to = 'aakashkhandelwal56@gmail.com'
     cc = ''
     bcc = ''
@@ -1818,7 +1809,7 @@ def kavi_sir_mail(request):
     body = render_to_string(os.path.join(STATIC_DIR,'kavi_sir_mail.html'),
     {'wid':wrkshp[0].id,'workshop_name':wrkshp[0].hcn,
     'venue_address':wrkshp[0].venueadd,'start_date':start_date,
-    'end_date':end_date,'district': district,'state' : state,'dte':dte,'stat':stat,'data':data})
+    'end_date':end_date,'district': district,'state' : state,'dte':dte,'stat':stat,'team':team})
     sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
     now = datetime.now()
     ts = now.strftime("%Y-%m-%d %H:%M:%S")
@@ -2001,27 +1992,8 @@ def algo_for_willing_mem(request):
     #print(x)
     mem_available = []
     for i in range(x.count()):
-        if x[i].eYRC == '1':
-            if x[i].approval_eYRC == 'None' or x[i].approval_eYRC == 'no':
-                mem_available.append(x[i].responder )
-        if x[i].eYIC == '1':
-            if x[i].approval_eYIC == 'None' or x[i].approval_eYIC == 'no':
-                mem_available.append(x[i].responder)
-        if x[i].eYRDC == '1':
-            if x[i].approval_eYRDC == 'None' or x[i].approval_eYRDC == 'no':
-                mem_available.append(x[i].responder)
-        if x[i].eLSI == '1':
-            if x[i].approval_eLSI == 'None' or x[i].approval_eLSI == 'no':
-                mem_available.append(x[i].responder)
-        if x[i].web == '1':
-            if x[i].approval_web == 'None' or x[i].approval_web == 'no':
-                mem_available.append(x[i].responder)
-        if x[i].course_or_other_eyantra_work == '1':
-            if x[i].approval_course_or_other_eyantra_work == 'None' or x[i].approval_course_or_other_eyantra_work == 'no':
-                mem_available.append(x[i].responder)
-        if x[i].personal_or_any_other == '1':
-            if x[i].approval_personal_or_any_other == 'None' or x[i].approval_personal_or_any_other == 'no':
-                mem_available.append(x[i].responder)
+        if x[i].approval_status == 'None' or x[i].approval_status == 'no':
+            mem_available.append(x[i].responder)
     spl_mem_available = []
     [spl_mem_available.append(x) for x in mem_available if x not in spl_mem_available]
     print(spl_mem_available,'step1')
@@ -2098,7 +2070,7 @@ def algo_for_willing_mem(request):
         return JsonResponse({'workshop_team':workshop_team})
 
 
-
+'''
 @api_view(['POST'])
 def mailids(request):
     objs = memberdetail.objects.filter(team = '1')
@@ -2108,43 +2080,14 @@ def mailids(request):
         l.append({'mailid':objs[idx].emailid,'name':objs[idx].name})
     #print(l)
     return JsonResponse({'data':l})
-
+'''
 def form(request,uid,wid):
     return render(request,'form.html',context={'uuid':uid,'wid':wid})
 
 def headapproval(request,uid,wid):
     headdet = memberdetail.objects.filter(id = uid)
     wrkshp = create_workshop.objects.filter(id = wid)
-    if headdet[0].iscohead == '1':
-        if headdet[0].cohead == 'eYRC':
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYRC = '1')
-        elif headdet[0].cohead == 'eYIC':
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYIC = '1')
-        elif headdet[0].cohead == 'eYRDC':
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYRDC = '1')
-        elif headdet[0].cohead == 'eLSI':
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eLSI = '1')
-        elif headdet[0].cohead == 'web':
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,web = '1')
-        elif headdet[0].cohead == 'course_or_other_eyantra_work':
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,course_or_other_eyantra_work = '1')
-        else:
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,personal_or_any_other = '1')
-    else:
-        if headdet[0].head == 'eYRC':
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYRC = '1')
-        elif headdet[0].head == 'eYIC':
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYIC = '1')
-        elif headdet[0].head == 'eYRDC':
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYRDC = '1')
-        elif headdet[0].head == 'eLSI':
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eLSI = '1')
-        elif headdet[0].head == 'web':
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,web = '1')
-        elif headdet[0].head == 'course_or_other_eyantra_work':
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,course_or_other_eyantra_work = '1')
-        else:
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,personal_or_any_other = '1')
+    data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,approved_or_rejected_by=headdet[0].name)
     return render(request,'headapproval.html',context={'uuid':uid,'wid':wid,'datas':data})
 
 @api_view(['POST'])
@@ -2155,47 +2098,23 @@ def headresults(request):
     nms = var.get('names')
     wrkshp = create_workshop.objects.filter(id = var.get('wid'))
     headdet = memberdetail.objects.filter(id = var.get('uuid'))
-    '''
-    eYRC,eYIC,eYRDC,eLSI,web,Course/Other e-Yantra Work,Personal/Any Other
-    '''
     for idx in range(len(nms)):
         obj = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,
                 responder = nms[idx])
-        if headdet[0].head == 'eYRC' or headdet[0].cohead == 'eYRC':
-            obj.update(approval_eYRC = values[idx])
-        elif headdet[0].head == 'eYIC' or headdet[0].cohead == 'eYIC':
-            obj.update(approval_eYIC = values[idx])
-        elif headdet[0].head == 'eYRDC' or headdet[0].cohead == 'eYRDC':
-            obj.update(approval_eYRDC = values[idx])
-        elif headdet[0].head == 'eLSI' or headdet[0].cohead == 'eLSI':
-            obj.update(approval_eLSI = values[idx])
-        elif headdet[0].head == 'web' or headdet[0].cohead == 'web':
-            obj.update(approval_web = values[idx])
-        elif headdet[0].head == 'course_or_other_eyantra_work' or headdet[0].cohead == 'course_or_other_eyantra_work':
-            obj.update(approval_course_or_other_eyantra_work = values[idx])
-        elif headdet[0].head == 'personal_or_any_other' or headdet[0].cohead == 'personal_or_any_other':
-            obj.update(approval_personal_or_any_other = values[idx])
+        obj.update(approval_status = values[idx])
     return Response('success')
 
 @api_view(['POST'])
 def formdata(request):
+    now = datetime.now()
+    ts = now.strftime("%Y-%m-%d %H:%M:%S")
     var = JSONParser().parse(request)
     print(var.get('uuid'),var.get('wid'),var.get('category'))
     wrkshp = create_workshop.objects.filter(id = var.get('wid'))
-    category = var.get('category')
-    feedreason = ['0','0','0','0','0','0','0']
-    cat = ['eYRC','eYIC','eYRDC','eLSI','web','course_or_other_eyantra_work','personal_or_any_other']
-    for i in range(len(category)):
-        index = cat.index(category[i])
-        feedreason[index] = '1'
-    print(feedreason)
     name = memberdetail.objects.filter(id = var.get('uuid'),team = '1')[0].name
     WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,
-        responder = name).update(willingness_or_unavailability = var.get('option'),
-        reason = var.get('reason'),eYRC = feedreason[0],eYIC = feedreason[1],
-        eYRDC = feedreason[2],eLSI = feedreason[3],web = feedreason[4],
-        course_or_other_eyantra_work = feedreason[5],
-        personal_or_any_other = feedreason[6])
+        responder = name).update(timestamp = ts,willingness_or_unavailability = var.get('option'),
+        reason = var.get('reason'),category_of_reason = var.get('category'))
     return Response('success')
 
 @api_view(['POST'])
@@ -2210,13 +2129,13 @@ def sendmail(request):
     state = d[0].state
     today = date.today()
     last_date = today + timedelta(3)
-    last_date = datetime.strptime(last_date, '%d-%m-%Y')
+    #last_date = datetime.strptime(last_date, '%d-%m-%Y')
     last_date = datetime.strftime(last_date,'%B %d, %Y')
     start_date = wrkshp[0].startdate
-    start_date = datetime.strptime(start_date, '%Y-%m-%d')
+    #start_date = datetime.strptime(start_date, '%Y-%m-%d')
     start_date = datetime.strftime(start_date,'%B %d, %Y')
     end_date = wrkshp[0].enddate
-    end_date = datetime.strptime(end_date, '%Y-%m-%d')
+    #end_date = datetime.strptime(end_date, '%Y-%m-%d')
     end_date = datetime.strftime(end_date,'%B %d, %Y')
     #selected = var.get('selected')
     #print(selected)
@@ -2272,6 +2191,7 @@ def headmail(request):
     selectedworkshop = var.get('selectedworkshop')
     wrkshp = create_workshop.objects.filter(hcn = selectedworkshop)
     objs = memberdetail.objects.filter(ishead = '1')
+    print(objs)
     label = var.get('label')
     d = {'sent':[],'success':'','failure':'','total':objs.count()}
     sucs = flr = 0
@@ -2286,62 +2206,98 @@ def headmail(request):
         {'course_or_other_eyantra_work':[]},{'personal_or_any_other':[]}]
     team = WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop)
     for idx in range(team.count()):
-        if team[idx].eYRC == '1':
+        if team[idx].category_of_reason and 'eYRC' in team[idx].category_of_reason :
             rsnd[0]['eYRC'].append(team[idx].responder)
-        if team[idx].eYIC == '1':
+        if team[idx].category_of_reason and 'eYIC' in team[idx].category_of_reason:
             rsnd[1]['eYIC'].append(team[idx].responder)
-        if team[idx].eYRDC == '1':
+        if team[idx].category_of_reason and 'eYRDC' in team[idx].category_of_reason:
             rsnd[2]['eYRDC'].append(team[idx].responder)
-        if team[idx].eLSI == '1':
+        if team[idx].category_of_reason and 'eLSI' in team[idx].category_of_reason:
             rsnd[3]['eLSI'].append(team[idx].responder)
-        if team[idx].web == '1':
+        if team[idx].category_of_reason and 'web' in team[idx].category_of_reason:
             rsnd[4]['web'].append(team[idx].responder)
-        if team[idx].course_or_other_eyantra_work == '1':
+        if team[idx].category_of_reason and 'course_or_other_eyantra_work' in team[idx].category_of_reason:
             rsnd[5]['course_or_other_eyantra_work'].append(team[idx].responder)
-        if team[idx].personal_or_any_other == '1':
+        if team[idx].category_of_reason and 'personal_or_any_other' in team[idx].category_of_reason:
             rsnd[6]['personal_or_any_other'].append(team[idx].responder)
     print(rsnd)
     print(objs.count())
     for idx in range(objs.count()):
-        to = objs[idx].emailid
-        uuid = objs[idx].id
         #print(len(list(rsnd[idx].values())[0]))
         for i in range(len(rsnd)):
             if objs[idx].head in list(rsnd[i].keys())[0] and len(list(rsnd[i].values())[0]):
+                #print('1')
                 if objs[idx].name in list(rsnd[i].values())[0]:
+                    #print('2')
                     cohead = memberdetail.objects.filter(iscohead = '1',cohead = list(rsnd[i].keys())[0])
                     to = cohead[0].emailid
                     uuid = cohead[0].id
                     print(cohead[0].name)
-                else :
-                    print(list(rsnd[i].values()))
-                print(objs[idx].name)
-                cc = ''
-                bcc = ''
-                subject = 'Workshop Team Selection approval'
-                body = render_to_string(os.path.join(STATIC_DIR,'headlink.html'),
-                    {'uid':uuid,'wid':wrkshp[0].id,'workshop_name':wrkshp[0].hcn,
-                    'venue_address':wrkshp[0].venueadd,'start_date':start_date,
-                    'end_date':end_date})
-                sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
-                now = datetime.now()
-                ts = now.strftime("%Y-%m-%d %H:%M:%S")
-                if sent:
-                    sucs+=1
-                    d['sent'].append(to)
-                    serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
-                        'timestamp' : ts,'mail_label' : 'DRAFT','rcptmailid' : to,
-                        'delegated_access':'1','dcprovider':'None','messageid':sent['id']})
-                else:
-                    flr+=1
-                    serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
-                        'timestamp' : ts,'mail_label' : '','rcptmailid' : to,
-                        'delegated_access':'1','dcprovider':'None','messageid':'None'})
-                if serializer.is_valid():
-                    serializer.save()
-                else:
-                    print(serializer.errors)
-                print(serializer)
+                    WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop, responder = name).update(approved_or_rejected_by = cohead[0].name)
+                    print(objs[idx].name)
+                    cc = ''
+                    bcc = ''
+                    subject = 'Workshop Team Selection approval'
+                    body = render_to_string(os.path.join(STATIC_DIR,'headlink.html'),
+                        {'uid':uuid,'wid':wrkshp[0].id,'workshop_name':wrkshp[0].hcn,
+                        'venue_address':wrkshp[0].venueadd,'start_date':start_date,
+                        'end_date':end_date,'responder_list':cohead[0].name})
+                    sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
+                    now = datetime.now()
+                    ts = now.strftime("%Y-%m-%d %H:%M:%S")
+                    if sent:
+                        sucs+=1
+                        d['sent'].append(to)
+                        serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
+                            'timestamp' : ts,'mail_label' : 'DRAFT','rcptmailid' : to,
+                            'delegated_access':'1','dcprovider':'None','messageid':sent['id']})
+                    else:
+                        flr+=1
+                        serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
+                            'timestamp' : ts,'mail_label' : '','rcptmailid' : to,
+                            'delegated_access':'1','dcprovider':'None','messageid':'None'})
+                    if serializer.is_valid():
+                        serializer.save()
+                    else:
+                        print(serializer.errors)
+                    print(serializer)
+                if  objs[idx].name in list(rsnd[i].values())[0] or len(list(rsnd[i].values())[0]) >= 1:
+                    #print('3')
+                    to = objs[idx].emailid
+                    uuid = objs[idx].id
+                    responder_list = []
+                    for name in list(rsnd[i].values())[0]:
+                        if name != objs[idx].name:
+                            responder_list.append(name)
+                            WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop, responder = name).update(approved_or_rejected_by = objs[idx].name)
+                    print(responder_list)
+                    print(objs[idx].name)
+                    cc = ''
+                    bcc = ''
+                    subject = 'Workshop Team Selection approval'
+                    body = render_to_string(os.path.join(STATIC_DIR,'headlink.html'),
+                        {'uid':uuid,'wid':wrkshp[0].id,'workshop_name':wrkshp[0].hcn,
+                        'venue_address':wrkshp[0].venueadd,'start_date':start_date,
+                        'end_date':end_date,'responder_list':responder_list})
+                    sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
+                    now = datetime.now()
+                    ts = now.strftime("%Y-%m-%d %H:%M:%S")
+                    if sent:
+                        sucs+=1
+                        d['sent'].append(to)
+                        serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
+                            'timestamp' : ts,'mail_label' : 'DRAFT','rcptmailid' : to,
+                            'delegated_access':'1','dcprovider':'None','messageid':sent['id']})
+                    else:
+                        flr+=1
+                        serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
+                            'timestamp' : ts,'mail_label' : '','rcptmailid' : to,
+                            'delegated_access':'1','dcprovider':'None','messageid':'None'})
+                    if serializer.is_valid():
+                        serializer.save()
+                    else:
+                        print(serializer.errors)
+                    print(serializer)
     d['success'] = sucs
     d['failure'] = flr
     return JsonResponse(d)

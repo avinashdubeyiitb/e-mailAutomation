@@ -2,12 +2,12 @@
 def authlogin(request):
     """Authenticates the user trying to login.
 
-     Args:
-      username(Json-obj): The login credential username.
-      password(Json-obj): The login credential password.
+    Args:
+        username(Json-obj): The login credential username.
+        password(Json-obj): The login credential password.
 
-     Returns:
-      JsonResponse returning the status of login.
+    Returns:
+        JsonResponse returning the status of login.
     """
     var = JSONParser().parse(request)
     name = var.get('username')
@@ -46,111 +46,206 @@ def authlogin(request):
 
 
 def authlogout(request):
-    """ logout the current logged in user.
+    """logout the current logged in user.
 
-     Returns:
-      JsonResponse containing the status.
+    Returns:
+        JsonResponse containing the status.
     """
     logout(request)
     #print(User.objects.filter(logged_in = 'True').values())
     return JsonResponse({'status':'logged out'})
 
+def download(request):
+    """Searches for message within gmail and downloads the attachments accordingly.
+
+    Args:
+        messageid(Json-obj): message id of the mail(message).
+
+    Returns:
+        JsonResponse returning either status of successfull download or error if any.
+    """
+    try:
+        var = JSONParser().parse(request)
+        mid = var.get('messageid')
+        credentials = get_credentials()
+        service = build('gmail', 'v1', credentials=credentials)
+        msg = service.users().messages().get(userId='me', id=mid,format = 'full').execute()
+        tmp = msg.get("payload").get("headers")
+        downloads_path = str(Path.home() / "Downloads")
+        print(downloads_path)
+        attachments = []
+        for idx in range(len(tmp)):
+            if tmp[idx]['name'] == 'Subject' or  tmp[idx]['name'] == 'subject':
+                subject = tmp[idx]['value']
+        for part in msg['payload'].get('parts'):
+            if part['filename']:
+                file_name = part['filename']
+                idx = file_name.rindex(".")
+                now = str(datetime.now())[:19]
+                now = now.replace(":","_")
+                file_name = file_name[:idx]+"_"+str(now)+file_name[idx:]
+                attachments.append(file_name)
+                if 'data' in part['body']:
+                    data=part['body']['data']
+                else:
+                    att_id=part['body']['attachmentId']
+                    att=service.users().messages().attachments().get(userId='me', messageId=mid,id=att_id).execute()
+                    data=att['data']
+                file_data = base64.urlsafe_b64decode(data.encode('UTF-8'))
+                path = os.path.join(downloads_path,file_name)
+                with open(path, 'wb') as f:
+                    f.write(file_data)
+        print(attachments)
+        return JsonResponse({'status':'downloaded'})
+    except errors.HttpError as error:
+        print('An error occurred: %s' % error)
+        return JsonResponse({'status':error})
+
+def getmdtl(request):
+    """Searches for message within gmail and gather details like subject, body and attachments.
+
+    Args:
+        messageid: message id of the mail.
+        type: under sent, draft or inbox type.
+    Returns:
+        JsonResponse returning either subject, body and attachments of the message or error any any.
+    """
+    try:
+        var = JSONParser().parse(request)
+        mid = var.get('messageid')
+        credentials = get_credentials()
+        service = build('gmail', 'v1', credentials=credentials)
+        msg = service.users().messages().get(userId='me', id=mid,format = 'full').execute()
+        #print(msg)
+        tmp = msg.get("payload").get("headers")
+        attachments = []
+        for idx in range(len(tmp)):
+            if tmp[idx]['name'] == 'Subject' or  tmp[idx]['name'] == 'subject':
+                subject = tmp[idx]['value']
+        for part in msg['payload'].get('parts'):
+            if part['filename']:
+                attachments.append(part['filename'])
+            else :
+                if var.get('type') == 'inbox':
+                    pass
+                else:
+                    pass
+        if var.get('type') == 'inbox' :
+            body = msg.get("payload").get("parts")[1].get('body')
+            if body.get('attachmentId'):
+                body = msg.get("payload").get("parts")[0].get('parts')[1].get('body')
+        else :
+            body = msg.get("payload").get("parts")[0].get('body')
+            if not body['size']:
+                body = msg.get("payload").get("parts")[0].get('parts')[0].get('parts')[0].get('body')
+        bodydata = base64.urlsafe_b64decode(body.get("data").encode("ASCII")).decode("utf-8")
+        return JsonResponse({'subject':subject,'body':bodydata,'attachments':attachments})
+    except errors.HttpError as error:
+        print('An error occurred: %s' % error)
+        return JsonResponse({'status':error})
+
 def stats(request):
     """This function is used to return the statistical data to Email Analytics page.
 
-     Returns:
-      JsonResponse containing the data about which user send the mails to whom about what(label), saved drafts.
+    Returns:
+        JsonResponse containing the data about which user send the mails to whom about what(label), saved drafts and inbox responses.
     """
-    obj = ssn_detail.objects.all()
-    dct = {'Sent':[],'Inbox':[],'Draft':[]}
-    lbl = []
-    for idx in range(obj.count()):
-        lst = obj[idx].mail_label.split(',')
-        if 'DRAFT' in lst or not len(lst):
-            for i in range(len(dct['Draft'])):
-                if dct['Draft'][i]['user'] == obj[idx].user:
-                    if len(lst):
-                        dct['Draft'][i]['Data']['count']+=1
-                        dct['Draft'][i]['Data']['clist'].append(obj[idx].rcptmailid)
-                    else:
-                        dct['Draft'][i]['Data']['failed']+=1
-                        dct['Draft'][i]['Data']['flist'].append(obj[idx].rcptmailid)
-                    break
-            else:
-                if len(lst):
-                    dct['Draft'].append({'user':obj[idx].user,'Data':{'count':1,'failed':0,'clist':[obj[idx].rcptmailid],'flist':[]}})
+    try:
+        obj = ssn_detail.objects.all()
+        dct = {'Sent':[],'Inbox':[],'Draft':[]}
+        lbl = []
+        for idx in range(obj.count()):
+            lst = obj[idx].mail_label.split(',')
+            if 'DRAFT' in lst or not len(lst):
+                for i in range(len(dct['Draft'])):
+                    if dct['Draft'][i]['user'] == obj[idx].user:
+                        if len(lst):
+                            dct['Draft'][i]['Data']['count']+=1
+                            dct['Draft'][i]['Data']['clist'].append((obj[idx].rcptmailid,obj[idx].messageid))
+                        else:
+                            dct['Draft'][i]['Data']['failed']+=1
+                            dct['Draft'][i]['Data']['flist'].append((obj[idx].rcptmailid,obj[idx].messageid))
+                        break
                 else:
-                    dct['Draft'].append({'user':obj[idx].user,'Data':{'count':0,'failed':1,'clist':[],'flist':[obj[idx].rcptmailid]}})
-        else:
-            for i in range(len(dct['Sent'])):
-                if dct['Sent'][i]['user'] == obj[idx].user:
-                    break
+                    if len(lst):
+                        dct['Draft'].append({'user':obj[idx].user,'Data':{'count':1,'failed':0,'clist':[(obj[idx].rcptmailid,obj[idx].messageid)],'flist':[]}})
+                    else:
+                        dct['Draft'].append({'user':obj[idx].user,'Data':{'count':0,'failed':1,'clist':[],'flist':[(obj[idx].rcptmailid,obj[idx].messageid)]}})
             else:
-                i = len(dct['Sent'])
-                dct['Sent'].append({'user':obj[idx].user,'Data':[]})
-            for j in range(len(dct['Sent'][i]['Data'])):
-                if dct['Sent'][i]['Data'][j]['label'] in lst:
+                for i in range(len(dct['Sent'])):
+                    if dct['Sent'][i]['user'] == obj[idx].user:
+                        break
+                else:
+                    i = len(dct['Sent'])
+                    dct['Sent'].append({'user':obj[idx].user,'Data':[]})
+                for j in range(len(dct['Sent'][i]['Data'])):
+                    if dct['Sent'][i]['Data'][j]['label'] in lst:
+                        if len(lst) == 1:
+                            dct['Sent'][i]['Data'][j]['failed'] +=1
+                            dct['Sent'][i]['Data'][j]['flist'].append((obj[idx].rcptmailid,obj[idx].messageid))
+                        else :
+                            dct['Sent'][i]['Data'][j]['count'] +=1
+                            dct['Sent'][i]['Data'][j]['clist'].append((obj[idx].rcptmailid,obj[idx].messageid))
+                        break
+                else:
                     if len(lst) == 1:
-                        dct['Sent'][i]['Data'][j]['failed'] +=1
-                        dct['Sent'][i]['Data'][j]['flist'].append(obj[idx].rcptmailid)
+                        lbl.append(lst[0])
+                        dct['Sent'][i]['Data'].append({'label':lst[0],'count':0,'failed':1,'clist':[],'flist':[(obj[idx].rcptmailid,obj[idx].messageid)]})
                     else :
-                        dct['Sent'][i]['Data'][j]['count'] +=1
-                        dct['Sent'][i]['Data'][j]['clist'].append(obj[idx].rcptmailid)
-                    break
-            else:
-                if len(lst) == 1:
-                    lbl.append(lst[0])
-                    dct['Sent'][i]['Data'].append({'label':lst[0],'count':0,'failed':1,'clist':[],'flist':[obj[idx].rcptmailid]})
-                else :
-                    lbl.append(lst[1])
-                    dct['Sent'][i]['Data'].append({'label':lst[1],'count':1,'failed':0,'clist':[obj[idx].rcptmailid],'flist':[]})
-    print(dct)
-    lbl = list(set(lbl))
-    print(lbl)
-    ids = []
-    credentials = get_credentials()
-    print(credentials,'credentials')
-    service = build('gmail', 'v1', credentials=credentials)
-    labels = ListLabels(service,'me')
-    for val in labels:
-        if val['name'] in lbl:
-            ids.append(val['id'])
-    msg = ListMessagesWithLabels(service,'me',['INBOX'])
-    #print(msg)
-    for idx in range(len(ids)):
-        m = ListMessagesWithLabels(service,'me',[ids[idx]])
-        for i in range(len(m)):
-            for j in range(len(msg)):
-                if m[i]['threadId'] == msg[j]['threadId']:
-                    tmp = service.users().messages().get(userId='me', id=msg[j]['id']).execute()
-                    #print(tmp)
-                    for l in range(len(tmp['payload']['headers'])):
-                        if tmp['payload']['headers'][l]['name'] == 'From':
-                            print(lbl[idx],tmp['payload']['headers'][l]['value'])
-                            f = tmp['payload']['headers'][l]['value']
-                            if f.find('<') != -1:
-                                f = f[f.index('<')+1:f.index('>')]
-                        if tmp['payload']['headers'][l]['name'] == 'To':
-                            print(lbl[idx],tmp['payload']['headers'][l]['value'])
-                            t = tmp['payload']['headers'][l]['value']
-                            if t.find('<') != -1:
-                                t = t[t.index('<')+1:t.index('>')]
-                            break
-                    for a in range(len(dct['Inbox'])):
-                        if dct['Inbox'][a]['user'] == t:
-                            break
-                    else:
-                        a = len(dct['Inbox'])
-                        dct['Inbox'].append({'user':t,'Data':[]})
-                    for b in range(len(dct['Inbox'][a]['Data'])):
-                        if dct['Inbox'][a]['Data'][b]['label'] == lbl[idx]:
-                            dct['Inbox'][a]['Data'][b]['count'] +=1
-                            dct['Inbox'][a]['Data'][b]['clist'].append(f)
-                            break
-                    else:
-                        dct['Inbox'][a]['Data'].append({'label':lbl[idx],'count':1,'clist':[f]})
-    print(dct)
-    return JsonResponse(dct)
+                        lbl.append(lst[1])
+                        dct['Sent'][i]['Data'].append({'label':lst[1],'count':1,'failed':0,'clist':[(obj[idx].rcptmailid,obj[idx].messageid)],'flist':[]})
+        print(dct)
+        lbl = list(set(lbl))
+        print(lbl)
+        ids = []
+        credentials = get_credentials()
+        print(credentials,'credentials')
+        service = build('gmail', 'v1', credentials=credentials)
+        labels = ListLabels(service,'me')
+        for val in labels:
+            if val['name'] in lbl:
+                ids.append(val['id'])
+        msg = ListMessagesWithLabels(service,'me',['INBOX'])
+        #print(msg)
+        for idx in range(len(ids)):
+            m = ListMessagesWithLabels(service,'me',[ids[idx]])
+            for i in range(len(m)):
+                for j in range(len(msg)):
+                    if m[i]['threadId'] == msg[j]['threadId']:
+                        tmp = service.users().messages().get(userId='me', id=msg[j]['id']).execute()
+                        #print(tmp)
+                        f = None;t = None
+                        for l in range(len(tmp['payload']['headers'])):
+                            if tmp['payload']['headers'][l]['name'] == 'From':
+                                print(lbl[idx],tmp['payload']['headers'][l]['value'])
+                                f = tmp['payload']['headers'][l]['value']
+                                if f.find('<') != -1:
+                                    f = f[f.index('<')+1:f.index('>')]
+                            if tmp['payload']['headers'][l]['name'] == 'To':
+                                print(lbl[idx],tmp['payload']['headers'][l]['value'])
+                                t = tmp['payload']['headers'][l]['value']
+                                if t.find('<') != -1:
+                                    t = t[t.index('<')+1:t.index('>')]
+                                break
+                        if f and t :
+                            for a in range(len(dct['Inbox'])):
+                                if dct['Inbox'][a]['user'] == t:
+                                    break
+                            else:
+                                a = len(dct['Inbox'])
+                                dct['Inbox'].append({'user':t,'Data':[]})
+                            for b in range(len(dct['Inbox'][a]['Data'])):
+                                if dct['Inbox'][a]['Data'][b]['label'] == lbl[idx]:
+                                    dct['Inbox'][a]['Data'][b]['count'] +=1
+                                    dct['Inbox'][a]['Data'][b]['clist'].append((f,tmp['id']))
+                                    break
+                            else:
+                                dct['Inbox'][a]['Data'].append({'label':lbl[idx],'count':1,'clist':[(f,tmp['id'])]})
+        print(dct)
+        return JsonResponse(dct)
+    except errors.HttpError as error:
+        print('An error occurred: %s' % error)
+        return JsonResponse({'status':error})    
 
 def ListMessagesWithLabels(service, user_id, label_ids=[]):
   """List all Messages of the user's mailbox with label_ids applied.
@@ -188,17 +283,17 @@ def ListMessagesWithLabels(service, user_id, label_ids=[]):
 def getbody(clg,obj,sta,dis):
         """ Creates the subject, body for send information mail part.
 
-         Args:
-          clg: It contains the given college name.
-          obj: It contains the given college name details.
-          sta: It contains the state of the college.
-          dis: It contains the district of the college.
+        Args:
+            clg: It contains the given college name.
+            obj: It contains the given college name details.
+            sta: It contains the state of the college.
+            dis: It contains the district of the college.
 
-         Returns:
-          subject: the subject content that is to be sent.
-          body: the body content that is to be sent.
-          subdiv: denotes the type of body content.
-          tchdtl: contains the teacher details of the given college.
+        Returns:
+            subject: the subject content that is to be sent.
+            body: the body content that is to be sent.
+            subdiv: denotes the type of body content.
+            tchdtl: contains the teacher details of the given college.
         """
         try:
             district = dis
@@ -430,6 +525,12 @@ def ListLabels(service, user_id):
     print('An error occurred: %s' % error)
 
 def SendMessage(sender, to, cc, bcc, subject, body,label,attachmentFile=None):
+    """
+
+    Args:
+
+    Returns:
+    """
     credentials = get_credentials()
     print(credentials,'credentials')
     service = build('gmail', 'v1', credentials=credentials)

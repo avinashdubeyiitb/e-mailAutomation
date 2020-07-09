@@ -34,8 +34,8 @@ class WorkshopTeamSerializer(serializers.ModelSerializer):
         fields = (
             'workshop_id',
             'workshop_venue',
-            'date',
             'district',
+            'date',
             'responder',
         )
 class UserSerializer(serializers.ModelSerializer):
