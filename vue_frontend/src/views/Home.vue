@@ -12,6 +12,11 @@
               ></b-form-input>
             </b-form-group>
             <b-button variant="primary" size="sm" @click="onClick(url)">Save</b-button>
+            <div>
+              <b-form-checkbox v-model="checked" @change="themechange()" name="check-button" switch>
+                <b>Change Theme </b>
+              </b-form-checkbox>
+            </div>
           </b-dropdown-form>
         </b-dropdown>
       </div>
@@ -77,6 +82,7 @@ export default {
   },
   data () {
     return {
+      checked: true,
       stat: '',
       user_name: this.$store.getters.user_name,
       user_pass: '',
@@ -88,6 +94,14 @@ export default {
   watch: {
   },
   methods: {
+    themechange () {
+      const t = document.getElementById('theme')
+      if (this.checked === true) {
+        t.setAttribute('href', '/theme/light.css')
+      } else {
+        t.setAttribute('href', '/theme/dark.css')
+      }
+    },
     conti (e) {
       e.preventDefault()
       console.log('here')
@@ -175,6 +189,11 @@ export default {
 }
 </script>
 <style scoped>
+#th{
+  position:absolute;
+  top: 30%;
+  left:33%;
+}
 .container{
   background: #FFFFFF;
   position:absolute;

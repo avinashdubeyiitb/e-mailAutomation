@@ -45,7 +45,7 @@ class ssn_detail(models.Model):
     rcptmailid = models.CharField(max_length=50,blank=False,null=False)
     delegated_access = models.CharField(max_length=10,blank=False,null=False)
     dcprovider = models.CharField(max_length=50,blank=False,null=False)
-
+    messageid = models.TextField(null = False, blank = False)
     def __str__(self):
         return self.user
 

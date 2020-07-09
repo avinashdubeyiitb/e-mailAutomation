@@ -96,7 +96,6 @@
       <strong> .</strong>
     </label>
     </label><br>
-  </div>
   <button id="msub" @click="formSubmit">Submit</button>
   <button id="nsub" @click="savealgo">Confirm changes!</button>
 
@@ -113,6 +112,8 @@
     </tr>
   </tbody>
 </table>
+</div>
+
   </div>
 </template>
 <script>
@@ -327,7 +328,6 @@ left: 6.5%;
 right:1%;
 top: 9%;
 z-index: -1;
-background: #4ABDAC;
 border: 1px solid #000000;
 box-sizing: border-box;
 border-radius: 10px;

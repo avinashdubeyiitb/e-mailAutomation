@@ -152,7 +152,8 @@ export default {
       success: false,
       showing: true,
       wrklist: [],
-      selectedworkshop1: ''
+      selectedworkshop1: '',
+      isactive: ''
     }
   },
   watch: {
@@ -178,6 +179,7 @@ export default {
           currentObj.workshoplist()
           if (currentObj.selectedworkshop === currentObj.selectedworkshop1 && currentObj.isactive === 'False') {
             currentObj.selectedworkshop = ''
+            this.$store.commit('awsselectedworkshop', '')
           }
         })
         .catch(function (error) {
@@ -260,6 +262,7 @@ export default {
           if (this.output.status === 'Created Successfully') {
             this.success = true
           }
+          this.workshoplist()
         })
         .catch(function (error) {
           currentObj.output = error
@@ -307,7 +310,6 @@ left: 7%;
 right:1%;
 top: 10%;
 z-index: -1;
-background: #4ABDAC;
 border: 1px solid #000000;
 box-sizing: border-box;
 border-radius: 10px;

@@ -573,7 +573,7 @@ export default {
         formData.append('file2send2', Object.values({ pamp: 'Pamphlet2020.pdf', LoI: 'letter-of-intent.docx' }))
       }
       formData.append('list', this.selected)
-      formData.append('label', 'sim')
+      formData.append('label', 'information-mail')
       formData.append('user', this.$store.getters.user_name)
       const currentObj = this
       this.axios.post(this.url + '/api/main/csv/approve', formData,
@@ -780,7 +780,7 @@ export default {
       formData.append('bcc', this.output.bcc)
       formData.append('body', this.output.body)
       formData.append('subject', this.output.subject)
-      formData.append('label', 'sim')
+      formData.append('label', 'information-mail')
       formData.append('user', this.$store.getters.user_name)
       e.preventDefault()
       const currentObj = this
@@ -909,7 +909,7 @@ font-style: normal;
 font-weight: normal;
 font-size: 2em;
 text-align: center;
-color: #FFFFFF;
+color: #FFFFFF
 }
 #col1inner{
 position: absolute;
@@ -918,7 +918,6 @@ height: 90%;
 left: 7%;
 top: 10%;
 z-index: -1;
-background: #4ABDAC;
 border: 1px solid #000000;
 box-sizing: border-box;
 border-radius: 10px;
@@ -930,8 +929,6 @@ width: 48%;
 height: 90%;
 right: 1%;
 top: 10%;
-
-background: #4ABDAC;
 border: 1px solid #000000;
 box-sizing: border-box;
 border-radius: 10px;
