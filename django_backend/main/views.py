@@ -1723,7 +1723,7 @@ def kavi_sir_mail(request):
     district = d[0].district
     state = d[0].state
     stat = WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop)
-    app = memberdetail.objects.all()
+    app = memberdetail.objects.filter(ishead = '1')
     dte = wrkshp[0].startdate + ' & ' + wrkshp[0].enddate
     d = {'sent':[],'success':'','failure':''}
     sucs = flr = 0
@@ -1733,6 +1733,84 @@ def kavi_sir_mail(request):
     end_date = wrkshp[0].enddate
     end_date = datetime.strptime(end_date, '%Y-%m-%d')
     end_date = datetime.strftime(end_date,'%B %d, %Y')
+    data = {}
+    print(stat.count())
+    rsnd = [{'eYRC':[]},{'eYIC':[]},{'eYRDC':[]},{'eLSI':[]},{'web':[]},
+        {'course_or_other_eyantra_work':[]},{'personal_or_any_other':[]}]
+    for idx in range(stat.count()):
+        if stat[idx].eYRC == '1':
+            rsnd[0]['eYRC'].append(stat[idx].responder)
+        if stat[idx].eYIC == '1':
+            rsnd[1]['eYIC'].append(stat[idx].responder)
+        if stat[idx].eYRDC == '1':
+            rsnd[2]['eYRDC'].append(stat[idx].responder)
+        if stat[idx].eLSI == '1':
+            rsnd[3]['eLSI'].append(stat[idx].responder)
+        if stat[idx].web == '1':
+            rsnd[4]['web'].append(stat[idx].responder)
+        if stat[idx].course_or_other_eyantra_work == '1':
+            rsnd[5]['course_or_other_eyantra_work'].append(stat[idx].responder)
+        if stat[idx].personal_or_any_other == '1':
+            rsnd[6]['personal_or_any_other'].append(stat[idx].responder)
+    for i in range(stat.count()):
+        catapprove = []
+        head = ''
+        if stat[i].approval_eYRC == 'yes':
+            catapprove.append('eYRC approved')
+        if stat[i].approval_eYIC == 'yes':
+            catapprove.append('eYIC approved')
+        if stat[i].approval_eYRDC == 'yes':
+            catapprove.append('eYRDC approved')
+        if stat[i].approval_eLSI == 'yes':
+            catapprove.append('eLSI approved')
+        if stat[i].approval_web == 'yes':
+            catapprove.append('web approved')
+        if stat[i].approval_course_or_other_eyantra_work == 'yes':
+            catapprove.append('course_or_other_eyantra_work approved')
+        if stat[i].approval_personal_or_any_other == 'yes':
+            catapprove.append('personal_or_any_other approved')
+        if stat[i].approval_eYRC == 'no':
+            catapprove.append('eYRC rejected')
+        if stat[i].approval_eYIC == 'no':
+            catapprove.append('eYIC rejected')
+        if stat[i].approval_eYRDC == 'no':
+            catapprove.append('eYRDC rejected')
+        if stat[i].approval_eLSI == 'no':
+            catapprove.append('eLSI rejected')
+        if stat[i].approval_web == 'no':
+            catapprove.append('web rejected')
+        if stat[i].approval_course_or_other_eyantra_work == 'no':
+            catapprove.append('course_or_other_eyantra_work rejected')
+        if stat[i].approval_personal_or_any_other == 'no':
+            catapprove.append('personal_or_any_other rejected')
+        if stat[i].approval_eYRC == 'None' and stat[i].eYRC == '1':
+            catapprove.append('no feedback')
+        if stat[i].approval_eYIC == 'None' and stat[i].eYIC == '1':
+            catapprove.append('no feedback')
+        if stat[i].approval_eYRDC == 'None' and stat[i].eYRDC == '1':
+            catapprove.append('no feedback')
+        if stat[i].approval_eLSI == 'None' and stat[i].eLSI == '1':
+            catapprove.append('no feedback')
+        if stat[i].approval_web == 'None' and stat[i].web == '1':
+            catapprove.append('no feedback')
+        if stat[i].approval_course_or_other_eyantra_work == 'None' and stat[i].course_or_other_eyantra_work == '1':
+            catapprove.append('no feedback')
+        if stat[i].approval_personal_or_any_other == 'None' and stat[i].personal_or_any_other == '1':
+            catapprove.append('no feedback')
+        li = ','.join(catapprove)
+        for idx in range(app.count()):
+            for j in range(len(rsnd)):
+                if app[idx].head in list(rsnd[j].keys())[0] and len(list(rsnd[j].values())[0]):
+                    if app[idx].name in list(rsnd[j].values())[0]:
+                        cohead = memberdetail.objects.filter(iscohead = '1',cohead = list(rsnd[j].keys())[0])
+                        print(cohead[0].name)
+                        head = cohead[0].name
+                    else :
+                        print(list(rsnd[j].values()))
+                        head = app[idx].name
+                        print(app[idx].name)
+        data['flood' + str(i)] = [wrkshp[0].hcn,dte,district,stat[i].responder,stat[i].willingness_or_unavailability,stat[i].reason,li,head]
+    print(data)
     to = 'aakashkhandelwal56@gmail.com'
     cc = ''
     bcc = ''
@@ -1740,7 +1818,7 @@ def kavi_sir_mail(request):
     body = render_to_string(os.path.join(STATIC_DIR,'kavi_sir_mail.html'),
     {'wid':wrkshp[0].id,'workshop_name':wrkshp[0].hcn,
     'venue_address':wrkshp[0].venueadd,'start_date':start_date,
-    'end_date':end_date,'district': district,'state' : state,'dte':dte,'stat':stat})
+    'end_date':end_date,'district': district,'state' : state,'dte':dte,'stat':stat,'data':data})
     sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
     now = datetime.now()
     ts = now.strftime("%Y-%m-%d %H:%M:%S")
