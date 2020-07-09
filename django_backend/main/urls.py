@@ -18,7 +18,7 @@ urlpatterns = [
     url(r'^api/main/getlang', views.getlang),
     url(r'^api/main/savewrkactv', views.savewrkactv),
     url(r'^api/main/sendmail',views.sendmail),
-    url(r'^api/main/getfile',views.getfile),
+    #url(r'^api/main/getfile',views.getfile),
     url(r'^api/main/formdata',views.formdata),
     url(r'^api/main/headresults',views.headresults),
     url(r'^api/main/form/(?P<uid>[^/]+)/(?P<wid>\w+)/$',views.form),
