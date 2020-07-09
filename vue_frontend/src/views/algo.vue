@@ -112,8 +112,10 @@
     </tr>
   </tbody>
 </table>
-</div>
+<button id="sub1" @click="kavi_sir_mail">Send Mail to Kavi sir</button>
+<div id="result">{{result}}</div>
 
+</div>
   </div>
 </template>
 <script>
@@ -165,12 +167,27 @@ export default {
       availcriteria: [],
       output: this.$store.getters.algooutput,
       out: '',
-      algodetail: ''
+      algodetail: '',
+      result: ''
     }
   },
   watch: {
   },
   methods: {
+    kavi_sir_mail () {
+      this.result = 'sending mails'
+      this.axios.post(this.url + '/api/main/kavi_sir_mail', {
+        selectedworkshop: this.selectedworkshop,
+        label: 'willingness-unavailability',
+        user: this.$store.getters.user_name
+      })
+        .then(function (response) {
+          this.result = response.data
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    },
     getalgodetail () {
       this.axios.post(this.url + '/api/main/getalgodetail', {
       })
@@ -427,6 +444,11 @@ top: 15%;
   right:24%;
   top: 25%;
 }
+#sub1{
+  position: absolute;
+  right:17%;
+  top: 80%;
+}
 #rep{
   position: absolute;
   left:62%;
@@ -451,5 +473,10 @@ table, th, td {
   max-height: 160px;
   overflow-y: auto;
   z-index:10000;
+}
+#result{
+position: absolute;
+right:20%;
+top: 83%;
 }
 </style>

@@ -35,6 +35,7 @@ urlpatterns = [
     url(r'^api/main/stats',views.stats),
     url(r'^api/main/getmdtl',views.getmdtl),
     url(r'^api/main/download',views.download),
+    url(r'^api/main/kavi_sir_mail',views.kavi_sir_mail),
     # url(r'^api/public/', views.public),
     # url(r'^api/private/', views.private),
     # url(r'^api/main/google', views.GoogleLogin),

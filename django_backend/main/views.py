@@ -19,7 +19,7 @@ from django.core.files.storage import default_storage
 from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.http import FileResponse,HttpResponse
-from datetime import datetime
+from datetime import datetime,date,timedelta
 from django.utils.encoding import escape_uri_path
 import smtplib
 import json
@@ -1713,6 +1713,58 @@ def awssave(request):
 # workshop team algo
 
 @api_view(['POST'])
+def kavi_sir_mail(request):
+    var = JSONParser().parse(request)
+    user = var.get('user')
+    selectedworkshop = var.get('selectedworkshop')
+    wrkshp = create_workshop.objects.filter(hcn = selectedworkshop)
+    d = ElsiCollegeDtls.objects.filter(college_name = selectedworkshop)
+    label = var.get('label')
+    district = d[0].district
+    state = d[0].state
+    stat = WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop)
+    app = memberdetail.objects.all()
+    dte = wrkshp[0].startdate + ' & ' + wrkshp[0].enddate
+    d = {'sent':[],'success':'','failure':''}
+    sucs = flr = 0
+    start_date = wrkshp[0].startdate
+    start_date = datetime.strptime(start_date, '%Y-%m-%d')
+    start_date = datetime.strftime(start_date,'%B %d, %Y')
+    end_date = wrkshp[0].enddate
+    end_date = datetime.strptime(end_date, '%Y-%m-%d')
+    end_date = datetime.strftime(end_date,'%B %d, %Y')
+    to = 'aakashkhandelwal56@gmail.com'
+    cc = ''
+    bcc = ''
+    subject = 'Workshop team for workshop at ' +  wrkshp[0].hcn + ' ,' + district + ' ,'+ state + ' on ' + start_date + ' - ' + end_date + '.'
+    body = render_to_string(os.path.join(STATIC_DIR,'kavi_sir_mail.html'),
+    {'wid':wrkshp[0].id,'workshop_name':wrkshp[0].hcn,
+    'venue_address':wrkshp[0].venueadd,'start_date':start_date,
+    'end_date':end_date,'district': district,'state' : state,'dte':dte,'stat':stat})
+    sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
+    now = datetime.now()
+    ts = now.strftime("%Y-%m-%d %H:%M:%S")
+    if sent:
+        sucs+=1
+        d['sent'].append(to)
+        serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
+                    'timestamp' : ts,'mail_label' : 'SENT,'+label,'rcptmailid' : to,
+                    'delegated_access':'1','dcprovider':'None','messageid':sent['id']})
+    else:
+        flr+=1
+        serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
+                    'timestamp' : ts,'mail_label' : label,'rcptmailid' : to,
+                    'delegated_access':'1','dcprovider':'None','messageid':'None'})
+        if serializer.is_valid():
+            serializer.save()
+        else:
+            print(serializer.errors)
+        print(serializer)
+    d['success'] = sucs
+    d['failure'] = flr
+    return JsonResponse(d)
+
+@api_view(['POST'])
 def getalgodetail(request):
     obj = algo_detail.objects.all()
     algodetail = {}
@@ -1957,12 +2009,12 @@ def algo_for_willing_mem(request):
     workshop_team  = []
     if len(workshop_lead) < 2 or len(ranked_data) < 3:
         workshop_lead,ranked_data,msg = algo_for_available_mem(spl_mem_available,workshop_lead,ranked_data,availcriteria,lang,tcntt)
-        workshop_team = workshop_lead + ranked_data[:3]
+        workshop_team = workshop_lead + ranked_data
         print(workshop_team,'workshop_team')
         print(msg)
         return JsonResponse({'workshop_team':workshop_team,'msg':msg})
     else:
-        workshop_team = workshop_lead + ranked_data[:3]
+        workshop_team = workshop_lead + ranked_data
         print(workshop_team,'workshop_team')
     # if len(will_mem_available) < 5:
         return JsonResponse({'workshop_team':workshop_team})
@@ -2077,6 +2129,17 @@ def sendmail(request):
     d = ElsiCollegeDtls.objects.filter(college_name = selectedworkshop)
     label = var.get('label')
     district = d[0].district
+    state = d[0].state
+    today = date.today()
+    last_date = today + timedelta(3)
+    last_date = datetime.strptime(last_date, '%d-%m-%Y')
+    last_date = datetime.strftime(last_date,'%B %d, %Y')
+    start_date = wrkshp[0].startdate
+    start_date = datetime.strptime(start_date, '%Y-%m-%d')
+    start_date = datetime.strftime(start_date,'%B %d, %Y')
+    end_date = wrkshp[0].enddate
+    end_date = datetime.strptime(end_date, '%Y-%m-%d')
+    end_date = datetime.strftime(end_date,'%B %d, %Y')
     #selected = var.get('selected')
     #print(selected)
     objs = memberdetail.objects.filter(team = '1')
@@ -2096,11 +2159,11 @@ def sendmail(request):
             uuid = objs[idx].id
             cc = ''
             bcc = ''
-            subject = 'Workshop Team Selection Form'
+            subject = 'Regarding Workshop Team for upcoming workshop at ' +  wrkshp[0].hcn + ' ,' + district + ' ,'+ state + ' .'
             body = render_to_string(os.path.join(STATIC_DIR,'link.html'),
                 {'uid':uuid,'wid':wrkshp[0].id,'workshop_name':wrkshp[0].hcn,
-                'venue_address':wrkshp[0].venueadd,'start_date':wrkshp[0].startdate,
-                'end_date':wrkshp[0].enddate})
+                'venue_address':wrkshp[0].venueadd,'start_date':start_date,
+                'end_date':end_date,'district': district,'state' : state,'last_date':last_date})
             sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
             now = datetime.now()
             ts = now.strftime("%Y-%m-%d %H:%M:%S")
@@ -2134,6 +2197,12 @@ def headmail(request):
     label = var.get('label')
     d = {'sent':[],'success':'','failure':'','total':objs.count()}
     sucs = flr = 0
+    start_date = wrkshp[0].startdate
+    start_date = datetime.strptime(start_date, '%Y-%m-%d')
+    start_date = datetime.strftime(start_date,'%B %d, %Y')
+    end_date = wrkshp[0].enddate
+    end_date = datetime.strptime(end_date, '%Y-%m-%d')
+    end_date = datetime.strftime(end_date,'%B %d, %Y')
     #eYRC,eYIC,eYRDC,eLSI,web,Course/Other e-Yantra Work,Personal/Any Other
     rsnd = [{'eYRC':[]},{'eYIC':[]},{'eYRDC':[]},{'eLSI':[]},{'web':[]},
         {'course_or_other_eyantra_work':[]},{'personal_or_any_other':[]}]
@@ -2174,8 +2243,8 @@ def headmail(request):
                 subject = 'Workshop Team Selection approval'
                 body = render_to_string(os.path.join(STATIC_DIR,'headlink.html'),
                     {'uid':uuid,'wid':wrkshp[0].id,'workshop_name':wrkshp[0].hcn,
-                    'venue_address':wrkshp[0].venueadd,'start_date':wrkshp[0].startdate,
-                    'end_date':wrkshp[0].enddate})
+                    'venue_address':wrkshp[0].venueadd,'start_date':start_date,
+                    'end_date':end_date})
                 sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
                 now = datetime.now()
                 ts = now.strftime("%Y-%m-%d %H:%M:%S")

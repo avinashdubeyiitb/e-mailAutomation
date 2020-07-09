@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+      table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+      }
+    </style>
+</head>
+<body>
+  <p>Dear Sir,</p>
+  <p>For the upcoming workshop at {{workshop_name}}, {{district}}, {{state}} on {{start_date}} - {{end_date}},
+    we have got the following responses for Willingness and Unavailability .</p>
+    <table>
+      <tbody>
+        {% for data in stat%}
+        <tr>
+          <td>
+            <table>
+              <thead>
+                <th>Workshop Venue</th>
+                <th>Date</th>
+                <th>District</th>
+              </thead>
+              <tbody>
+                <tr>
+                  <td >{{workshop_name}}</td>
+                  <td >{{dte}}</td>
+                  <td >{{district}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+          <td>
+            <table>
+            <thead>
+              <th>Responder</th>
+              <th>Willingness/Unavailability</th>
+              <th>Reason</th>
+            </thead>
+            <tbody>
+                <tr>
+                  <td>
+                    {{data.responder}}
+                  </td>
+                  <td>
+                    {{data.willingness_or_unavailability}}
+                  </td>
+                  <td>
+                    {{data.reason}}
+                  </td>
+                </tr>
+            </tbody>
+            </table>
+          </td>
+          <td>
+            <table>
+              <thead>
+                <th>Approved/Rejected</th>
+                <th>Approved/Rejected by</th>
+              </thead>
+              <tbody>
+            <tr>
+              {% if data.eYRC == "1" %}
+              <td>
+                eYRC
+              </td>
+              {% endif %}
+              {% if data.eYIC == '1' %}
+              <td>
+                eYIC
+              </td>
+              {%endif%}
+              {% if data.eYRDC == '1' %}
+              <td>
+                eYRDC
+              </td>
+              {%endif%}
+              {% if data.eLSI == '1' %}
+              <td>
+                eLSI
+              </td>
+              {%endif%}
+              {% if data.web == '1' %}
+              <td>
+                web
+              </td>
+              {%endif%}
+              {% if data.course_or_other_eyantra_work == '1'%}
+              <td>
+                course_or_other_eyantra_work
+              </td>
+              {%endif%}
+              {% if data.personal_or_any_other == '1' %}
+              <td>
+                personal_or_any_other
+              </td>
+              {%endif%}
+            </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+        {%endfor%}
+
+      </tbody>
+    </table>
+
+<p>
+Please suggest a team for the workshop from the list below
+</p>
+    <table>
+
+    </table>
+</body>
+</html>
