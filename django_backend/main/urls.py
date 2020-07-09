@@ -24,7 +24,7 @@ urlpatterns = [
     url(r'^api/main/form/(?P<uid>[^/]+)/(?P<wid>\w+)/$',views.form),
     url(r'^api/main/headapproval/(?P<uid>[^/]+)/(?P<wid>\w+)/$',views.headapproval),
     url(r'^api/main/store',views.store),
-    url(r'^api/main/mailids',views.mailids),
+    #url(r'^api/main/mailids',views.mailids),
     url(r'^api/main/gethcn',views.gethcn),
     url(r'^api/main/headmail',views.headmail),
     url(r'^api/main/awsedit',views.awsedit),

@@ -179,7 +179,8 @@ export default {
       this.axios.post(this.url + '/api/main/kavi_sir_mail', {
         selectedworkshop: this.selectedworkshop,
         label: 'willingness-unavailability',
-        user: this.$store.getters.user_name
+        user: this.$store.getters.user_name,
+        team: this.output.workshop_team
       })
         .then(function (response) {
           this.result = response.data

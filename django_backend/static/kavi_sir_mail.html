@@ -69,41 +69,8 @@
               <tbody>
                 {% for data in stat%}
             <tr>
-              {% if data.eYRC == "1" %}
-              <td>
-                eYRC
-              </td>
-              {% endif %}
-              {% if data.eYIC == '1' %}
-              <td>
-                eYIC
-              </td>
-              {%endif%}
-              {% if data.eYRDC == '1' %}
-              <td>
-                eYRDC
-              </td>
-              {%endif%}
-              {% if data.eLSI == '1' %}
-              <td>
-                eLSI
-              </td>
-              {%endif%}
-              {% if data.web == '1' %}
-              <td>
-                web
-              </td>
-              {%endif%}
-              {% if data.course_or_other_eyantra_work == '1'%}
-              <td>
-                course_or_other_eyantra_work
-              </td>
-              {%endif%}
-              {% if data.personal_or_any_other == '1' %}
-              <td>
-                personal_or_any_other
-              </td>
-              {%endif%}
+              <td>{{data.approval_status}}</td>
+              <td>{{data.approved_or_rejected_by}}</td>
             </tr>
             {%endfor%}
               </tbody>
@@ -117,7 +84,20 @@
 Please suggest a team for the workshop from the list below
 </p>
     <table>
-
+      <thead>
+        <th>Responder</th>
+        <th>Count</th>
+        <th>Willingness/Unavailability</th>
+      </thead>
+      <tbody>
+        {% for data in team%}
+    <tr>
+      <td>{{data.name}}</td>
+      <td>{{data.count}}</td>
+      <td>{{data.status}}</td>
+    </tr>
+    {%endfor%}
+      </tbody>
     </table>
 </body>
 </html>

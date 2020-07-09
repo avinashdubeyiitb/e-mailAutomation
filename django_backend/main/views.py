@@ -1773,7 +1773,7 @@ def awssave(request):
 
 ######################
 # workshop team algo
-
+catlist = ['eYRC','eYIC','eYRDC','eLSI','web','course_or_other_eyantra_work','personal_or_any_other']
 @api_view(['POST'])
 def kavi_sir_mail(request):
     var = JSONParser().parse(request)
@@ -1782,6 +1782,13 @@ def kavi_sir_mail(request):
     wrkshp = create_workshop.objects.filter(hcn = selectedworkshop)
     d = ElsiCollegeDtls.objects.filter(college_name = selectedworkshop)
     label = var.get('label')
+    tm = var.get('team')
+    print(tm)
+    team = []
+    for idx in range(len(tm)):
+        cnt = WorkshopsTakenCount.objects.filter(name = tm[idx])[0].total_count
+        sts = WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop,responder = tm[idx])[0].willingness_or_unavailability
+        team.append({'name':tm[idx],'count':cnt,'status':sts})
     district = d[0].district
     state = d[0].state
     stat = WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop)
@@ -1795,14 +1802,14 @@ def kavi_sir_mail(request):
     end_date = wrkshp[0].enddate
     end_date = datetime.strptime(end_date, '%Y-%m-%d')
     end_date = datetime.strftime(end_date,'%B %d, %Y')
-    to = 'aakashkhandelwal56@gmail.com'
+    to = '98dikshitajain@gmail.com'
     cc = ''
     bcc = ''
     subject = 'Workshop team for workshop at ' +  wrkshp[0].hcn + ' ,' + district + ' ,'+ state + ' on ' + start_date + ' - ' + end_date + '.'
     body = render_to_string(os.path.join(STATIC_DIR,'kavi_sir_mail.html'),
     {'wid':wrkshp[0].id,'workshop_name':wrkshp[0].hcn,
     'venue_address':wrkshp[0].venueadd,'start_date':start_date,
-    'end_date':end_date,'district': district,'state' : state,'dte':dte,'stat':stat})
+    'end_date':end_date,'district': district,'state' : state,'dte':dte,'stat':stat,'team':team})
     sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
     now = datetime.now()
     ts = now.strftime("%Y-%m-%d %H:%M:%S")
@@ -1985,27 +1992,8 @@ def algo_for_willing_mem(request):
     #print(x)
     mem_available = []
     for i in range(x.count()):
-        if x[i].eYRC == '1':
-            if x[i].approval_eYRC == 'None' or x[i].approval_eYRC == 'no':
-                mem_available.append(x[i].responder )
-        if x[i].eYIC == '1':
-            if x[i].approval_eYIC == 'None' or x[i].approval_eYIC == 'no':
-                mem_available.append(x[i].responder)
-        if x[i].eYRDC == '1':
-            if x[i].approval_eYRDC == 'None' or x[i].approval_eYRDC == 'no':
-                mem_available.append(x[i].responder)
-        if x[i].eLSI == '1':
-            if x[i].approval_eLSI == 'None' or x[i].approval_eLSI == 'no':
-                mem_available.append(x[i].responder)
-        if x[i].web == '1':
-            if x[i].approval_web == 'None' or x[i].approval_web == 'no':
-                mem_available.append(x[i].responder)
-        if x[i].course_or_other_eyantra_work == '1':
-            if x[i].approval_course_or_other_eyantra_work == 'None' or x[i].approval_course_or_other_eyantra_work == 'no':
-                mem_available.append(x[i].responder)
-        if x[i].personal_or_any_other == '1':
-            if x[i].approval_personal_or_any_other == 'None' or x[i].approval_personal_or_any_other == 'no':
-                mem_available.append(x[i].responder)
+        if x[i].approval_status == 'None' or x[i].approval_status == 'no':
+            mem_available.append(x[i].responder)
     spl_mem_available = []
     [spl_mem_available.append(x) for x in mem_available if x not in spl_mem_available]
     print(spl_mem_available,'step1')
@@ -2082,7 +2070,7 @@ def algo_for_willing_mem(request):
         return JsonResponse({'workshop_team':workshop_team})
 
 
-
+'''
 @api_view(['POST'])
 def mailids(request):
     objs = memberdetail.objects.filter(team = '1')
@@ -2092,43 +2080,14 @@ def mailids(request):
         l.append({'mailid':objs[idx].emailid,'name':objs[idx].name})
     #print(l)
     return JsonResponse({'data':l})
-
+'''
 def form(request,uid,wid):
     return render(request,'form.html',context={'uuid':uid,'wid':wid})
 
 def headapproval(request,uid,wid):
     headdet = memberdetail.objects.filter(id = uid)
     wrkshp = create_workshop.objects.filter(id = wid)
-    if headdet[0].iscohead == '1':
-        if headdet[0].cohead == 'eYRC':
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYRC = '1')
-        elif headdet[0].cohead == 'eYIC':
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYIC = '1')
-        elif headdet[0].cohead == 'eYRDC':
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYRDC = '1')
-        elif headdet[0].cohead == 'eLSI':
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eLSI = '1')
-        elif headdet[0].cohead == 'web':
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,web = '1')
-        elif headdet[0].cohead == 'course_or_other_eyantra_work':
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,course_or_other_eyantra_work = '1')
-        else:
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,personal_or_any_other = '1')
-    else:
-        if headdet[0].head == 'eYRC':
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYRC = '1')
-        elif headdet[0].head == 'eYIC':
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYIC = '1')
-        elif headdet[0].head == 'eYRDC':
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eYRDC = '1')
-        elif headdet[0].head == 'eLSI':
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,eLSI = '1')
-        elif headdet[0].head == 'web':
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,web = '1')
-        elif headdet[0].head == 'course_or_other_eyantra_work':
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,course_or_other_eyantra_work = '1')
-        else:
-            data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,personal_or_any_other = '1')
+    data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,approved_or_rejected_by=headdet[0].name)
     return render(request,'headapproval.html',context={'uuid':uid,'wid':wid,'datas':data})
 
 @api_view(['POST'])
@@ -2139,47 +2098,23 @@ def headresults(request):
     nms = var.get('names')
     wrkshp = create_workshop.objects.filter(id = var.get('wid'))
     headdet = memberdetail.objects.filter(id = var.get('uuid'))
-    '''
-    eYRC,eYIC,eYRDC,eLSI,web,Course/Other e-Yantra Work,Personal/Any Other
-    '''
     for idx in range(len(nms)):
         obj = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,
                 responder = nms[idx])
-        if headdet[0].head == 'eYRC' or headdet[0].cohead == 'eYRC':
-            obj.update(approval_eYRC = values[idx])
-        elif headdet[0].head == 'eYIC' or headdet[0].cohead == 'eYIC':
-            obj.update(approval_eYIC = values[idx])
-        elif headdet[0].head == 'eYRDC' or headdet[0].cohead == 'eYRDC':
-            obj.update(approval_eYRDC = values[idx])
-        elif headdet[0].head == 'eLSI' or headdet[0].cohead == 'eLSI':
-            obj.update(approval_eLSI = values[idx])
-        elif headdet[0].head == 'web' or headdet[0].cohead == 'web':
-            obj.update(approval_web = values[idx])
-        elif headdet[0].head == 'course_or_other_eyantra_work' or headdet[0].cohead == 'course_or_other_eyantra_work':
-            obj.update(approval_course_or_other_eyantra_work = values[idx])
-        elif headdet[0].head == 'personal_or_any_other' or headdet[0].cohead == 'personal_or_any_other':
-            obj.update(approval_personal_or_any_other = values[idx])
+        obj.update(approval_status = values[idx])
     return Response('success')
 
 @api_view(['POST'])
 def formdata(request):
+    now = datetime.now()
+    ts = now.strftime("%Y-%m-%d %H:%M:%S")
     var = JSONParser().parse(request)
     print(var.get('uuid'),var.get('wid'),var.get('category'))
     wrkshp = create_workshop.objects.filter(id = var.get('wid'))
-    category = var.get('category')
-    feedreason = ['0','0','0','0','0','0','0']
-    cat = ['eYRC','eYIC','eYRDC','eLSI','web','course_or_other_eyantra_work','personal_or_any_other']
-    for i in range(len(category)):
-        index = cat.index(category[i])
-        feedreason[index] = '1'
-    print(feedreason)
     name = memberdetail.objects.filter(id = var.get('uuid'),team = '1')[0].name
     WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,
-        responder = name).update(willingness_or_unavailability = var.get('option'),
-        reason = var.get('reason'),eYRC = feedreason[0],eYIC = feedreason[1],
-        eYRDC = feedreason[2],eLSI = feedreason[3],web = feedreason[4],
-        course_or_other_eyantra_work = feedreason[5],
-        personal_or_any_other = feedreason[6])
+        responder = name).update(timestamp = ts,willingness_or_unavailability = var.get('option'),
+        reason = var.get('reason'),category_of_reason = var.get('category'))
     return Response('success')
 
 @api_view(['POST'])
@@ -2194,13 +2129,13 @@ def sendmail(request):
     state = d[0].state
     today = date.today()
     last_date = today + timedelta(3)
-    last_date = datetime.strptime(last_date, '%d-%m-%Y')
+    #last_date = datetime.strptime(last_date, '%d-%m-%Y')
     last_date = datetime.strftime(last_date,'%B %d, %Y')
     start_date = wrkshp[0].startdate
-    start_date = datetime.strptime(start_date, '%Y-%m-%d')
+    #start_date = datetime.strptime(start_date, '%Y-%m-%d')
     start_date = datetime.strftime(start_date,'%B %d, %Y')
     end_date = wrkshp[0].enddate
-    end_date = datetime.strptime(end_date, '%Y-%m-%d')
+    #end_date = datetime.strptime(end_date, '%Y-%m-%d')
     end_date = datetime.strftime(end_date,'%B %d, %Y')
     #selected = var.get('selected')
     #print(selected)
@@ -2256,6 +2191,7 @@ def headmail(request):
     selectedworkshop = var.get('selectedworkshop')
     wrkshp = create_workshop.objects.filter(hcn = selectedworkshop)
     objs = memberdetail.objects.filter(ishead = '1')
+    print(objs)
     label = var.get('label')
     d = {'sent':[],'success':'','failure':'','total':objs.count()}
     sucs = flr = 0
@@ -2270,62 +2206,98 @@ def headmail(request):
         {'course_or_other_eyantra_work':[]},{'personal_or_any_other':[]}]
     team = WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop)
     for idx in range(team.count()):
-        if team[idx].eYRC == '1':
+        if team[idx].category_of_reason and 'eYRC' in team[idx].category_of_reason :
             rsnd[0]['eYRC'].append(team[idx].responder)
-        if team[idx].eYIC == '1':
+        if team[idx].category_of_reason and 'eYIC' in team[idx].category_of_reason:
             rsnd[1]['eYIC'].append(team[idx].responder)
-        if team[idx].eYRDC == '1':
+        if team[idx].category_of_reason and 'eYRDC' in team[idx].category_of_reason:
             rsnd[2]['eYRDC'].append(team[idx].responder)
-        if team[idx].eLSI == '1':
+        if team[idx].category_of_reason and 'eLSI' in team[idx].category_of_reason:
             rsnd[3]['eLSI'].append(team[idx].responder)
-        if team[idx].web == '1':
+        if team[idx].category_of_reason and 'web' in team[idx].category_of_reason:
             rsnd[4]['web'].append(team[idx].responder)
-        if team[idx].course_or_other_eyantra_work == '1':
+        if team[idx].category_of_reason and 'course_or_other_eyantra_work' in team[idx].category_of_reason:
             rsnd[5]['course_or_other_eyantra_work'].append(team[idx].responder)
-        if team[idx].personal_or_any_other == '1':
+        if team[idx].category_of_reason and 'personal_or_any_other' in team[idx].category_of_reason:
             rsnd[6]['personal_or_any_other'].append(team[idx].responder)
     print(rsnd)
     print(objs.count())
     for idx in range(objs.count()):
-        to = objs[idx].emailid
-        uuid = objs[idx].id
         #print(len(list(rsnd[idx].values())[0]))
         for i in range(len(rsnd)):
             if objs[idx].head in list(rsnd[i].keys())[0] and len(list(rsnd[i].values())[0]):
+                #print('1')
                 if objs[idx].name in list(rsnd[i].values())[0]:
+                    #print('2')
                     cohead = memberdetail.objects.filter(iscohead = '1',cohead = list(rsnd[i].keys())[0])
                     to = cohead[0].emailid
                     uuid = cohead[0].id
                     print(cohead[0].name)
-                else :
-                    print(list(rsnd[i].values()))
-                print(objs[idx].name)
-                cc = ''
-                bcc = ''
-                subject = 'Workshop Team Selection approval'
-                body = render_to_string(os.path.join(STATIC_DIR,'headlink.html'),
-                    {'uid':uuid,'wid':wrkshp[0].id,'workshop_name':wrkshp[0].hcn,
-                    'venue_address':wrkshp[0].venueadd,'start_date':start_date,
-                    'end_date':end_date})
-                sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
-                now = datetime.now()
-                ts = now.strftime("%Y-%m-%d %H:%M:%S")
-                if sent:
-                    sucs+=1
-                    d['sent'].append(to)
-                    serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
-                        'timestamp' : ts,'mail_label' : 'DRAFT','rcptmailid' : to,
-                        'delegated_access':'1','dcprovider':'None','messageid':sent['id']})
-                else:
-                    flr+=1
-                    serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
-                        'timestamp' : ts,'mail_label' : '','rcptmailid' : to,
-                        'delegated_access':'1','dcprovider':'None','messageid':'None'})
-                if serializer.is_valid():
-                    serializer.save()
-                else:
-                    print(serializer.errors)
-                print(serializer)
+                    WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop, responder = name).update(approved_or_rejected_by = cohead[0].name)
+                    print(objs[idx].name)
+                    cc = ''
+                    bcc = ''
+                    subject = 'Workshop Team Selection approval'
+                    body = render_to_string(os.path.join(STATIC_DIR,'headlink.html'),
+                        {'uid':uuid,'wid':wrkshp[0].id,'workshop_name':wrkshp[0].hcn,
+                        'venue_address':wrkshp[0].venueadd,'start_date':start_date,
+                        'end_date':end_date,'responder_list':cohead[0].name})
+                    sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
+                    now = datetime.now()
+                    ts = now.strftime("%Y-%m-%d %H:%M:%S")
+                    if sent:
+                        sucs+=1
+                        d['sent'].append(to)
+                        serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
+                            'timestamp' : ts,'mail_label' : 'DRAFT','rcptmailid' : to,
+                            'delegated_access':'1','dcprovider':'None','messageid':sent['id']})
+                    else:
+                        flr+=1
+                        serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
+                            'timestamp' : ts,'mail_label' : '','rcptmailid' : to,
+                            'delegated_access':'1','dcprovider':'None','messageid':'None'})
+                    if serializer.is_valid():
+                        serializer.save()
+                    else:
+                        print(serializer.errors)
+                    print(serializer)
+                if  objs[idx].name in list(rsnd[i].values())[0] or len(list(rsnd[i].values())[0]) >= 1:
+                    #print('3')
+                    to = objs[idx].emailid
+                    uuid = objs[idx].id
+                    responder_list = []
+                    for name in list(rsnd[i].values())[0]:
+                        if name != objs[idx].name:
+                            responder_list.append(name)
+                            WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop, responder = name).update(approved_or_rejected_by = objs[idx].name)
+                    print(responder_list)
+                    print(objs[idx].name)
+                    cc = ''
+                    bcc = ''
+                    subject = 'Workshop Team Selection approval'
+                    body = render_to_string(os.path.join(STATIC_DIR,'headlink.html'),
+                        {'uid':uuid,'wid':wrkshp[0].id,'workshop_name':wrkshp[0].hcn,
+                        'venue_address':wrkshp[0].venueadd,'start_date':start_date,
+                        'end_date':end_date,'responder_list':responder_list})
+                    sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
+                    now = datetime.now()
+                    ts = now.strftime("%Y-%m-%d %H:%M:%S")
+                    if sent:
+                        sucs+=1
+                        d['sent'].append(to)
+                        serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
+                            'timestamp' : ts,'mail_label' : 'DRAFT','rcptmailid' : to,
+                            'delegated_access':'1','dcprovider':'None','messageid':sent['id']})
+                    else:
+                        flr+=1
+                        serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
+                            'timestamp' : ts,'mail_label' : '','rcptmailid' : to,
+                            'delegated_access':'1','dcprovider':'None','messageid':'None'})
+                    if serializer.is_valid():
+                        serializer.save()
+                    else:
+                        print(serializer.errors)
+                    print(serializer)
     d['success'] = sucs
     d['failure'] = flr
     return JsonResponse(d)
