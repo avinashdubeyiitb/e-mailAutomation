@@ -2040,7 +2040,55 @@ def save_finalteam(request):
     create_workshop.objects.filter(id = wid).update(eyantra_mem1 = final_team[0],eyantra_mem2 = final_team[1],
         eyantra_mem3 = final_team[2],eyantra_mem4 = final_team[3],eyantra_mem5 = final_team[4],eyantra_mem6 = final_team[5],
         eyantra_mem7 =final_team[6],eyantra_mem8 = final_team[7])
-    return JsonResponse({'status':'Success'})
+    try:
+        objs = create_workshop.objects.filter(id = wid)
+        objs2 = ElsiCollegeDtls.objects.filter(college_name = objs[0].hcn)
+        to = []
+        for i in range(len(team)):
+            obj = memberdetail.objects.filter(name__contains = team[i])[0].emailid
+            to.append(obj)
+        str_team = ','.join(map(str,team))
+        start_date = objs[0].startdate
+        start_date = datetime.strptime(start_date, '%Y-%m-%d')
+        start_date = datetime.strftime(start_date,'%B %d, %Y')
+        end_date = objs[0].enddate
+        end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        end_date = datetime.strftime(end_date,'%B %d, %Y')
+        to = ','.join(map(str,to))
+        label = 'willingness-unavailability'
+        cc = ''
+        bcc  = ''
+        subject = "Workshop team for workshop at " + objs[0].hcn + ', ' + objs2[0].district + ', ' + objs2[0].state + " on " + start_date + " - " + end_date + " ."
+        body = render_to_string(os.path.join(STATIC_DIR,'mail_to_team.html'),
+            {'team':str_team,'workshop_name': objs[0].hcn,
+            'start_date':start_date,'end_date':end_date,'district': objs2[0].district,'state' : objs2[0].state,
+            'cooname':objs[0].cooname,'cooemail':objs[0].cooemail,'coono':objs[0].coono})
+        sent = None
+        sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
+        now = datetime.now()
+        ts = now.strftime("%Y-%m-%d %H:%M:%S")
+        if sent :
+            serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : request.user,
+                    'timestamp' : ts,'mail_label' : 'SENT,'+label,'rcptmailid' : to,
+                    'delegated_access':'0','dcprovider':'None','messageid':sent['id']})
+            if serializer.is_valid():
+                serializer.save()
+            else :
+                print(serializer.errors)
+            print(serializer)
+            return Response('success')
+        else :
+            serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : request.user,
+                    'timestamp' : ts,'mail_label' : label,'rcptmailid' : to,
+                    'delegated_access':'0','dcprovider':'None','messageid':'None'})
+            if serializer.is_valid():
+                serializer.save()
+            else :
+                print(serializer.errors)
+            print(serializer)
+            return Response('failure')
+    except ValueError as e:
+        return Response(e.args[0],status.HTTP_400_BAD_REQUEST)
 
 catlist = ['eYRC','eYIC','eYRDC','eLSI','web','course_or_other_eyantra_work','personal_or_any_other']
 
