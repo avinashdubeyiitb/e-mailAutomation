@@ -165,6 +165,14 @@ class create_workshop(models.Model):
     cooemail = models.EmailField(blank=False,null=False)
     coono = models.TextField(blank=True, null=True)
     isactive = models.CharField(max_length=10,blank=False, null=False, default='True')
+    eyantra_mem1 = models.TextField(blank=True, null=True)
+    eyantra_mem2 = models.TextField(blank=True, null=True)
+    eyantra_mem3 = models.TextField(blank=True, null=True)
+    eyantra_mem4 = models.TextField(blank=True, null=True)
+    eyantra_mem5 = models.TextField(blank=True, null=True)
+    eyantra_mem6 = models.TextField(blank=True, null=True)
+    eyantra_mem7 = models.TextField(blank=True, null=True)
+    eyantra_mem8 = models.TextField(blank=True, null=True)
     def __str__(self):
         return str(self.id)
     class Meta:

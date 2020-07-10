@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+      table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+      }
+    </style>
+</head>
+<body>
+  <table>
+    <thead>
+      <th>Responder</th>
+      <th>Count of workshops taken in past 1 year</th>
+      <th>Willingness/Unavailability</th>
+      <th>Reason</th>
+      <th>Total count of workshops taken</th>
+      <th>Approve</th>
+    </thead>
+    <tbody>
+      {% for data in team%}
+  <tr>
+    <td>{{data.name}}</td>
+    <td>{{data.past_count}}</td>
+    <td>{{data.status}}</td>
+    <td>{{data.reason}}</td>
+    <td>{{data.total_count}}</td>
+    <td> <input type="checkbox" name="approve_name" value={{data.name}}></td>
+  </tr>
+  {%endfor%}
+    </tbody>
+  </table>
+    <button  onclick="myFunction()">submit</button>
+    <p id="a"></p>
+
+    <script>
+    function myFunction() {
+        var items=document.getElementsByName('approve_name');
+        var selectedItems=[];
+        for(var i=0; i<items.length; i++){
+          if(items[i].type=='checkbox' && items[i].checked==true) {
+          selectedItems.push(items[i].value);
+          }
+        }
+        console.log(window.location.port)
+        console.log(selectedItems)
+        axios({
+            method: 'POST',
+            url: window.location.origin+'/api/main/save_finalteam',
+            data: {
+                team: selectedItems,
+                wid: '{{wid}}'
+            }
+        })
+        .then(function (response) {
+            console.log(response);
+            if (response.data == 'success') {
+            var x = document.getElementById("a").innerHTML = "Success";
+            setInterval(function(){ window.open('','_self').close() }, 2000);
+            }
+        })
+        .catch(function (error) {
+            console.log(error.response.data);
+            var x = document.getElementById("a").innerHTML = error;
+        });
+    }
+    </script>
+</body>
+</html>

@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^api/main/headresults',views.headresults),
     url(r'^api/main/form/(?P<uid>[^/]+)/(?P<wid>\w+)/$',views.form),
     url(r'^api/main/headapproval/(?P<uid>[^/]+)/(?P<wid>\w+)/$',views.headapproval),
+    url(r'^api/main/kavisirmailapprove/(?P<wid>\w+)/$',views.kavi_sir_mail_approve),
     url(r'^api/main/store',views.store),
     #url(r'^api/main/mailids',views.mailids),
     url(r'^api/main/gethcn',views.gethcn),
@@ -41,6 +42,8 @@ urlpatterns = [
     # url(r'^api/main/google', views.GoogleLogin),
     # url(r'^auth/google/',views.GoogleLogin.as_view(), name ='google_login' ),
     url(r'^api/main/algo',views.algo_for_willing_mem),
+    url(r'^api/main/meminfo',views.getmeminfo),
     url(r'^api/main/savealgo',views.savealgo),
-    url(r'^api/main/getalgodetail',views.getalgodetail)
+    url(r'^api/main/getalgodetail',views.getalgodetail),
+    url(r'^api/main/save_finalteam',views.save_finalteam)
 ]

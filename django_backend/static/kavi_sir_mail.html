@@ -54,18 +54,23 @@ Please suggest a team for the workshop from the list below
     <table>
       <thead>
         <th>Responder</th>
-        <th>Count</th>
+        <th>Count of workshops taken in past 1 year</th>
         <th>Willingness/Unavailability</th>
+        <th>Reason</th>
+        <th>Total count of workshops taken</th>
       </thead>
       <tbody>
         {% for data in team%}
     <tr>
       <td>{{data.name}}</td>
-      <td>{{data.count}}</td>
+      <td>{{data.past_count}}</td>
       <td>{{data.status}}</td>
+      <td>{{data.reason}}</td>
+      <td>{{data.total_count}}</td>
     </tr>
     {%endfor%}
       </tbody>
     </table>
+    <p>Please use this link to approve the team : <a href="{{ url }}/api/main/kavisirmailapprove/{{ wid }}">link</a> </p>
 </body>
 </html>
