@@ -2588,12 +2588,12 @@ def headmail(request):
                         sucs+=1
                         d['sent'].append(to)
                         serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
-                            'timestamp' : ts,'mail_label' : 'DRAFT','rcptmailid' : to,
+                            'timestamp' : ts,'mail_label' : 'SENT,'+label,'rcptmailid' : to,
                             'delegated_access':'1','dcprovider':'None','messageid':sent['id']})
                     else:
                         flr+=1
                         serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
-                            'timestamp' : ts,'mail_label' : '','rcptmailid' : to,
+                            'timestamp' : ts,'mail_label' : label,'rcptmailid' : to,
                             'delegated_access':'1','dcprovider':'None','messageid':'None'})
                     if serializer.is_valid():
                         serializer.save()
