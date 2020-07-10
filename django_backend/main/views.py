@@ -2091,7 +2091,7 @@ def kavi_sir_mail(request):
     body = render_to_string(os.path.join(STATIC_DIR,'kavi_sir_mail.html'),
     {'wid':wrkshp[0].id,'workshop_name':wrkshp[0].hcn,
     'venue_address':wrkshp[0].venueadd,'start_date':start_date,
-    'end_date':end_date,'district': district,'state' : state,'dte':dte,'stat':stat,'team':team})
+    'end_date':end_date,'district': district,'state' : state,'dte':dte,'stat':stat,'team':team,'url':var.get('url')})
     sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
     now = datetime.now()
     ts = now.strftime("%Y-%m-%d %H:%M:%S")

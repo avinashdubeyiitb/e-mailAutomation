@@ -247,7 +247,8 @@ export default {
         selectedworkshop: this.selectedworkshop,
         label: 'willingness-unavailability',
         user: this.$store.getters.user_name,
-        team: this.output.workshop_team
+        team: this.output.workshop_team,
+        url: this.$store.getters.url
       })
         .then(function (response) {
           this.result = response.data
