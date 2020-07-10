@@ -1773,6 +1773,46 @@ def awssave(request):
 
 ######################
 # workshop team algo
+
+def kavi_sir_mail_approve(request,wid):
+    print('hii')
+    file_path = os.path.join(ASSETS_DIR,'team.json')
+    with open(file_path, 'r') as openfile:
+        # Reading from json file
+        team = json.load(openfile)
+    print(team)
+    return render(request,'kavi_sir_approve.html',context={'team':team,'wid':wid})
+
+@api_view(['POST'])
+def getmeminfo(request):
+    var = JSONParser().parse(request)
+    user = var.get('user')
+    selectedworkshop = var.get('selectedworkshop')
+    name = var.get('name')
+    data = {}
+    WrkshopsTakenCount = WorkshopsTakenCount.objects.filter(name__iexact = name)
+    WrkshopTeamStatus = WorkshopTeamStatus.objects.filter(responder__iexact = name,workshop_venue = selectedworkshop)
+    Demo_Dtls = DemoDtls.objects.filter(name__iexact = name)
+    data['WorkshopsTakenCount'] = list(WrkshopsTakenCount.values())
+    data['WorkshopTeamStatus'] = list(WrkshopTeamStatus.values())
+    data['DemoDtls'] = list(Demo_Dtls.values())
+    print(data)
+    return JsonResponse(data)
+
+@api_view(['POST'])
+def save_finalteam(request):
+    var = JSONParser().parse(request)
+    team = var.get('team')
+    wid = var.get('wid')
+    print(team,wid)
+    final_team = ['None','None','None','None','None','None','None','None']
+    for i in range(len(team)):
+        final_team[i] = team[i]
+    create_workshop.objects.filter(id = wid).update(eyantra_mem1 = final_team[0],eyantra_mem2 = final_team[1],
+        eyantra_mem3 = final_team[2],eyantra_mem4 = final_team[3],eyantra_mem5 = final_team[4],eyantra_mem6 = final_team[5],
+        eyantra_mem7 =final_team[6],eyantra_mem8 = final_team[7])
+    return JsonResponse({'status':'Success'})
+
 catlist = ['eYRC','eYIC','eYRDC','eLSI','web','course_or_other_eyantra_work','personal_or_any_other']
 @api_view(['POST'])
 def kavi_sir_mail(request):
@@ -1787,8 +1827,17 @@ def kavi_sir_mail(request):
     team = []
     for idx in range(len(tm)):
         cnt = WorkshopsTakenCount.objects.filter(name = tm[idx])[0].total_count
+        pcnt = WorkshopsTakenCount.objects.filter(name = tm[idx])[0].past_year
         sts = WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop,responder = tm[idx])[0].willingness_or_unavailability
-        team.append({'name':tm[idx],'count':cnt,'status':sts})
+        reason = WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop,responder = tm[idx])[0].reason
+        team.append({'name':tm[idx],'total_count':cnt,'status':sts,'past_count':pcnt,'reason':reason})
+    # Serializing json
+    json_object = json.dumps(team, indent = 4)
+
+    # Writing to sample.json
+    file_path = os.path.join(ASSETS_DIR,'team.json')
+    with open(file_path, "w") as outfile:
+        outfile.write(json_object)
     district = d[0].district
     state = d[0].state
     stat = WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop)
@@ -1802,6 +1851,7 @@ def kavi_sir_mail(request):
     end_date = wrkshp[0].enddate
     end_date = datetime.strptime(end_date, '%Y-%m-%d')
     end_date = datetime.strftime(end_date,'%B %d, %Y')
+
     to = 'aakashkhandelwal56@gmail.com'
     cc = ''
     bcc = ''
@@ -2190,6 +2240,7 @@ def headmail(request):
     user = var.get('user')
     selectedworkshop = var.get('selectedworkshop')
     wrkshp = create_workshop.objects.filter(hcn = selectedworkshop)
+    x = ElsiCollegeDtls.objects.filter(college_name = selectedworkshop)
     objs = memberdetail.objects.filter(ishead = '1')
     print(objs)
     label = var.get('label')
@@ -2235,13 +2286,18 @@ def headmail(request):
                     print(cohead[0].name)
                     WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop, responder = name).update(approved_or_rejected_by = cohead[0].name)
                     print(objs[idx].name)
+                    da = {}
+                    sts = WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop,responder = objs[idx].name)[0].category_of_reason
+                    reason = WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop,responder = objs[idx].name)[0].reason
+                    da.append({'responder_list':objs[idx].name,'category':sts,'reason':reason})
                     cc = ''
                     bcc = ''
-                    subject = 'Workshop Team Selection approval'
+                    subject = 'Regarding approval of unavailability for workshop by ' + objs[idx].name + '.'
                     body = render_to_string(os.path.join(STATIC_DIR,'headlink.html'),
                         {'uid':uuid,'wid':wrkshp[0].id,'workshop_name':wrkshp[0].hcn,
                         'venue_address':wrkshp[0].venueadd,'start_date':start_date,
-                        'end_date':end_date,'responder_list':cohead[0].name})
+                        'end_date':end_date,'responder_list':objs[idx].name,'lead_name':cohead[0].name,'state':x[0].state,
+                        'district':x[0].district,'da':da})
                     sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
                     now = datetime.now()
                     ts = now.strftime("%Y-%m-%d %H:%M:%S")
@@ -2271,14 +2327,21 @@ def headmail(request):
                             responder_list.append(name)
                             WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop, responder = name).update(approved_or_rejected_by = objs[idx].name)
                     print(responder_list)
+                    da = {}
+                    for idx in range(len(responder_list)):
+                        sts = WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop,responder = responder_list)[0].category_of_reason
+                        reason = WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop,responder = responder_list)[0].reason
+                        da.append({'responder_list':responder_list[idx],'category':sts,'reason':reason})
+                    r_list = ','.join(map(str,responder_list))
                     print(objs[idx].name)
                     cc = ''
                     bcc = ''
-                    subject = 'Workshop Team Selection approval'
+                    subject = 'Regarding approval of unavailability for workshop by ' + r_list + '.'
                     body = render_to_string(os.path.join(STATIC_DIR,'headlink.html'),
                         {'uid':uuid,'wid':wrkshp[0].id,'workshop_name':wrkshp[0].hcn,
                         'venue_address':wrkshp[0].venueadd,'start_date':start_date,
-                        'end_date':end_date,'responder_list':responder_list})
+                        'end_date':end_date,'responder_list':responder_list,'lead_name':objs[idx].name,
+                        'state':x[0].state,'district':x[0].district,'da':da})
                     sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
                     now = datetime.now()
                     ts = now.strftime("%Y-%m-%d %H:%M:%S")

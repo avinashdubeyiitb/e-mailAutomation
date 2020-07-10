@@ -107,11 +107,59 @@
   <tbody>
     <tr v-for="(it,j) in output.workshop_team" :key="j">
       <td>
-        {{it}}
+        {{it}}<b-button size="sm" v-b-modal="'box'+j" @click="getinfo(it)">Stats</b-button>
+            <b-modal :id="'box'+j" size="xl" title="Stats" hide-footer scrollable>
+              <table>
+                <thead>
+                  <th><button @click="show1 = !show1;show2 = false;show3 = false">Count of Workshop taken</button></th>
+                  <th><button @click="show2 = !show2;show1 = false;show3 = false">Willingness/Unavailability</button></th>
+                  <th><button @click="show3 = !show3;show2 = false;show1 = false">Demo details</button></th>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+            <b-container class="px-2" v-show="show1">
+              <table>
+                <thead v-for="(x1,j1) in response.WorkshopsTakenCount" :key="j1">
+                  <th v-for="(value1,key1) in x1" :key="key1">{{key1}}</th>
+                </thead>
+                <tbody>
+              <tr v-for="(x2,j2) in response.WorkshopsTakenCount" :key="j2">
+                <td v-for="(value2,key2) in x2" :key="key2">{{value2}}</td>
+              </tr>
+                </tbody>
+              </table>
+            </b-container>
+            <b-container class="px-2" v-show="show2">
+              <table>
+                <thead v-for="(x3,j3) in response.WorkshopTeamStatus" :key="j3">
+                  <th v-for="(value3,key3) in x3" :key="key3">{{key3}}</th>
+                </thead>
+                <tbody>
+              <tr v-for="(x4,j4) in response.WorkshopTeamStatus" :key="j4">
+                <td v-for="(value4,key4) in x4" :key="key4">{{value4}}</td>
+              </tr>
+                </tbody>
+              </table>
+            </b-container>
+            <b-container class="px-2" v-show="show3">
+              <table>
+                <thead v-for="(x5,j5) in response.DemoDtls" :key="j5">
+                  <th v-for="(value5,key5) in x5" :key="key5">{{key5}}</th>
+                </thead>
+                <tbody>
+              <tr v-for="(x6,j6) in response.DemoDtls" :key="j6">
+                <td v-for="(value6,key6) in x6" :key="key6">{{value6}}</td>
+              </tr>
+                </tbody>
+              </table>
+            </b-container>
+            </b-modal>
       </td>
     </tr>
   </tbody>
 </table>
+
 <button id="sub1" @click="kavi_sir_mail">Send Mail to Kavi sir</button>
 <div id="result">{{result}}</div>
 
@@ -157,6 +205,9 @@ export default {
       tcnt: '',
       key3: '',
       tcntt: '',
+      show1: true,
+      show2: false,
+      show3: false,
       selectedworkshop: this.$store.getters.selectedworkshop,
       selectedlang: this.$store.getters.selectedlang,
       wrklist: this.$store.getters.wrklist,
@@ -168,12 +219,28 @@ export default {
       output: this.$store.getters.algooutput,
       out: '',
       algodetail: '',
-      result: ''
+      result: '',
+      response: ''
     }
   },
   watch: {
   },
   methods: {
+    getinfo (name) {
+      console.log(name)
+      this.axios.post(this.url + '/api/main/meminfo', {
+        selectedworkshop: this.selectedworkshop,
+        user: this.$store.getters.user_name,
+        name: name
+      })
+        .then(response => {
+          this.response = response.data
+          console.log(response)
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    },
     kavi_sir_mail () {
       this.result = 'sending mails'
       this.axios.post(this.url + '/api/main/kavi_sir_mail', {
