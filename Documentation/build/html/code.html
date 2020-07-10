@@ -159,8 +159,7 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>service</strong> – Authorized Gmail API service instance.</p></li>
-<li><p><strong>user_id</strong> – User’s email address. The special value “me”</p></li>
-<li><p><strong>be used to indicate the authenticated user.</strong> (<em>can</em>) – </p></li>
+<li><p><strong>user_id</strong> – User’s email address. The special value “me” can be used to indicate the authenticated user.</p></li>
 <li><p><strong>message_body</strong> – The body of the email message, including headers.</p></li>
 </ul>
 </dd>
@@ -178,13 +177,34 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>service</strong> – Authorized Gmail API service instance.</p></li>
-<li><p><strong>user_id</strong> – User’s email address. The special value “me”</p></li>
-<li><p><strong>be used to indicate the authenticated user.</strong> (<em>can</em>) – </p></li>
+<li><p><strong>user_id</strong> – User’s email address. The special value “me” can be used to indicate the authenticated user.</p></li>
 <li><p><strong>label_object</strong> – label to be added.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Created Label.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.CreateMessageHtml">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">CreateMessageHtml</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sender</span></em>, <em class="sig-param"><span class="n">to</span></em>, <em class="sig-param"><span class="n">cc</span></em>, <em class="sig-param"><span class="n">bcc</span></em>, <em class="sig-param"><span class="n">subject</span></em>, <em class="sig-param"><span class="n">body</span></em>, <em class="sig-param"><span class="n">msgHtml</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.CreateMessageHtml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a message for an email.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sender</strong> – Email address of the sender.</p></li>
+<li><p><strong>to</strong> – Email address of the receiver.</p></li>
+<li><p><strong>cc</strong> – cc email address(s)</p></li>
+<li><p><strong>bcc</strong> – bcc email address(s)</p></li>
+<li><p><strong>subject</strong> – The subject of the email message.</p></li>
+<li><p><strong>body</strong> – The body of the email message.</p></li>
+<li><p><strong>msgHtml</strong> – The html of the email message.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An object containing a base64url encoded email object.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -197,8 +217,7 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>service</strong> – Authorized Gmail API service instance.</p></li>
-<li><p><strong>user_id</strong> – User’s email address. The special value “me”</p></li>
-<li><p><strong>be used to indicate the authenticated user.</strong> (<em>can</em>) – </p></li>
+<li><p><strong>user_id</strong> – User’s email address. The special value “me” can be used to indicate the authenticated user.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -215,8 +234,7 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>service</strong> – Authorized Gmail API service instance.</p></li>
-<li><p><strong>user_id</strong> – User’s email address. The special value “me”</p></li>
-<li><p><strong>be used to indicate the authenticated user.</strong> (<em>can</em>) – </p></li>
+<li><p><strong>user_id</strong> – User’s email address. The special value “me” can be used to indicate the authenticated user.</p></li>
 <li><p><strong>label_ids</strong> – Only return Messages with these labelIds applied.</p></li>
 </ul>
 </dd>
@@ -247,6 +265,114 @@ appropriate id to get the details of a Message.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt id="views.SendMessage">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">SendMessage</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sender</span></em>, <em class="sig-param"><span class="n">to</span></em>, <em class="sig-param"><span class="n">cc</span></em>, <em class="sig-param"><span class="n">bcc</span></em>, <em class="sig-param"><span class="n">subject</span></em>, <em class="sig-param"><span class="n">body</span></em>, <em class="sig-param"><span class="n">label</span></em>, <em class="sig-param"><span class="n">attachmentFile</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.SendMessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>gets the credentials, checks for label and adds the new label, creates the message and sends the message</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sender</strong> – Email address of sender</p></li>
+<li><p><strong>to</strong> – Email address of recepeint</p></li>
+<li><p><strong>cc</strong> – cc Email address(s)</p></li>
+<li><p><strong>bcc</strong> – bcc Email address(s)</p></li>
+<li><p><strong>subject</strong> – The subject of the email message.</p></li>
+<li><p><strong>body</strong> – The body of the email message.</p></li>
+<li><p><strong>label</strong> – labels attached with email</p></li>
+<li><p><strong>attachmentFile</strong> – attachments with email</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>sent message returned by SendMessageInternal() function which contains entire details of sent email</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.SendMessageInternal">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">SendMessageInternal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">service</span></em>, <em class="sig-param"><span class="n">user_id</span></em>, <em class="sig-param"><span class="n">message</span></em>, <em class="sig-param"><span class="n">label</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.SendMessageInternal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send an email message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>service</strong> – Authorized Gmail API service instance.</p></li>
+<li><p><strong>user_id</strong> – User’s email address. The special value “me”can be used to indicate the authenticated user.</p></li>
+<li><p><strong>message</strong> – Message to be sent.</p></li>
+<li><p><strong>label</strong> – label attached with mail</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Sent Message.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.algo_for_available_mem">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">algo_for_available_mem</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spl_mem_available</span></em>, <em class="sig-param"><span class="n">workshop_lead</span></em>, <em class="sig-param"><span class="n">ranked_data</span></em>, <em class="sig-param"><span class="n">availcriteria</span></em>, <em class="sig-param"><span class="n">lang</span></em>, <em class="sig-param"><span class="n">tcntt</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.algo_for_available_mem" title="Permalink to this definition">¶</a></dt>
+<dd><p>algorithm for team selection from available members</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spl_mem_available</strong> – list of all available members</p></li>
+<li><p><strong>workshop_lead</strong> – workshop lead list choosen from willing members</p></li>
+<li><p><strong>ranked_data</strong> – ranked list choosen from willing members</p></li>
+<li><p><strong>availcriteria</strong> – order in which conflicts will be removed while ranking members</p></li>
+<li><p><strong>lang</strong> – language prefered</p></li>
+<li><p><strong>tcntt</strong> – total count of workshops</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>returns updated ranked list, workshop leads and a message</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.algo_for_willing_mem">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">algo_for_willing_mem</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.algo_for_willing_mem" title="Permalink to this definition">¶</a></dt>
+<dd><p>algorithm of team selection for workshop conduction</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>selectedworkshop</strong> – host college name</p></li>
+<li><p><strong>willcriteria</strong> – conflict solving order for willing members</p></li>
+<li><p><strong>availcriteria</strong> – conflict solving order for available members</p></li>
+<li><p><strong>lang</strong> – language preference</p></li>
+<li><p><strong>tcnt</strong> – total workshop count for willing members</p></li>
+<li><p><strong>tcntt</strong> – total workshop count for available members</p></li>
+<li><p><strong>demo</strong> – count of demo module cleared by the team members</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>JsonResponse returning team of selected members on the basis of few criterias</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.approve">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">approve</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.approve" title="Permalink to this definition">¶</a></dt>
+<dd><p>send email to the college</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user</strong> – user who has logged in this session</p></li>
+<li><p><strong>to</strong> – recepient email address</p></li>
+<li><p><strong>label</strong> – label attached with email</p></li>
+<li><p><strong>cc</strong> – cc email address(s)</p></li>
+<li><p><strong>bcc</strong> – bcc email address(s)</p></li>
+<li><p><strong>subject</strong> – subject of message email</p></li>
+<li><p><strong>body</strong> – body of message email</p></li>
+<li><p><strong>attachments</strong> – attachments of message email</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>JsonResponse returning the status of email</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="views.authlogin">
 <code class="sig-prename descclassname">views.</code><code class="sig-name descname">authlogin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.authlogin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Authenticates the user trying to login.</p>
@@ -267,13 +393,110 @@ appropriate id to get the details of a Message.</p>
 <dt id="views.authlogout">
 <code class="sig-prename descclassname">views.</code><code class="sig-name descname">authlogout</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.authlogout" title="Permalink to this definition">¶</a></dt>
 <dd><p>logout the current logged in user.</p>
-<p>Args:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>JsonResponse containing the status.</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py function">
+<dt id="views.awsapprove">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">awsapprove</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.awsapprove" title="Permalink to this definition">¶</a></dt>
+<dd><p>send email to  participating colleges and host college name for workshop</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user</strong> – user who has logged in this session</p></li>
+<li><p><strong>remail</strong> – coodinator email address</p></li>
+<li><p><strong>label</strong> – label attached with email</p></li>
+<li><p><strong>cc</strong> – cc email address</p></li>
+<li><p><strong>bcc</strong> – bcc email address</p></li>
+<li><p><strong>subject</strong> – subject of message email</p></li>
+<li><p><strong>body</strong> – body of message email</p></li>
+<li><p><strong>attachments</strong> – attachments of message email</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>JsonResponse returning status of email</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.awsedit">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">awsedit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.awsedit" title="Permalink to this definition">¶</a></dt>
+<dd><p>retruns created workshop details</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>selectedworkshop</strong> – host college name</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>JsonResponse returning of created workshop details</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.awsgsave">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">awsgsave</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.awsgsave" title="Permalink to this definition">¶</a></dt>
+<dd><p>saves email to gmail draft of participating colleges and host college name for workshop</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user</strong> – user who has logged in this session</p></li>
+<li><p><strong>remail</strong> – coodinator email address</p></li>
+<li><p><strong>label</strong> – label attached with email</p></li>
+<li><p><strong>cc</strong> – cc email address</p></li>
+<li><p><strong>bcc</strong> – bcc email address</p></li>
+<li><p><strong>subject</strong> – subject of message email</p></li>
+<li><p><strong>body</strong> – body of message email</p></li>
+<li><p><strong>attachments</strong> – attachments of message email</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>JsonResponse returning status of saved draft</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.awssave">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">awssave</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.awssave" title="Permalink to this definition">¶</a></dt>
+<dd><p>saves the edited workshop details</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>wid</strong> – workshop id</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>JsonResponse returning of updated workshop details</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.awssubmit">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">awssubmit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.awssubmit" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the email structure of announced workshop</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>selectedworkshop</strong> – host college name</p></li>
+<li><p><strong>filldate</strong> – last date to fill form</p></li>
+<li><p><strong>state</strong> – state of host college name</p></li>
+<li><p><strong>district</strong> – district of host college name</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>JsonRespone returning email structure containing subject, body and attachments</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.check">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">check</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">credentials</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt id="views.createMessageWithAttachment">
@@ -284,9 +507,10 @@ appropriate id to get the details of a Message.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>sender</strong> – Email address of the sender.</p></li>
 <li><p><strong>to</strong> – Email address of the receiver.</p></li>
+<li><p><strong>cc</strong> – cc email address(s)</p></li>
+<li><p><strong>bcc</strong> – bcc email address(s)</p></li>
 <li><p><strong>subject</strong> – The subject of the email message.</p></li>
-<li><p><strong>msgHtml</strong> – Html message to be sent</p></li>
-<li><p><strong>msgPlain</strong> – Alternative plain text message for older email clients</p></li>
+<li><p><strong>body</strong> – The body of the email message</p></li>
 <li><p><strong>attachmentFile</strong> – The path to the file to be attached.</p></li>
 </ul>
 </dd>
@@ -297,23 +521,183 @@ appropriate id to get the details of a Message.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="views.getbody">
-<code class="sig-prename descclassname">views.</code><code class="sig-name descname">getbody</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">clg</span></em>, <em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">sta</span></em>, <em class="sig-param"><span class="n">dis</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.getbody" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates the subject, body and of send information mail part.</p>
+<dt id="views.csvapprove">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">csvapprove</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.csvapprove" title="Permalink to this definition">¶</a></dt>
+<dd><p>sends mail to colleges within csv file</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>clg</strong> – The login credential username.</p></li>
-<li><p><strong>obj</strong> – The login credential password.</p></li>
-<li><p><strong>sta</strong> – </p></li>
-<li><p><strong>dis</strong> – </p></li>
+<li><p><strong>user</strong> – user who has logged in for this session</p></li>
+<li><p><strong>label</strong> – label attached with the message email</p></li>
+<li><p><strong>list</strong> – list of colleges for sending mail</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Json objects returning status of sent and failed emails</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.csvdraft">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">csvdraft</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.csvdraft" title="Permalink to this definition">¶</a></dt>
+<dd><p>saves mails as draft of colleges within csv file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user</strong> – user who has logged in for this session</p></li>
+<li><p><strong>list</strong> – list of colleges for drafting mail</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Json objects returning status of drafted and failed emails</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.csvsubmit">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">csvsubmit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.csvsubmit" title="Permalink to this definition">¶</a></dt>
+<dd><p>stores the csv file data for future access</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file</strong> – csv or xlsx file</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>JsonResponse returning college name and recepient email address of colleges present in file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.cwssubmit">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">cwssubmit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.cwssubmit" title="Permalink to this definition">¶</a></dt>
+<dd><p>saves the created workshop within database</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hcn</strong> – host college name</p></li>
+<li><p><strong>startdate</strong> – start date of the workshop</p></li>
+<li><p><strong>enddate</strong> – enddate of the workshop</p></li>
+<li><p><strong>venueadd</strong> – venue address</p></li>
+<li><p><strong>cooname</strong> – coordinator name</p></li>
+<li><p><strong>cooemail</strong> – coordinator email address</p></li>
+<li><p><strong>coono</strong> – coordinator contac number</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>JsonResponse returning status of saving of workshops</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.download">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">download</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.download" title="Permalink to this definition">¶</a></dt>
+<dd><p>Searches for message within gmail and downloads the attachments accordingly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>messageid</strong> (<em>Json-obj</em>) – message id of the mail(message).</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>JsonResponse returning either status of successfull download or error if any.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.form">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">form</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">uid</span></em>, <em class="sig-param"><span class="n">wid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.form" title="Permalink to this definition">¶</a></dt>
+<dd><p>renders to form.html for filling the forms by the team for asking there willingness or
+unavailability for workshop</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>renders to html page i.e., form.html with context, member unique id(uuid) and workshop id(wid)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.formdata">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">formdata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.formdata" title="Permalink to this definition">¶</a></dt>
+<dd><p>stores the team members responses of willingness or unavailability along with reason and
+category of reason</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>uuid</strong> – unique id of team members</p></li>
+<li><p><strong>wid</strong> – workshop id</p></li>
+<li><p><strong>option</strong> – willing or unavailable</p></li>
+<li><p><strong>category</strong> – category of reason</p></li>
+<li><p><strong>reason</strong> – reason explained in brief</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>success response of saving the updates</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.gauthlogin">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">gauthlogin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.gauthlogin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="views.get_credentials">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">get_credentials</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#views.get_credentials" title="Permalink to this definition">¶</a></dt>
+<dd><p>generates the crdentials(json) file from pickle.token file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>credentials in json format</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.get_user_info">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">get_user_info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">credentials</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.get_user_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send a request to the UserInfo API to retrieve the user’s information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>credentials</strong> – oauth2client.client.OAuth2Credentials instance to authorize the
+request.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>User information as a dict.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.getalgodetail">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">getalgodetail</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.getalgodetail" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns algorithm details</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>JsonResponse returning algo details</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.getbody">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">getbody</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">clg</span></em>, <em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">sta</span></em>, <em class="sig-param"><span class="n">dis</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.getbody" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the subject, body for send information mail part.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>clg</strong> – It contains the given college name.</p></li>
+<li><p><strong>obj</strong> – It contains the given college name details.</p></li>
+<li><p><strong>sta</strong> – It contains the state of the college.</p></li>
+<li><p><strong>dis</strong> – It contains the district of the college.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>the subject content that is to be sent.
 body: the body content that is to be sent.
 subdiv: denotes the type of body content.
-tchdtl: contains the teacher details that was requested.</p>
+tchdtl: contains the teacher details of the given college.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>subject</p>
@@ -324,13 +708,101 @@ tchdtl: contains the teacher details that was requested.</p>
 <dl class="py function">
 <dt id="views.gethcn">
 <code class="sig-prename descclassname">views.</code><code class="sig-name descname">gethcn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.gethcn" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the list of colleges from selected state for hosting the workshop.</p>
+<dd><p>returns college names present within requested state</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>state</strong> (<em>Json-obj</em>) – Contains the selected state for choosing a host college for workshop.</p>
+<dd class="field-odd"><p><strong>state</strong> – state of which college names is required</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>JsonResponse containing the college names of a particular state.</p>
+<dd class="field-even"><p>JsonResponse returning list of college names</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.getlang">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">getlang</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.getlang" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns language preferences within database</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>JsonResponse returning list of languages prefered by the team members</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.getmdtl">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">getmdtl</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.getmdtl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Searches for message within gmail and gather details like subject, body and attachments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>messageid</strong> – message id of the mail.</p></li>
+<li><p><strong>type</strong> – under sent, draft or inbox type.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>JsonResponse returning either subject, body and attachments of the message or error any any.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.getname">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">getname</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.getname" title="Permalink to this definition">¶</a></dt>
+<dd><p>normalizes the college name using chromedriver</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> – college name</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>normalized college name</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.getwrklist">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">getwrklist</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.getwrklist" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the list of created workshops</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>JsonResponse returning list if created workshops along with there active flag.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.gsave">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">gsave</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.gsave" title="Permalink to this definition">¶</a></dt>
+<dd><p>saves email as gmail draft</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user</strong> – user who has logged in this session</p></li>
+<li><p><strong>to</strong> – recepient email address</p></li>
+<li><p><strong>label</strong> – label attached with email</p></li>
+<li><p><strong>cc</strong> – cc email address(s)</p></li>
+<li><p><strong>bcc</strong> – bcc email address(s)</p></li>
+<li><p><strong>subject</strong> – subject of message email</p></li>
+<li><p><strong>body</strong> – body of message email</p></li>
+<li><p><strong>attachments</strong> – attachments of message email</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>JsonResponse returning the status of draft</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.headapproval">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">headapproval</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">uid</span></em>, <em class="sig-param"><span class="n">wid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.headapproval" title="Permalink to this definition">¶</a></dt>
+<dd><p>renders to headapproval.html for approval from the team leads upon unavailability of team members</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>renders to html page i.e., headapproval.html with context, member unique id(uuid) workshop
+id(wid) and  list of members whom approval is looked upon(datas)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -338,17 +810,112 @@ tchdtl: contains the teacher details that was requested.</p>
 <dl class="py function">
 <dt id="views.headmail">
 <code class="sig-prename descclassname">views.</code><code class="sig-name descname">headmail</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.headmail" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send mails to respective #eYRC,eYIC,eYRDC,eLSI,web,Course/Other e-Yantra Work,Personal/Any Other heads.</p>
+<dd><p>send mail to team leads for approval of unavailable members</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>user</strong> (<em>Json-obj</em>) – The person logged in who is trying to send the mail.</p></li>
-<li><p><strong>selectedworkshop</strong> (<em>Json-obj</em>) – The college name selected to announce the workshop.</p></li>
-<li><p><strong>label</strong> (<em>Json-obj</em>) – Denotes the category of label of mail that is being sent.</p></li>
+<li><p><strong>user</strong> – user who is logged in this session</p></li>
+<li><p><strong>selectedworkshop</strong> – host college name</p></li>
+<li><p><strong>label</strong> – label attached with email</p></li>
+<li><p><strong>url</strong> – django server url</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>JsonResponse stating the mail was sent successfully or not.</p>
+<dd class="field-even"><p>JsonResponse returning success or failure while sending email to team leads</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.headresults">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">headresults</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.headresults" title="Permalink to this definition">¶</a></dt>
+<dd><p>stores the decisions of team leads upon unavailability into database</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>uuid</strong> – unique id of team members</p></li>
+<li><p><strong>wid</strong> – workshop id</p></li>
+<li><p><strong>values</strong> – decision list respectively for each member</p></li>
+<li><p><strong>names</strong> – team member names</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>success response of saving the updates</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.idrequest">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">idrequest</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.idrequest" title="Permalink to this definition">¶</a></dt>
+<dd><p>displays email structure of the selected college from csv file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cname</strong> – college name</p></li>
+<li><p><strong>remail</strong> – recepient email address</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>JsonResponse returning recepient email address, cc, bcc, subject, body, attachments and there links</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.kavi_sir_mail">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">kavi_sir_mail</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.kavi_sir_mail" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="views.savealgo">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">savealgo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.savealgo" title="Permalink to this definition">¶</a></dt>
+<dd><p>saves edited algorithm details</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>willcriteria</strong> – conflict solving order for willing members</p></li>
+<li><p><strong>availcriteria</strong> – conflict solving order for available members</p></li>
+<li><p><strong>lang</strong> – language preference</p></li>
+<li><p><strong>tcnt</strong> – total workshop count for willing members</p></li>
+<li><p><strong>tcntt</strong> – total workshop count for available members</p></li>
+<li><p><strong>demo</strong> – count of demo module cleared by the team members</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>JsonResponse returning status</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.savewrkactv">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">savewrkactv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.savewrkactv" title="Permalink to this definition">¶</a></dt>
+<dd><p>saves the active flag of workshop
+:param workshop: host college name
+:param isactive: updated active flag</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>JsonResponse returning status of the update</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.sendmail">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">sendmail</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.sendmail" title="Permalink to this definition">¶</a></dt>
+<dd><p>send mail to team for selection in workshop conduction</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user</strong> – user who is logged in this session</p></li>
+<li><p><strong>selectedworkshop</strong> – host college name</p></li>
+<li><p><strong>label</strong> – label attached with email</p></li>
+<li><p><strong>url</strong> – django server url</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>JsonResponse returning success or failure while sending email to team</p>
 </dd>
 </dl>
 </dd></dl>
@@ -356,11 +923,48 @@ tchdtl: contains the teacher details that was requested.</p>
 <dl class="py function">
 <dt id="views.stats">
 <code class="sig-prename descclassname">views.</code><code class="sig-name descname">stats</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.stats" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function is used to return the statistical data to Email Analytics page .</p>
-<p>Args:</p>
+<dd><p>This function is used to return the statistical data to Email Analytics page.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>JsonResponse containing the data about which user send the mails to whom about what(label), saved drafts.</p>
+<dd class="field-odd"><p>JsonResponse containing the data about which user send the mails to whom about what(label), saved drafts and inbox responses.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.store">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">store</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.store" title="Permalink to this definition">¶</a></dt>
+<dd><p>allows editing in body of the email by first categorize the mail and then add the updates</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cname</strong> – college name to which mail is to be sent</p></li>
+<li><p><strong>district</strong> – district of college</p></li>
+<li><p><strong>state</strong> – state of college</p></li>
+<li><p><strong>args</strong> (<em>other</em>) – and many more variables containing the teacher details and category in which college comes according to elsi college database</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>updated json object containing mail details like subject, body, attachments and many more.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="views.submit">
+<code class="sig-prename descclassname">views.</code><code class="sig-name descname">submit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="headerlink" href="#views.submit" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the structure of email of the college based upon its categorization(first college name is
+normalised)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cname</strong> – college name</p></li>
+<li><p><strong>district</strong> – district of the college</p></li>
+<li><p><strong>state</strong> – state of the college</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>JsonResponse returning recepient email address, cc, bcc, subject, body, attachments and many more</p>
 </dd>
 </dl>
 </dd></dl>

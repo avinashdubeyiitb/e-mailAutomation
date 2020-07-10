@@ -321,7 +321,8 @@ export default {
       this.axios.post(this.url + '/api/main/headmail', {
         selectedworkshop: this.selectedworkshop,
         label: 'willingness-unavailability',
-        user: this.$store.getters.user_name
+        user: this.$store.getters.user_name,
+        url: this.$store.getters.url
       })
         .then(function (response) {
           currentObj.result = response.data
@@ -337,7 +338,8 @@ export default {
       this.axios.post(this.url + '/api/main/sendmail', {
         selectedworkshop: this.selectedworkshop,
         label: 'willingness-unavailability',
-        user: this.$store.getters.user_name
+        user: this.$store.getters.user_name,
+        url: this.$store.getters.url
       })
         .then(function (response) {
           currentObj.result = response.data

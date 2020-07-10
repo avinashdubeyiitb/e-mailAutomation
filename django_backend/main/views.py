@@ -443,6 +443,7 @@ def ListMessagesWithLabels(service, user_id, label_ids=[]):
     return messages
   except errors.HttpError as error:
     print('An error occurred: %s' % error)
+
 '''
 @api_view(['POST'])
 def getfile(request):
@@ -460,252 +461,266 @@ def getfile(request):
             response['Content-Disposition'] = "attachment; filename={}".format(escape_uri_path('letter-of-intent.docx'))
             return response
 '''
+
 def getbody(clg,obj,sta,dis):
-        """ Creates the subject, body for send information mail part.
+    """ Creates the subject, body for send information mail part.
 
-        Args:
-            clg: It contains the given college name.
-            obj: It contains the given college name details.
-            sta: It contains the state of the college.
-            dis: It contains the district of the college.
+    Args:
+        clg: It contains the given college name.
+        obj: It contains the given college name details.
+        sta: It contains the state of the college.
+        dis: It contains the district of the college.
 
-        Returns:
-            subject: the subject content that is to be sent.
-            body: the body content that is to be sent.
-            subdiv: denotes the type of body content.
-            tchdtl: contains the teacher details of the given college.
-        """
-        try:
-            district = dis
-            state = sta
-            c = ElsiCollegeDtls.objects.all()
-            count=0
-            tchdtl = ['default']
-            for c in c.values('lab_inaugurated'):
-                if c.get('lab_inaugurated') == 1:
-                    count=count+1
-            if obj.count() < 1:
-                print('A')
-                subdiv = 'A'
-                subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): " +\
+    Returns:
+        subject: the subject content that is to be sent.
+        body: the body content that is to be sent.
+        subdiv: denotes the type of body content.
+        tchdtl: contains the teacher details of the given college.
+    """
+    try:
+        district = dis
+        state = sta
+        c = ElsiCollegeDtls.objects.all()
+        count=0
+        tchdtl = ['default']
+        for c in c.values('lab_inaugurated'):
+            if c.get('lab_inaugurated') == 1:
+                count=count+1
+        if obj.count() < 1:
+            print('A')
+            subdiv = 'A'
+            subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): " +\
+                "Information for e-Yantra Lab Setup Initiative (eLSI): " +\
+                    clg + " , " + district + " , " + state
+            body = render_to_string(os.path.join(STATIC_DIR,'no_record.html'),{'count':count})
+        else :
+            college_name = obj[0].normalised_ins_name
+            district = obj[0].district
+            state = obj[0].state
+            wo_attend = obj[0].wo_attend
+            tbt_allowed = obj[0].tbt_allowed
+            lab_inaugurated = obj[0].lab_inaugurated
+            workshop = WorkshopParticipants.objects.filter(clg_id = obj[0].id)
+            print(workshop.values())
+            subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): " +\
                     "Information for e-Yantra Lab Setup Initiative (eLSI): " +\
-                     clg + " , " + district + " , " + state
-                body = render_to_string(os.path.join(STATIC_DIR,'no_record.html'),{'count':count})
-            else :
-                college_name = obj[0].normalised_ins_name
-                district = obj[0].district
-                state = obj[0].state
-                wo_attend = obj[0].wo_attend
-                tbt_allowed = obj[0].tbt_allowed
-                lab_inaugurated = obj[0].lab_inaugurated
-                workshop = WorkshopParticipants.objects.filter(clg_id = obj[0].id)
-                print(workshop.values())
-                subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): " +\
-                        "Information for e-Yantra Lab Setup Initiative (eLSI): " +\
-                        college_name + " , " + district + " , " + state
-                if  obj[0].lab_inaugurated:
-                    print('E')
-                    subdiv = 'E'
+                    college_name + " , " + district + " , " + state
+            if  obj[0].lab_inaugurated:
+                print('E')
+                subdiv = 'E'
+                l = ['sno.']
+                tchdtl2 = ['name','department','designation']
+                for fields in ElsiTeacherDtls._meta.fields:
+                        tchdtl.append(fields.name)
+                        if fields.name in tchdtl2:
+                            l.append(fields.name)
+                det = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id)
+                print(det)
+                d= {'data':[]}
+                for idx in range(det.count()):
+                    d['data'].append({'id':det[idx].id,'value':[idx+1]})
+                    for field in ElsiTeacherDtls._meta.fields:
+                        if field.name in tchdtl2:
+                            d['data'][idx]['value'].append(det.values()[idx][field.name])
+                print(d)
+                body = render_to_string(os.path.join(STATIC_DIR,'elsi_college.html'),
+                {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
+                'count':count,"datas":d,'lst':l})
+            elif obj[0].wo_attend and obj[0].tbt_allowed:
+                tb = TbtCollegeDtls.objects.filter(elsi_clg_id = obj[0].id )
+                if tb[0].completed:
+                    print('D')
+                    subdiv = 'D'
                     l = ['sno.']
                     tchdtl2 = ['name','department','designation']
-                    for fields in ElsiTeacherDtls._meta.fields:
-                            tchdtl.append(fields.name)
-                            if fields.name in tchdtl2:
-                                l.append(fields.name)
-                    det = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id)
-                    print(det)
-                    d= {'data':[]}
-                    for idx in range(det.count()):
-                        d['data'].append({'id':det[idx].id,'value':[idx+1]})
-                        for field in ElsiTeacherDtls._meta.fields:
-                            if field.name in tchdtl2:
-                                d['data'][idx]['value'].append(det.values()[idx][field.name])
-                    print(d)
-                    body = render_to_string(os.path.join(STATIC_DIR,'elsi_college.html'),
-                    {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
-                    'count':count,"datas":d,'lst':l})
-                elif obj[0].wo_attend and obj[0].tbt_allowed:
-                    tb = TbtCollegeDtls.objects.filter(elsi_clg_id = obj[0].id )
-                    if tb[0].completed:
-                        print('D')
-                        subdiv = 'D'
-                        l = ['sno.']
-                        tchdtl2 = ['name','department','designation']
-                        for fields in ElsiTeacherDtls._meta.fields:
-                            tchdtl.append(fields.name)
-                            if fields.name in tchdtl2:
-                                l.append(fields.name)
-                        det = WorkshopDtls.objects.filter(id = workshop[0].workshop_id )
-                        workshop_id = workshop[0].workshop_id
-                        temp = ElsiCollegeDtls.objects.filter(id = det[0].clg_id)
-                        details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
-                        print(details)
-                        d= {'data':[]}
-                        for idx in range(details.count()):
-                            d['data'].append({'id':details[idx].id,'value':[idx+1]})
-                            for field in ElsiTeacherDtls._meta.fields:
-                                if field.name in tchdtl2:
-                                    d['data'][idx]['value'].append(details.values()[idx][field.name])
-                        print(d)
-                        start_date = det[0].start_date
-                        start_date = datetime.strptime(start_date, '%d-%m-%Y')
-                        start_date = datetime.strftime(start_date,'%B %d, %Y')
-                        end_date = det[0].end_date
-                        end_date = datetime.strptime(end_date, '%d-%m-%Y')
-                        end_date = datetime.strftime(end_date,'%B %d, %Y')
-                        body = render_to_string(os.path.join(STATIC_DIR,'tbt_complete.html'),
-                        {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
-                        'count':count,'start_date':start_date,'end_date':end_date,'host_college':temp[0].college_name,'host_State':temp[0].state,
-                        'host_District':temp[0].district,"datas":d,'lst':l})
-                    else:
-                        print('C')
-                        subdiv = 'C'
-                        l = ['sno.']
-                        tchdtl2 = ['name','department','designation']
-                        for fields in ElsiTeacherDtls._meta.fields:
-                            tchdtl.append(fields.name)
-                            if fields.name in tchdtl2:
-                                l.append(fields.name)
-                        det = WorkshopDtls.objects.filter(id = workshop[0].workshop_id )
-                        print(det.values())
-                        workshop_id = workshop[0].workshop_id
-                        temp = ElsiCollegeDtls.objects.filter(id = det[0].clg_id)
-                        details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
-                        print(details)
-                        d= {'data':[]}
-                        for idx in range(details.count()):
-                            d['data'].append({'id':details[idx].id,'value':[idx+1]})
-                            for field in ElsiTeacherDtls._meta.fields:
-                                if field.name in tchdtl2:
-                                    d['data'][idx]['value'].append(details.values()[idx][field.name])
-                        print(d)
-                        start_date = det[0].start_date
-                        start_date = datetime.strptime(start_date, '%d-%m-%Y')
-                        start_date = datetime.strftime(start_date,'%B %d, %Y')
-                        end_date = det[0].end_date
-                        end_date = datetime.strptime(end_date, '%d-%m-%Y')
-                        end_date = datetime.strftime(end_date,'%B %d, %Y')
-                        body = render_to_string(os.path.join(STATIC_DIR,'tbt_notcomplete.html'),
-                        {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
-                        'count':count,'start_date':start_date,'end_date':end_date,'host_college':temp[0].college_name,'host_State':temp[0].state,
-                        'host_District':temp[0].district,"datas":d,'lst':l})
-                elif obj[0].wo_attend :
-                    print('B')
-                    subdiv = 'B'
-                    l = ['sno.']
-                    tchdtl2 = ['name','department']
                     for fields in ElsiTeacherDtls._meta.fields:
                         tchdtl.append(fields.name)
                         if fields.name in tchdtl2:
                             l.append(fields.name)
-                    print(tchdtl)
-                    print(workshop.values())
+                    det = WorkshopDtls.objects.filter(id = workshop[0].workshop_id )
                     workshop_id = workshop[0].workshop_id
-                    workshop_dtl = WorkshopDtls.objects.filter(id = workshop_id)
-                    print(workshop_dtl.values())
-                    datas = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
-                    print(datas.values())
+                    temp = ElsiCollegeDtls.objects.filter(id = det[0].clg_id)
+                    details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
+                    print(details)
                     d= {'data':[]}
-                    for idx in range(datas.count()):
-                        d['data'].append({'id':datas[idx].id,'value':[idx+1]})
+                    for idx in range(details.count()):
+                        d['data'].append({'id':details[idx].id,'value':[idx+1]})
                         for field in ElsiTeacherDtls._meta.fields:
                             if field.name in tchdtl2:
-                                d['data'][idx]['value'].append(datas.values()[idx][field.name])
+                                d['data'][idx]['value'].append(details.values()[idx][field.name])
                     print(d)
-                    clg_id = workshop_dtl[0].clg_id
-                    temp = ElsiCollegeDtls.objects.filter(id = clg_id)
-                    print(temp.values())
-                    body = render_to_string(os.path.join(STATIC_DIR,'workshop_done.html'),
-                    {'CollegeName':college_name,'State': state,'District':district,
-                        'count':count,'host_college':temp[0].college_name,'host_State':temp[0].state,'host_District':temp[0].district,
-                        "datas":d,'lst':l})
-                else :
-                    print('A')
-                    subdiv = 'A'
-                    body = render_to_string(os.path.join(STATIC_DIR,'no_record.html'),{'count':count})
-            return {'subject':subject,'body':body,'subdiv':subdiv,'tchdtl':tchdtl}
-        except ValueError as e:
-            return {'status':'failed','info':e.args[0]}
+                    start_date = det[0].start_date
+                    start_date = datetime.strptime(start_date, '%d-%m-%Y')
+                    start_date = datetime.strftime(start_date,'%B %d, %Y')
+                    end_date = det[0].end_date
+                    end_date = datetime.strptime(end_date, '%d-%m-%Y')
+                    end_date = datetime.strftime(end_date,'%B %d, %Y')
+                    body = render_to_string(os.path.join(STATIC_DIR,'tbt_complete.html'),
+                    {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
+                    'count':count,'start_date':start_date,'end_date':end_date,'host_college':temp[0].college_name,'host_State':temp[0].state,
+                    'host_District':temp[0].district,"datas":d,'lst':l})
+                else:
+                    print('C')
+                    subdiv = 'C'
+                    l = ['sno.']
+                    tchdtl2 = ['name','department','designation']
+                    for fields in ElsiTeacherDtls._meta.fields:
+                        tchdtl.append(fields.name)
+                        if fields.name in tchdtl2:
+                            l.append(fields.name)
+                    det = WorkshopDtls.objects.filter(id = workshop[0].workshop_id )
+                    print(det.values())
+                    workshop_id = workshop[0].workshop_id
+                    temp = ElsiCollegeDtls.objects.filter(id = det[0].clg_id)
+                    details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
+                    print(details)
+                    d= {'data':[]}
+                    for idx in range(details.count()):
+                        d['data'].append({'id':details[idx].id,'value':[idx+1]})
+                        for field in ElsiTeacherDtls._meta.fields:
+                            if field.name in tchdtl2:
+                                d['data'][idx]['value'].append(details.values()[idx][field.name])
+                    print(d)
+                    start_date = det[0].start_date
+                    start_date = datetime.strptime(start_date, '%d-%m-%Y')
+                    start_date = datetime.strftime(start_date,'%B %d, %Y')
+                    end_date = det[0].end_date
+                    end_date = datetime.strptime(end_date, '%d-%m-%Y')
+                    end_date = datetime.strftime(end_date,'%B %d, %Y')
+                    body = render_to_string(os.path.join(STATIC_DIR,'tbt_notcomplete.html'),
+                    {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
+                    'count':count,'start_date':start_date,'end_date':end_date,'host_college':temp[0].college_name,'host_State':temp[0].state,
+                    'host_District':temp[0].district,"datas":d,'lst':l})
+            elif obj[0].wo_attend :
+                print('B')
+                subdiv = 'B'
+                l = ['sno.']
+                tchdtl2 = ['name','department']
+                for fields in ElsiTeacherDtls._meta.fields:
+                    tchdtl.append(fields.name)
+                    if fields.name in tchdtl2:
+                        l.append(fields.name)
+                print(tchdtl)
+                print(workshop.values())
+                workshop_id = workshop[0].workshop_id
+                workshop_dtl = WorkshopDtls.objects.filter(id = workshop_id)
+                print(workshop_dtl.values())
+                datas = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
+                print(datas.values())
+                d= {'data':[]}
+                for idx in range(datas.count()):
+                    d['data'].append({'id':datas[idx].id,'value':[idx+1]})
+                    for field in ElsiTeacherDtls._meta.fields:
+                        if field.name in tchdtl2:
+                            d['data'][idx]['value'].append(datas.values()[idx][field.name])
+                print(d)
+                clg_id = workshop_dtl[0].clg_id
+                temp = ElsiCollegeDtls.objects.filter(id = clg_id)
+                print(temp.values())
+                body = render_to_string(os.path.join(STATIC_DIR,'workshop_done.html'),
+                {'CollegeName':college_name,'State': state,'District':district,
+                    'count':count,'host_college':temp[0].college_name,'host_State':temp[0].state,'host_District':temp[0].district,
+                    "datas":d,'lst':l})
+            else :
+                print('A')
+                subdiv = 'A'
+                body = render_to_string(os.path.join(STATIC_DIR,'no_record.html'),{'count':count})
+        return {'subject':subject,'body':body,'subdiv':subdiv,'tchdtl':tchdtl}
+    except ValueError as e:
+        return {'status':'failed','info':e.args[0]}
 
 def CreateLabel(service, user_id, label_object):
-  """Creates a new label within user's mailbox, also prints Label ID.
+    """Creates a new label within user's mailbox, also prints Label ID.
 
-  Args:
-    service: Authorized Gmail API service instance.
-    user_id: User's email address. The special value "me"
-    can be used to indicate the authenticated user.
-    label_object: label to be added.
+    Args:
+        service: Authorized Gmail API service instance.
+        user_id: User's email address. The special value "me"
+        can be used to indicate the authenticated user.
+        label_object: label to be added.
 
-  Returns:
-    Created Label.
-  """
-  try:
-    label = service.users().labels().create(userId=user_id,
-                                            body=label_object).execute()
-    print(label['id'])
-    return label
-  except errors.HttpError as error:
-    print('An error occurred: %s' % error)
+    Returns:
+        Created Label.
+    """
+    try:
+        label = service.users().labels().create(userId=user_id,
+                                                body=label_object).execute()
+        print(label['id'])
+        return label
+    except errors.HttpError as error:
+        print('An error occurred: %s' % error)
 
 def MakeLabel(label_name, mlv='show', llv='labelShow'):
-  """Create Label object.
+    """Create Label object.
 
-  Args:
-    label_name: The name of the Label.
-    mlv: Message list visibility, show/hide.
-    llv: Label list visibility, labelShow/labelHide.
+    Args:
+        label_name: The name of the Label.
+        mlv: Message list visibility, show/hide.
+        llv: Label list visibility, labelShow/labelHide.
 
-  Returns:
-    Created Label.
-  """
-  label = {'messageListVisibility': mlv,
-           'name': label_name,
-           'labelListVisibility': llv}
-  return label
+    Returns:
+        Created Label.
+    """
+    label = {'messageListVisibility': mlv,
+            'name': label_name,
+            'labelListVisibility': llv}
+    return label
 
 def CreateDraft(service, user_id, message_body):
-  """Create and insert a draft email. Print the returned draft's message and id.
+    """Create and insert a draft email. Print the returned draft's message and id.
 
-  Args:
-    service: Authorized Gmail API service instance.
-    user_id: User's email address. The special value "me"
-    can be used to indicate the authenticated user.
-    message_body: The body of the email message, including headers.
+    Args:
+        service: Authorized Gmail API service instance.
+        user_id: User's email address. The special value "me"
+        can be used to indicate the authenticated user.
+        message_body: The body of the email message, including headers.
 
-  Returns:
-    Draft object, including draft id and message meta data.
-  """
-  try:
-    message = {'message': message_body}
-    draft = service.users().drafts().create(userId=user_id, body=message).execute()
-    print('Draft id: %s\nDraft message: %s' % (draft['id'], draft['message']))
-    return draft
-  except errors.HttpError as error:
-    print('An error occurred: %s' % error)
-    return error
+    Returns:
+        Draft object, including draft id and message meta data.
+    """
+    try:
+        message = {'message': message_body}
+        draft = service.users().drafts().create(userId=user_id, body=message).execute()
+        print('Draft id: %s\nDraft message: %s' % (draft['id'], draft['message']))
+        return draft
+    except errors.HttpError as error:
+        print('An error occurred: %s' % error)
+        return error
 
 def ListLabels(service, user_id):
-  """Get a list all labels in the user's mailbox.
+    """Get a list all labels in the user's mailbox.
 
-  Args:
-    service: Authorized Gmail API service instance.
-    user_id: User's email address. The special value "me"
-    can be used to indicate the authenticated user.
+    Args:
+        service: Authorized Gmail API service instance.
+        user_id: User's email address. The special value "me"
+        can be used to indicate the authenticated user.
 
-  Returns:
-    A list all Labels in the user's mailbox.
-  """
-  try:
-    response = service.users().labels().list(userId=user_id).execute()
-    labels = response['labels']
-    #for label in labels:
-    #  print('Label id: %s - Label name: %s' % (label['id'], label['name']))
-    return labels
-  except errors.HttpError as error:
-    print('An error occurred: %s' % error)
+    Returns:
+        A list all Labels in the user's mailbox.
+    """
+    try:
+        response = service.users().labels().list(userId=user_id).execute()
+        labels = response['labels']
+        #for label in labels:
+        #  print('Label id: %s - Label name: %s' % (label['id'], label['name']))
+        return labels
+    except errors.HttpError as error:
+        print('An error occurred: %s' % error)
 
 def SendMessage(sender, to, cc, bcc, subject, body,label,attachmentFile=None):
-    
+    """gets the credentials, checks for label and adds the new label, creates the message and sends the message
+
+    Args:
+        sender: Email address of sender
+        to: Email address of recepeint
+        cc: cc Email address(s)
+        bcc: bcc Email address(s)
+        subject: The subject of the email message.
+        body: The body of the email message.
+        label: labels attached with email
+        attachmentFile: attachments with email
+    Returns:
+        sent message returned by SendMessageInternal() function which contains entire details of sent email
+    """
     credentials = get_credentials()
     print(credentials,'credentials')
     service = build('gmail', 'v1', credentials=credentials)
@@ -730,6 +745,11 @@ def SendMessage(sender, to, cc, bcc, subject, body,label,attachmentFile=None):
     return result
 
 def get_credentials():
+    """generates the crdentials(json) file from pickle.token file
+
+    Returns:
+        credentials in json format
+    """
     creds = None
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -754,6 +774,20 @@ def get_credentials():
     return creds
 
 def CreateMessageHtml(sender, to, cc, bcc, subject, body, msgHtml=None):
+    """Create a message for an email.
+
+    Args:
+        sender: Email address of the sender.
+        to: Email address of the receiver.
+        cc: cc email address(s)
+        bcc: bcc email address(s)
+        subject: The subject of the email message.
+        body: The body of the email message.
+        msgHtml: The html of the email message.
+
+    Returns:
+        An object containing a base64url encoded email object.
+    """
     msg = MIMEMultipart('alternative')
     msg['Subject'] = subject
     msg['From'] = sender
@@ -765,6 +799,16 @@ def CreateMessageHtml(sender, to, cc, bcc, subject, body, msgHtml=None):
     return {'raw': base64.urlsafe_b64encode(msg.as_string().encode()).decode()}
 
 def SendMessageInternal(service, user_id, message,label):
+    """Send an email message.
+
+    Args:
+        service: Authorized Gmail API service instance.
+        user_id: User's email address. The special value "me"can be used to indicate the authenticated user.
+        message: Message to be sent.
+        label: label attached with mail
+    Returns:
+        Sent Message.
+    """
     try:
         message = (service.users().messages().send(userId=user_id, body=message).execute())
         msg_labels = {'removeLabelIds': [], 'addLabelIds': label['id']}
@@ -776,20 +820,20 @@ def SendMessageInternal(service, user_id, message,label):
         return "Error"
     return "OK"
 
-def createMessageWithAttachment(
-    sender, to,cc,bcc, subject,body, attachmentFile):
+def createMessageWithAttachment(sender, to,cc,bcc, subject,body, attachmentFile):
     """Create a message for an email.
 
     Args:
-      sender: Email address of the sender.
-      to: Email address of the receiver.
-      subject: The subject of the email message.
-      msgHtml: Html message to be sent
-      msgPlain: Alternative plain text message for older email clients
-      attachmentFile: The path to the file to be attached.
+        sender: Email address of the sender.
+        to: Email address of the receiver.
+        cc: cc email address(s)
+        bcc: bcc email address(s)
+        subject: The subject of the email message.
+        body: The body of the email message
+        attachmentFile: The path to the file to be attached.
 
     Returns:
-      An object containing a base64url encoded email object.
+        An object containing a base64url encoded email object.
     """
     message = MIMEMultipart('mixed')
     message['to'] = to
@@ -840,6 +884,14 @@ def createMessageWithAttachment(
     return {'raw': base64.urlsafe_b64encode(message.as_string().encode()).decode()}
 
 def getname(name):
+    """normalizes the college name using chromedriver
+
+    Args:
+        name: college name
+
+    Returns:
+        normalized college name
+    """
     # API_KEY = 'AIzaSyD9qTJmiFUe3FQWlo5Z-A3l6pigxA3s8U8'
     # url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
     # input=name
@@ -873,6 +925,7 @@ def getname(name):
     #     return name
     # else:
     #     return collx['candidates'][0]['name']
+'''    
 def getloc(name):
     API_KEY = 'AIzaSyBE-9YyXHa6tXkOFmZpNS3fdXkSwU2bMk8'
     url='https://maps.googleapis.com/maps/api/place/findplacefromtext/json?'
@@ -886,180 +939,202 @@ def getloc(name):
         return name
     else:
         return collx
+'''
 ################################
 
 ################################
 # send information mail
 @api_view(['POST'])
 def store(request):
-        try:
-            var = JSONParser().parse(request)
-            clg = var.get('cname')
-            district = var.get('district')
-            state = var.get('state')
-            tchdtl2 = var.get('tchdtl')
-            subdiv = var.get('subdiv')
-            tchdtl = ['default']
-            if 'default' in tchdtl2:
-                tchdtl2.remove('default')
-                tchdtl2.append('name')
-                tchdtl2.append('department')
-                if subdiv in ['C','D','E']:
-                    tchdtl2.append('designation')
-            print(tchdtl2,district,state,clg)
-            coll = getname(str(var.get('cname')))
-            print(coll)
-            # if len(district) >0 and len(state)>0:
-            #     dis = getname(str(var.get('district')))
-            #     sta = getname(str(var.get('state')))
-            # else:
-            #     collx = getloc(coll)
-            #     data = collx['candidates'][0]['formatted_address']
-            #     data.replace(" ", "")
-            #     data = data.split(",")
-            #     dis = "".join(filter(lambda x: not x.isdigit(), data[-3]))
-            #     print(dis)
-            #     sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
-            #     print(sta)
-            obj = ElsiCollegeDtls.objects.filter(normalised_ins_name = coll)
-            c = ElsiCollegeDtls.objects.all()
-            count=0
-            for c in c.values('lab_inaugurated'):
-                if c.get('lab_inaugurated') == 1:
-                    count=count+1
-            if obj.count() < 1:
-                pass
-            else :
-                college_name = obj[0].normalised_ins_name
-                district = obj[0].district
-                state = obj[0].state
-                wo_attend = obj[0].wo_attend
-                tbt_allowed = obj[0].tbt_allowed
-                lab_inaugurated = obj[0].lab_inaugurated
-                workshop = WorkshopParticipants.objects.filter(clg_id = obj[0].id)
-                print(workshop.values())
-                subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): " +\
-                        "Information for e-Yantra Lab Setup Initiative (eLSI): " +\
-                        college_name + " , " + district + " , " + state
-                if  obj[0].lab_inaugurated:
-                    print('E')
+    """allows editing in body of the email by first categorize the mail and then add the updates
+
+        Args:
+            cname: college name to which mail is to be sent
+            district: district of college
+            state: state of college
+            and many more variables containing the teacher details and category in which college comes
+            according to elsi college database
+        Returns:
+            updated json object containing mail details like subject, body, attachments and many more.
+    """
+    try:
+        var = JSONParser().parse(request)
+        clg = var.get('cname')
+        district = var.get('district')
+        state = var.get('state')
+        tchdtl2 = var.get('tchdtl')
+        subdiv = var.get('subdiv')
+        tchdtl = ['default']
+        if 'default' in tchdtl2:
+            tchdtl2.remove('default')
+            tchdtl2.append('name')
+            tchdtl2.append('department')
+            if subdiv in ['C','D','E']:
+                tchdtl2.append('designation')
+        print(tchdtl2,district,state,clg)
+        coll = getname(str(var.get('cname')))
+        print(coll)
+        # if len(district) >0 and len(state)>0:
+        #     dis = getname(str(var.get('district')))
+        #     sta = getname(str(var.get('state')))
+        # else:
+        #     collx = getloc(coll)
+        #     data = collx['candidates'][0]['formatted_address']
+        #     data.replace(" ", "")
+        #     data = data.split(",")
+        #     dis = "".join(filter(lambda x: not x.isdigit(), data[-3]))
+        #     print(dis)
+        #     sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
+        #     print(sta)
+        obj = ElsiCollegeDtls.objects.filter(normalised_ins_name = coll)
+        c = ElsiCollegeDtls.objects.all()
+        count=0
+        for c in c.values('lab_inaugurated'):
+            if c.get('lab_inaugurated') == 1:
+                count=count+1
+        if obj.count() < 1:
+            pass
+        else :
+            college_name = obj[0].normalised_ins_name
+            district = obj[0].district
+            state = obj[0].state
+            wo_attend = obj[0].wo_attend
+            tbt_allowed = obj[0].tbt_allowed
+            lab_inaugurated = obj[0].lab_inaugurated
+            workshop = WorkshopParticipants.objects.filter(clg_id = obj[0].id)
+            print(workshop.values())
+            subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): " +\
+                    "Information for e-Yantra Lab Setup Initiative (eLSI): " +\
+                    college_name + " , " + district + " , " + state
+            if  obj[0].lab_inaugurated:
+                print('E')
+                l = ['sno.']
+                for fields in ElsiTeacherDtls._meta.fields:
+                        tchdtl.append(fields.name)
+                        if fields.name in tchdtl2:
+                            l.append(fields.name)
+                det = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id )
+                print(det)
+                d= {'data':[]}
+                for idx in range(det.count()):
+                    d['data'].append({'id':det[idx].id,'value':[idx+1]})
+                    for field in ElsiTeacherDtls._meta.fields:
+                        if field.name in tchdtl2:
+                            d['data'][idx]['value'].append(det.values()[idx][field.name])
+                print(d)
+                body = render_to_string(os.path.join(STATIC_DIR,'elsi_college.html'),
+                {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
+                'count':count,"datas":d,'lst':l})
+            elif obj[0].wo_attend and obj[0].tbt_allowed:
+                tb = TbtCollegeDtls.objects.filter(elsi_clg_id = obj[0].id )
+                if tb[0].completed:
+                    print('D')
                     l = ['sno.']
                     for fields in ElsiTeacherDtls._meta.fields:
-                            tchdtl.append(fields.name)
-                            if fields.name in tchdtl2:
-                                l.append(fields.name)
-                    det = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id )
-                    print(det)
-                    d= {'data':[]}
-                    for idx in range(det.count()):
-                        d['data'].append({'id':det[idx].id,'value':[idx+1]})
-                        for field in ElsiTeacherDtls._meta.fields:
-                            if field.name in tchdtl2:
-                                d['data'][idx]['value'].append(det.values()[idx][field.name])
-                    print(d)
-                    body = render_to_string(os.path.join(STATIC_DIR,'elsi_college.html'),
-                    {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
-                    'count':count,"datas":d,'lst':l})
-                elif obj[0].wo_attend and obj[0].tbt_allowed:
-                    tb = TbtCollegeDtls.objects.filter(elsi_clg_id = obj[0].id )
-                    if tb[0].completed:
-                        print('D')
-                        l = ['sno.']
-                        for fields in ElsiTeacherDtls._meta.fields:
-                            tchdtl.append(fields.name)
-                            if fields.name in tchdtl2:
-                                l.append(fields.name)
-                        det = WorkshopDtls.objects.filter(id = workshop[0].workshop_id )
-                        workshop_id = workshop[0].workshop_id
-                        temp = ElsiCollegeDtls.objects.filter(id = det[0].clg_id)
-                        details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
-                        print(details)
-                        d= {'data':[]}
-                        for idx in range(details.count()):
-                            d['data'].append({'id':details[idx].id,'value':[idx+1]})
-                            for field in ElsiTeacherDtls._meta.fields:
-                                if field.name in tchdtl2:
-                                    d['data'][idx]['value'].append(details.values()[idx][field.name])
-                        print(d)
-                        start_date = det[0].start_date
-                        start_date = datetime.strptime(start_date, '%d-%m-%Y')
-                        start_date = datetime.strftime(start_date,'%b %d, %Y')
-                        end_date = det[0].end_date
-                        end_date = datetime.strptime(end_date, '%d-%m-%Y')
-                        end_date = datetime.strftime(end_date,'%b %d, %Y')
-                        body = render_to_string(os.path.join(STATIC_DIR,'tbt_complete.html'),
-                        {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
-                        'count':count,'start_date':start_date,'end_date':end_date,'host_college':temp[0].college_name,'host_State':temp[0].state,
-                        'host_District':temp[0].district,"datas":d,'lst':l})
-                    else:
-                        print('C')
-                        l = ['sno.']
-                        for fields in ElsiTeacherDtls._meta.fields:
-                            tchdtl.append(fields.name)
-                            if fields.name in tchdtl2:
-                                l.append(fields.name)
-                        det = WorkshopDtls.objects.filter(id = workshop[0].workshop_id )
-                        workshop_id = workshop[0].workshop_id
-                        temp = ElsiCollegeDtls.objects.filter(id = det[0].clg_id)
-                        details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
-                        print(details)
-                        d= {'data':[]}
-                        for idx in range(details.count()):
-                            d['data'].append({'id':details[idx].id,'value':[idx+1]})
-                            for field in ElsiTeacherDtls._meta.fields:
-                                if field.name in tchdtl2:
-                                    d['data'][idx]['value'].append(details.values()[idx][field.name])
-                        print(d)
-                        start_date = det[0].start_date
-                        start_date = datetime.strptime(start_date, '%d-%m-%Y')
-                        start_date = datetime.strftime(start_date,'%b %d, %Y')
-                        end_date = det[0].end_date
-                        end_date = datetime.strptime(end_date, '%d-%m-%Y')
-                        end_date = datetime.strftime(end_date,'%b %d, %Y')
-                        body = render_to_string(os.path.join(STATIC_DIR,'tbt_notcomplete.html'),
-                        {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
-                        'count':count,'start_date':start_date,'end_date':end_date,'host_college':temp[0].college_name,'host_State':temp[0].state,
-                        'host_District':temp[0].district,"datas":d,'lst':l})
-                elif obj[0].wo_attend :
-                    print('B')
-                    l = ['sno.']
-                    for fields in ElsiTeacherDtls._meta.fields:
-                            tchdtl.append(fields.name)
-                            if fields.name in tchdtl2:
-                                l.append(fields.name)
-                    print(workshop.values())
+                        tchdtl.append(fields.name)
+                        if fields.name in tchdtl2:
+                            l.append(fields.name)
+                    det = WorkshopDtls.objects.filter(id = workshop[0].workshop_id )
                     workshop_id = workshop[0].workshop_id
-                    workshop_dtl = WorkshopDtls.objects.filter(id = workshop_id)
-                    print(workshop_dtl.values())
-                    datas = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
-                    print(datas)
+                    temp = ElsiCollegeDtls.objects.filter(id = det[0].clg_id)
+                    details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
+                    print(details)
                     d= {'data':[]}
-                    for idx in range(datas.count()):
-                        d['data'].append({'id':datas[idx].id,'value':[idx+1]})
+                    for idx in range(details.count()):
+                        d['data'].append({'id':details[idx].id,'value':[idx+1]})
                         for field in ElsiTeacherDtls._meta.fields:
                             if field.name in tchdtl2:
-                                d['data'][idx]['value'].append(datas.values()[idx][field.name])
+                                d['data'][idx]['value'].append(details.values()[idx][field.name])
                     print(d)
-                    clg_id = workshop_dtl[0].clg_id
-                    temp = ElsiCollegeDtls.objects.filter(id = clg_id)
-                    print(temp.values())
-                    body = render_to_string(os.path.join(STATIC_DIR,'workshop_done.html'),
-                    {'CollegeName':college_name,'State': state,'District':district,
-                        'count':count,'host_college':temp[0].college_name,'host_State':temp[0].state,'host_District':temp[0].district,
-                        "datas":d,'lst':l})
-                else :
-                    pass
-            var['subject']=subject
-            var['body']=body
-            var['attachments'] = {'pamp':'Pamphlet2020.pdf','LoI':'letter-of-intent.docx'}
-            var['subdiv'] = subdiv
-            var['tchdtl'] = tchdtl
-            return JsonResponse(var)
-        except ValueError as e:
-            return JsonResponse({'status':'failed','info':e.args[0]})
+                    start_date = det[0].start_date
+                    start_date = datetime.strptime(start_date, '%d-%m-%Y')
+                    start_date = datetime.strftime(start_date,'%b %d, %Y')
+                    end_date = det[0].end_date
+                    end_date = datetime.strptime(end_date, '%d-%m-%Y')
+                    end_date = datetime.strftime(end_date,'%b %d, %Y')
+                    body = render_to_string(os.path.join(STATIC_DIR,'tbt_complete.html'),
+                    {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
+                    'count':count,'start_date':start_date,'end_date':end_date,'host_college':temp[0].college_name,'host_State':temp[0].state,
+                    'host_District':temp[0].district,"datas":d,'lst':l})
+                else:
+                    print('C')
+                    l = ['sno.']
+                    for fields in ElsiTeacherDtls._meta.fields:
+                        tchdtl.append(fields.name)
+                        if fields.name in tchdtl2:
+                            l.append(fields.name)
+                    det = WorkshopDtls.objects.filter(id = workshop[0].workshop_id )
+                    workshop_id = workshop[0].workshop_id
+                    temp = ElsiCollegeDtls.objects.filter(id = det[0].clg_id)
+                    details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
+                    print(details)
+                    d= {'data':[]}
+                    for idx in range(details.count()):
+                        d['data'].append({'id':details[idx].id,'value':[idx+1]})
+                        for field in ElsiTeacherDtls._meta.fields:
+                            if field.name in tchdtl2:
+                                d['data'][idx]['value'].append(details.values()[idx][field.name])
+                    print(d)
+                    start_date = det[0].start_date
+                    start_date = datetime.strptime(start_date, '%d-%m-%Y')
+                    start_date = datetime.strftime(start_date,'%b %d, %Y')
+                    end_date = det[0].end_date
+                    end_date = datetime.strptime(end_date, '%d-%m-%Y')
+                    end_date = datetime.strftime(end_date,'%b %d, %Y')
+                    body = render_to_string(os.path.join(STATIC_DIR,'tbt_notcomplete.html'),
+                    {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
+                    'count':count,'start_date':start_date,'end_date':end_date,'host_college':temp[0].college_name,'host_State':temp[0].state,
+                    'host_District':temp[0].district,"datas":d,'lst':l})
+            elif obj[0].wo_attend :
+                print('B')
+                l = ['sno.']
+                for fields in ElsiTeacherDtls._meta.fields:
+                        tchdtl.append(fields.name)
+                        if fields.name in tchdtl2:
+                            l.append(fields.name)
+                print(workshop.values())
+                workshop_id = workshop[0].workshop_id
+                workshop_dtl = WorkshopDtls.objects.filter(id = workshop_id)
+                print(workshop_dtl.values())
+                datas = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
+                print(datas)
+                d= {'data':[]}
+                for idx in range(datas.count()):
+                    d['data'].append({'id':datas[idx].id,'value':[idx+1]})
+                    for field in ElsiTeacherDtls._meta.fields:
+                        if field.name in tchdtl2:
+                            d['data'][idx]['value'].append(datas.values()[idx][field.name])
+                print(d)
+                clg_id = workshop_dtl[0].clg_id
+                temp = ElsiCollegeDtls.objects.filter(id = clg_id)
+                print(temp.values())
+                body = render_to_string(os.path.join(STATIC_DIR,'workshop_done.html'),
+                {'CollegeName':college_name,'State': state,'District':district,
+                    'count':count,'host_college':temp[0].college_name,'host_State':temp[0].state,'host_District':temp[0].district,
+                    "datas":d,'lst':l})
+            else :
+                pass
+        var['subject']=subject
+        var['body']=body
+        var['attachments'] = {'pamp':'Pamphlet2020.pdf','LoI':'letter-of-intent.docx'}
+        var['subdiv'] = subdiv
+        var['tchdtl'] = tchdtl
+        return JsonResponse(var)
+    except ValueError as e:
+        return JsonResponse({'status':'failed','info':e.args[0]})
 
 @api_view(['POST'])
 def csvapprove(request):
+    """sends mail to colleges within csv file
+
+    Args:
+        user: user who has logged in for this session
+        label: label attached with the message email
+        list: list of colleges for sending mail
+
+    Returns:
+        Json objects returning status of sent and failed emails
+    """
     sent = None
     user = request.data.get('user')
     label = request.data.get('label')
@@ -1167,6 +1242,15 @@ def csvapprove(request):
 
 @api_view(['POST'])
 def csvdraft(request):
+    """saves mails as draft of colleges within csv file
+
+    Args:
+        user: user who has logged in for this session
+        list: list of colleges for drafting mail
+
+    Returns:
+        Json objects returning status of drafted and failed emails
+    """
     sent = None
     user = request.data.get('user')
     with open('assets/info.json','r') as read:
@@ -1280,12 +1364,23 @@ def csvdraft(request):
 
 @api_view(['POST'])
 def idrequest(request):
+    """displays email structure of the selected college from csv file
+
+    Args:
+        cname: college name
+        remail: recepient email address
+
+    Returns:
+        JsonResponse returning recepient email address, cc, bcc, subject, body, attachments and there links 
+    """
     var = JSONParser().parse(request)
     clg = var.get('cname')
     rema = var.get('remail')
     obj = ElsiCollegeDtls.objects.filter(college_name = clg)
-    file_path = os.path.join(BASE_DIR,'clgData.csv')
-    f = open(file_path)
+    with open('assets/info.json','r') as read:
+        rd = json.load(read)
+    #file_path = os.path.join(BASE_DIR,rd['file_name'])
+    f = open(rd['file_path'])
     reader = csv.DictReader(f)
     for rows in reader:
         if (rows['remail'] == rema):
@@ -1317,6 +1412,14 @@ def idrequest(request):
 
 @api_view(['POST'])
 def csvsubmit(request):
+    """stores the csv file data for future access
+
+    Args:
+        file: csv or xlsx file
+    
+    Returns:
+        JsonResponse returning college name and recepient email address of colleges present in file
+    """
     file = request.FILES['file']
     if os.path.getsize('assets/info.json') :
         with open('assets/info.json','r') as read:
@@ -1336,113 +1439,154 @@ def csvsubmit(request):
 
 @api_view(['POST'])
 def submit(request):
-        try:
-            var = JSONParser().parse(request)
-            clg = var.get('cname')
-            district = var.get('district')
-            if '(' in district:
-                district = re.sub(r'\([^)]*\)', '', district)[0:-1]
-            print(district)
-            state = var.get('state')
-            if '(' in state:
-                state = re.sub(r'\([^)]*\)', '', state)[0:-1]
-            print(state)
-            coll = getname(var.get('cname'))
-            print(coll)
-            # if len(district) >0 and len(state)>0:
-            #     dis=getname(str(var.get('district')))
-            #     sta=getname(str(var.get('state')))
-            # else:
-            #     collx = getloc(coll)
-            #     data = collx['candidates'][0]['formatted_address']
-            #     data.replace(" ", "")
-            #     data = data.split(",")
-            #     dis = "".join(filter(lambda x: not x.isdigit(), data[-3]))
-            #     print(dis)
-            #     sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
-            #     print(sta)
-            obj = ElsiCollegeDtls.objects.filter(normalised_ins_name = clg)
-            res = getbody(coll,obj,state,district)
-            var['subject']=res['subject']
-            var['body']=res['body']
-            var['attachments'] = {'pamp':'Pamphlet2020.pdf','LoI':'letter-of-intent.docx'}
-            var['attachmentlinks'] = {'pamp':'https://www.e-yantra.org/img/Pamphlet2020.pdf','LoI':'http://elsi.e-yantra.org/eyrtc/downloads/loi'}
-            var['subdiv'] = res['subdiv']
-            var['tchdtl'] = res['tchdtl']
-            return JsonResponse(var)
-        except ValueError as e:
-            return JsonResponse({'status':'failed','info':e.args[0]})
+    """returns the structure of email of the college based upon its categorization(first college name is
+    normalised)
+
+    Args:
+        cname: college name
+        district: district of the college
+        state: state of the college
+
+    Returns:
+        JsonResponse returning recepient email address, cc, bcc, subject, body, attachments and many more 
+    """
+    try:
+        var = JSONParser().parse(request)
+        clg = var.get('cname')
+        district = var.get('district')
+        if '(' in district:
+            district = re.sub(r'\([^)]*\)', '', district)[0:-1]
+        print(district)
+        state = var.get('state')
+        if '(' in state:
+            state = re.sub(r'\([^)]*\)', '', state)[0:-1]
+        print(state)
+        coll = getname(var.get('cname'))
+        print(coll)
+        # if len(district) >0 and len(state)>0:
+        #     dis=getname(str(var.get('district')))
+        #     sta=getname(str(var.get('state')))
+        # else:
+        #     collx = getloc(coll)
+        #     data = collx['candidates'][0]['formatted_address']
+        #     data.replace(" ", "")
+        #     data = data.split(",")
+        #     dis = "".join(filter(lambda x: not x.isdigit(), data[-3]))
+        #     print(dis)
+        #     sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
+        #     print(sta)
+        obj = ElsiCollegeDtls.objects.filter(normalised_ins_name = clg)
+        res = getbody(coll,obj,state,district)
+        var['subject']=res['subject']
+        var['body']=res['body']
+        var['attachments'] = {'pamp':'Pamphlet2020.pdf','LoI':'letter-of-intent.docx'}
+        var['attachmentlinks'] = {'pamp':'https://www.e-yantra.org/img/Pamphlet2020.pdf','LoI':'http://elsi.e-yantra.org/eyrtc/downloads/loi'}
+        var['subdiv'] = res['subdiv']
+        var['tchdtl'] = res['tchdtl']
+        return JsonResponse(var)
+    except ValueError as e:
+        return JsonResponse({'status':'failed','info':e.args[0]})
 
 @api_view(['POST'])
 def approve(request):
-        try:
-            #print(request.data.get('file1'))
-            #print(request.data.get('file2'))
-            user = request.data.get('user')
-            if request.user.is_authenticated:
-                print({'status':'already logged in'})
-            to = request.data.get('remail')
-            label = request.data.get('label')
-            # if type(request.data.get('cc')) == list:
-            #     cc = ','.join(map(str,request.data.get('cc') ))
-            # else:
-            cc = request.data.get('cc')
-            # if type(request.data.get('bcc')) == list:
-            #     bcc = ','.join(map(str,request.data.get('bcc') ))
-            # else:
-            bcc = request.data.get('bcc')
-            subject = request.data.get('subject')
-            body = request.data.get('body')
-            sent = None
-            files2send1 = list(request.data.get('files2send1').split(","))
-            print(files2send1)
-            attachments = []
-            for f in files2send1:
-                if f == 'Pamphlet2020.pdf':
-                    attachments.append(os.path.join(ASSETS_DIR,'Pamphlet2020.pdf'))
-                elif f == 'letter-of-intent.docx':
-                    attachments.append(os.path.join(ASSETS_DIR,'letter-of-intent.docx'))
-            fn = []
-            if request.FILES :
-                for i in request.FILES:
-                    file_name = default_storage.save(request.FILES[i].name, request.FILES[i])
-                    fn.append(file_name)
-                    attachments.append(os.path.join(BASE_DIR,file_name))
-            print(attachments)
-            sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label,attachments)
-            now = datetime.now()
-            ts = now.strftime("%Y-%m-%d %H:%M:%S")
-            if 'file1' in request.FILES :
-                os.remove(os.path.join(BASE_DIR,file_name))
-            if sent :
-                serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
-                        'timestamp' : ts,'mail_label' : 'SENT,'+label,'rcptmailid' : to,
-                        'delegated_access':'0','dcprovider':'None','messageid':sent['id']})
-                if serializer.is_valid():
-                    serializer.save()
-                else :
-                    print(serializer.errors)
-                print(serializer)
-                for i in range(len(fn)):
-                    os.remove(os.path.join(BASE_DIR,fn[i]))
-                return JsonResponse({'status':'success','info':'mail sent successfully'})
+    """send email to the college 
+
+    Args:
+        user: user who has logged in this session
+        to: recepient email address
+        label: label attached with email
+        cc: cc email address(s)
+        bcc: bcc email address(s)
+        subject: subject of message email
+        body: body of message email
+        attachments: attachments of message email
+
+    Returns:
+        JsonResponse returning the status of email
+    """
+    try:
+        #print(request.data.get('file1'))
+        #print(request.data.get('file2'))
+        user = request.data.get('user')
+        if request.user.is_authenticated:
+            print({'status':'already logged in'})
+        to = request.data.get('remail')
+        label = request.data.get('label')
+        # if type(request.data.get('cc')) == list:
+        #     cc = ','.join(map(str,request.data.get('cc') ))
+        # else:
+        cc = request.data.get('cc')
+        # if type(request.data.get('bcc')) == list:
+        #     bcc = ','.join(map(str,request.data.get('bcc') ))
+        # else:
+        bcc = request.data.get('bcc')
+        subject = request.data.get('subject')
+        body = request.data.get('body')
+        sent = None
+        files2send1 = list(request.data.get('files2send1').split(","))
+        print(files2send1)
+        attachments = []
+        for f in files2send1:
+            if f == 'Pamphlet2020.pdf':
+                attachments.append(os.path.join(ASSETS_DIR,'Pamphlet2020.pdf'))
+            elif f == 'letter-of-intent.docx':
+                attachments.append(os.path.join(ASSETS_DIR,'letter-of-intent.docx'))
+        fn = []
+        if request.FILES :
+            for i in request.FILES:
+                file_name = default_storage.save(request.FILES[i].name, request.FILES[i])
+                fn.append(file_name)
+                attachments.append(os.path.join(BASE_DIR,file_name))
+        print(attachments)
+        sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label,attachments)
+        now = datetime.now()
+        ts = now.strftime("%Y-%m-%d %H:%M:%S")
+        if 'file1' in request.FILES :
+            os.remove(os.path.join(BASE_DIR,file_name))
+        if sent :
+            serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
+                    'timestamp' : ts,'mail_label' : 'SENT,'+label,'rcptmailid' : to,
+                    'delegated_access':'0','dcprovider':'None','messageid':sent['id']})
+            if serializer.is_valid():
+                serializer.save()
             else :
-                serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
-                        'timestamp' : ts,'mail_label' : label,'rcptmailid' : to,
-                        'delegated_access':'0','dcprovider':'None','messageid':'None'})
-                if serializer.is_valid():
-                    serializer.save()
-                else :
-                    print(serializer.errors)
-                print(serializer)
-                for i in range(len(fn)):
-                    os.remove(os.path.join(BASE_DIR,fn[i]))
-                return JsonResponse({'status':'failure','info':'mail was not sent'})
-        except ValueError as e:
-            return Response(e.args[0],status.HTTP_400_BAD_REQUEST)
+                print(serializer.errors)
+            print(serializer)
+            for i in range(len(fn)):
+                os.remove(os.path.join(BASE_DIR,fn[i]))
+            return JsonResponse({'status':'success','info':'mail sent successfully'})
+        else :
+            serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
+                    'timestamp' : ts,'mail_label' : label,'rcptmailid' : to,
+                    'delegated_access':'0','dcprovider':'None','messageid':'None'})
+            if serializer.is_valid():
+                serializer.save()
+            else :
+                print(serializer.errors)
+            print(serializer)
+            for i in range(len(fn)):
+                os.remove(os.path.join(BASE_DIR,fn[i]))
+            return JsonResponse({'status':'failure','info':'mail was not sent'})
+    except ValueError as e:
+        return Response(e.args[0],status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def gsave(request):
+    """saves email as gmail draft 
+
+    Args:
+        user: user who has logged in this session
+        to: recepient email address
+        label: label attached with email
+        cc: cc email address(s)
+        bcc: bcc email address(s)
+        subject: subject of message email
+        body: body of message email
+        attachments: attachments of message email
+
+    Returns:
+        JsonResponse returning the status of draft
+    """
     to = request.data.get('remail')
     user = request.data.get('user')
     # if type(request.data.get('cc')) == list:
@@ -1504,189 +1648,258 @@ def gsave(request):
 #workshop announcement
 @api_view(['POST'])
 def cwssubmit(request):
-        try:
-            var = JSONParser().parse(request)
-            x = var.get('coono')
-            print(x)
-            clgid = ElsiCollegeDtls.objects.filter(college_name = var.get('hcn'))[0].id
-            serializer = CreateWorkshop(data={'clgid':clgid,'hcn':var.get('hcn'),'startdate':var.get('startdate'),
-                'enddate':var.get('enddate'),'venueadd':var.get('venueadd'),'cooname':var.get('cooname'),
-                'cooemail':var.get('cooemail'),'coono':var.get('coono')})
-            #print(serializer.is_valid())
-            if serializer.is_valid():
-                serializer.save()
-                print('done')
-                return JsonResponse({'status': 'Created Successfully'})
-            else:
-                print('failure')
-                return JsonResponse({'status': 'Problem in Serializing'})
-        except ValueError as e:
-            return JsonResponse({'status':'failed','info':e.args[0]})
+    """saves the created workshop within database
+
+    Args:
+        hcn: host college name
+        startdate: start date of the workshop
+        enddate: enddate of the workshop
+        venueadd: venue address
+        cooname: coordinator name
+        cooemail: coordinator email address
+        coono: coordinator contac number
+
+    Returns:
+        JsonResponse returning status of saving of workshops
+    """
+    try:
+        var = JSONParser().parse(request)
+        x = var.get('coono')
+        print(x)
+        clgid = ElsiCollegeDtls.objects.filter(college_name = var.get('hcn'))[0].id
+        serializer = CreateWorkshop(data={'clgid':clgid,'hcn':var.get('hcn'),'startdate':var.get('startdate'),
+            'enddate':var.get('enddate'),'venueadd':var.get('venueadd'),'cooname':var.get('cooname'),
+            'cooemail':var.get('cooemail'),'coono':var.get('coono')})
+        #print(serializer.is_valid())
+        if serializer.is_valid():
+            serializer.save()
+            print('done')
+            return JsonResponse({'status': 'Created Successfully'})
+        else:
+            print('failure')
+            return JsonResponse({'status': 'Problem in Serializing'})
+    except ValueError as e:
+        return JsonResponse({'status':'failed','info':e.args[0]})
 
 @api_view(['POST'])
 def getwrklist(request):
-        try:
-            obj = create_workshop.objects.all()
-            wrklist = {}
-            for i in range(obj.count()):
-                if "list" in wrklist:
-                    wrklist["list"].append((obj[i].hcn,obj[i].isactive))
-                else:
-                    wrklist["list"] = [(obj[i].hcn,obj[i].isactive)]
-            print(wrklist)
-            return JsonResponse(wrklist)
-        except ValueError as e:
-            return JsonResponse({'status':'failed','info':e.args[0]})
+    """returns the list of created workshops
+
+    Returns:
+        JsonResponse returning list if created workshops along with there active flag.
+    """
+    try:
+        obj = create_workshop.objects.all()
+        wrklist = {}
+        for i in range(obj.count()):
+            if "list" in wrklist:
+                wrklist["list"].append((obj[i].hcn,obj[i].isactive))
+            else:
+                wrklist["list"] = [(obj[i].hcn,obj[i].isactive)]
+        print(wrklist)
+        return JsonResponse(wrklist)
+    except ValueError as e:
+        return JsonResponse({'status':'failed','info':e.args[0]})
 
 @api_view(['POST'])
 def savewrkactv(request):
-        try:
-            var = JSONParser().parse(request)
-            obj = create_workshop.objects.filter(hcn = var.get('workshop'))
-            obj.update(isactive = var.get('isactive'))
-            print(obj.values())
-            return JsonResponse({'status':'saved'})
-        except ValueError as e:
-            return JsonResponse({'status':'failed','info':e.args[0]})
+    """saves the active flag of workshop
+    Args:
+        workshop: host college name
+        isactive: updated active flag
+
+    Returns:
+        JsonResponse returning status of the update
+    """
+    try:
+        var = JSONParser().parse(request)
+        obj = create_workshop.objects.filter(hcn = var.get('workshop'))
+        obj.update(isactive = var.get('isactive'))
+        print(obj.values())
+        return JsonResponse({'status':'saved'})
+    except ValueError as e:
+        return JsonResponse({'status':'failed','info':e.args[0]})
 
 @api_view(['POST'])
 def awssubmit(request):
-        try:
-            var = JSONParser().parse(request)
-            selectedworkshop = var.get('selectedworkshop')
-            wrkdet = create_workshop.objects.filter(hcn = selectedworkshop)
-            dict={}
-            clist=[]
-            hcn = wrkdet[0].hcn
-            getdet = ElsiCollegeDtls.objects.filter(college_name = hcn)
-            startdate = wrkdet[0].startdate
-            enddate = wrkdet[0].enddate
-            filldate = var.get('filldate')
-            startdate = datetime.strptime(startdate, '%Y-%m-%d')
-            day1 = startdate.strftime("%A")
-            startdate = datetime.strftime(startdate,'%B %d, %Y')
-            enddate = datetime.strptime(enddate, '%Y-%m-%d')
-            day2 = enddate.strftime("%A")
-            enddate = datetime.strftime(enddate,'%B %d, %Y')
-            filldate = datetime.strptime(filldate, '%Y-%m-%d')
-            filldate = datetime.strftime(filldate,'%B %d, %Y')
-            venueadd = wrkdet[0].venueadd
-            cooname = wrkdet[0].cooname
-            cooemail = wrkdet[0].cooemail
-            coono = wrkdet[0].coono
-            state = var.get('state')
-            if '(' in state:
-                state = re.sub(r'\([^)]*\)', '', state)[0:-1]
-            print(state)
-            districts = var.get('district')
-            c = ElsiCollegeDtls.objects.all()
-            count=0
-            for c in c.values('lab_inaugurated'):
-                if c.get('lab_inaugurated') == 1:
-                    count=count+1
-            obj1 = AICTE_list.objects.filter(state__iexact = state)
-            print(obj1)
-            if obj1.count() >= 1:
-                for district in districts:
-                    if '(' in district:
-                        district = re.sub(r'\([^)]*\)', '', district)[0:-1]
-                    print(district)
-                    obj2 = AICTE_list.objects.filter(district__iexact = district)
-                    if obj2.count() >= 1:
-                        for rows in list(obj2.values()) :
-                            clist = clist + [(rows['email'])]
-                if len(clist) == 0:
-                    print(clist)
-                    return JsonResponse({'key':'nodata'})
-                else:
-                    print(clist)
-                    dict['bcc'] = clist
-                    print(dict)
-                    subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): +\
-                     Invitation to Attend the Two Day Workshop at " + hcn +", " + getdet[0].district +", " + getdet[0].state
-                    body = render_to_string(os.path.join(STATIC_DIR,'announce_workshop.html'),
-                    {'venueadd':venueadd,'cooname': cooname,'cooemail':cooemail, 'coono':coono, 'hcn':hcn ,'hcnstate':getdet[0].state,
-                        'hcndistrict':getdet[0].district,'count':count,'startdate':startdate,'enddate':enddate,'day1':day1,'day2':day2,'filldate':filldate})
-                    dict['subject']=subject
-                    dict['body']=body
-                    dict['attachments'] = {'pamp':'Pamphlet2020.pdf','LoI':'letter-of-intent.docx'}
-                    dict['attachmentlinks'] = {'pamp':'https://www.e-yantra.org/img/Pamphlet2020.pdf','LoI':'http://elsi.e-yantra.org/eyrtc/downloads/loi'}
-                    return JsonResponse(dict)
-            else:
+    """returns the email structure of announced workshop
+
+    Args:
+        selectedworkshop: host college name
+        filldate: last date to fill form 
+        state: state of host college name
+        district: district of host college name
+
+    Returns:
+        JsonRespone returning email structure containing subject, body and attachments
+    """
+    try:
+        var = JSONParser().parse(request)
+        selectedworkshop = var.get('selectedworkshop')
+        wrkdet = create_workshop.objects.filter(hcn = selectedworkshop)
+        dict={}
+        clist=[]
+        hcn = wrkdet[0].hcn
+        getdet = ElsiCollegeDtls.objects.filter(college_name = hcn)
+        startdate = wrkdet[0].startdate
+        enddate = wrkdet[0].enddate
+        filldate = var.get('filldate')
+        startdate = datetime.strptime(startdate, '%Y-%m-%d')
+        day1 = startdate.strftime("%A")
+        startdate = datetime.strftime(startdate,'%B %d, %Y')
+        enddate = datetime.strptime(enddate, '%Y-%m-%d')
+        day2 = enddate.strftime("%A")
+        enddate = datetime.strftime(enddate,'%B %d, %Y')
+        filldate = datetime.strptime(filldate, '%Y-%m-%d')
+        filldate = datetime.strftime(filldate,'%B %d, %Y')
+        venueadd = wrkdet[0].venueadd
+        cooname = wrkdet[0].cooname
+        cooemail = wrkdet[0].cooemail
+        coono = wrkdet[0].coono
+        state = var.get('state')
+        if '(' in state:
+            state = re.sub(r'\([^)]*\)', '', state)[0:-1]
+        print(state)
+        districts = var.get('district')
+        c = ElsiCollegeDtls.objects.all()
+        count=0
+        for c in c.values('lab_inaugurated'):
+            if c.get('lab_inaugurated') == 1:
+                count=count+1
+        obj1 = AICTE_list.objects.filter(state__iexact = state)
+        print(obj1)
+        if obj1.count() >= 1:
+            for district in districts:
+                if '(' in district:
+                    district = re.sub(r'\([^)]*\)', '', district)[0:-1]
+                print(district)
+                obj2 = AICTE_list.objects.filter(district__iexact = district)
+                if obj2.count() >= 1:
+                    for rows in list(obj2.values()) :
+                        clist = clist + [(rows['email'])]
+            if len(clist) == 0:
+                print(clist)
                 return JsonResponse({'key':'nodata'})
-        except ValueError as e:
-            return JsonResponse({'status':'failed','info':e.args[0]})
+            else:
+                print(clist)
+                dict['bcc'] = clist
+                print(dict)
+                subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): +\
+                    Invitation to Attend the Two Day Workshop at " + hcn +", " + getdet[0].district +", " + getdet[0].state
+                body = render_to_string(os.path.join(STATIC_DIR,'announce_workshop.html'),
+                {'venueadd':venueadd,'cooname': cooname,'cooemail':cooemail, 'coono':coono, 'hcn':hcn ,'hcnstate':getdet[0].state,
+                    'hcndistrict':getdet[0].district,'count':count,'startdate':startdate,'enddate':enddate,'day1':day1,'day2':day2,'filldate':filldate})
+                dict['subject']=subject
+                dict['body']=body
+                dict['attachments'] = {'pamp':'Pamphlet2020.pdf','LoI':'letter-of-intent.docx'}
+                dict['attachmentlinks'] = {'pamp':'https://www.e-yantra.org/img/Pamphlet2020.pdf','LoI':'http://elsi.e-yantra.org/eyrtc/downloads/loi'}
+                return JsonResponse(dict)
+        else:
+            return JsonResponse({'key':'nodata'})
+    except ValueError as e:
+        return JsonResponse({'status':'failed','info':e.args[0]})
 
 @api_view(['POST'])
 def awsapprove(request):
-        try:
-            #print(request.data.get('file1'))
-            #print(request.data.get('file2'))
-            user = request.data.get('user')
-            if request.user.is_authenticated:
-                print({'status':'already logged in'})
-            to = request.data.get('remail')
-            label = request.data.get('label')
-            if type(request.data.get('cc')) == list:
-                cc = ','.join(map(str,request.data.get('cc') ))
-            else:
-                cc = request.data.get('cc')
-            if type(request.data.get('bcc')) == list:
-                bcc = ','.join(map(str,request.data.get('bcc') ))
-            else:
-                bcc = request.data.get('bcc')
-            subject = request.data.get('subject')
-            body = request.data.get('body')
-            sent = None
-            files2send1 = list(request.data.get('files2send1').split(","))
-            print(files2send1)
-            attachments = []
-            for f in files2send1:
-                if f == 'Pamphlet2020.pdf':
-                    attachments.append(os.path.join(ASSETS_DIR,'Pamphlet2020.pdf'))
-                elif f == 'letter-of-intent.docx':
-                    attachments.append(os.path.join(ASSETS_DIR,'letter-of-intent.docx'))
-            fn = []
-            if request.FILES :
-                for i in request.FILES:
-                    file_name = default_storage.save(request.FILES[i].name, request.FILES[i])
-                    fn.append(file_name)
-                    attachments.append(os.path.join(BASE_DIR,file_name))
-            print(attachments)
-            sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label,attachments)
-            now = datetime.now()
-            ts = now.strftime("%Y-%m-%d %H:%M:%S")
-            if 'file1' in request.FILES :
-                os.remove(os.path.join(BASE_DIR,file_name))
-            if sent :
-                serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
-                        'timestamp' : ts,'mail_label' : 'SENT,'+label,'rcptmailid' : to,
-                        'delegated_access':'0','dcprovider':'None','messageid':sent['id']})
-                if serializer.is_valid():
-                    serializer.save()
-                else :
-                    print(serializer.errors)
-                print(serializer)
-                for i in range(len(fn)):
-                    os.remove(os.path.join(BASE_DIR,fn[i]))
-                return JsonResponse({'status':'success','info':'mail sent successfully'})
+    """send email to  participating colleges and host college name for workshop
+
+    Args:
+        user: user who has logged in this session
+        remail: coodinator email address
+        label: label attached with email
+        cc: cc email address
+        bcc: bcc email address
+        subject: subject of message email
+        body: body of message email
+        attachments: attachments of message email
+
+    Returns:
+        JsonResponse returning status of email
+    """
+    try:
+        #print(request.data.get('file1'))
+        #print(request.data.get('file2'))
+        user = request.data.get('user')
+
+        if request.user.is_authenticated:
+            print({'status':'already logged in'})
+        to = request.data.get('remail')
+        label = request.data.get('label')
+        if type(request.data.get('cc')) == list:
+            cc = ','.join(map(str,request.data.get('cc') ))
+        else:
+            cc = request.data.get('cc')
+        if type(request.data.get('bcc')) == list:
+            bcc = ','.join(map(str,request.data.get('bcc') ))
+        else:
+            bcc = request.data.get('bcc')
+        subject = request.data.get('subject')
+        body = request.data.get('body')
+        sent = None
+        files2send1 = list(request.data.get('files2send1').split(","))
+        print(files2send1)
+        attachments = []
+        for f in files2send1:
+            if f == 'Pamphlet2020.pdf':
+                attachments.append(os.path.join(ASSETS_DIR,'Pamphlet2020.pdf'))
+            elif f == 'letter-of-intent.docx':
+                attachments.append(os.path.join(ASSETS_DIR,'letter-of-intent.docx'))
+        fn = []
+        if request.FILES :
+            for i in request.FILES:
+                file_name = default_storage.save(request.FILES[i].name, request.FILES[i])
+                fn.append(file_name)
+                attachments.append(os.path.join(BASE_DIR,file_name))
+        print(attachments)
+        sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label,attachments)
+        now = datetime.now()
+        ts = now.strftime("%Y-%m-%d %H:%M:%S")
+        if 'file1' in request.FILES :
+            os.remove(os.path.join(BASE_DIR,file_name))
+        if sent :
+            serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
+                    'timestamp' : ts,'mail_label' : 'SENT,'+label,'rcptmailid' : to,
+                    'delegated_access':'0','dcprovider':'None','messageid':sent['id']})
+            if serializer.is_valid():
+                serializer.save()
             else :
-                serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
-                        'timestamp' : ts,'mail_label' : label,'rcptmailid' : to,
-                        'delegated_access':'0','dcprovider':'None','messageid':'None'})
-                if serializer.is_valid():
-                    serializer.save()
-                else :
-                    print(serializer.errors)
-                print(serializer)
-                for i in range(len(fn)):
-                    os.remove(os.path.join(BASE_DIR,fn[i]))
-                return JsonResponse({'status':'failure','info':'mail was not sent'})
-        except ValueError as e:
-            return Response(e.args[0],status.HTTP_400_BAD_REQUEST)
+                print(serializer.errors)
+            print(serializer)
+            for i in range(len(fn)):
+                os.remove(os.path.join(BASE_DIR,fn[i]))
+            return JsonResponse({'status':'success','info':'mail sent successfully'})
+        else :
+            serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
+                    'timestamp' : ts,'mail_label' : label,'rcptmailid' : to,
+                    'delegated_access':'0','dcprovider':'None','messageid':'None'})
+            if serializer.is_valid():
+                serializer.save()
+            else :
+                print(serializer.errors)
+            print(serializer)
+            for i in range(len(fn)):
+                os.remove(os.path.join(BASE_DIR,fn[i]))
+            return JsonResponse({'status':'failure','info':'mail was not sent'})
+    except ValueError as e:
+        return Response(e.args[0],status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def awsgsave(request):
+    """saves email to gmail draft of participating colleges and host college name for workshop
+
+    Args:
+        user: user who has logged in this session
+        remail: coodinator email address
+        label: label attached with email
+        cc: cc email address
+        bcc: bcc email address
+        subject: subject of message email
+        body: body of message email
+        attachments: attachments of message email
+
+    Returns:
+        JsonResponse returning status of saved draft
+    """
     to = request.data.get('remail')
     user = request.data.get('user')
     if type(request.data.get('cc')) == list:
@@ -1746,6 +1959,14 @@ def awsgsave(request):
 
 @api_view(['POST'])
 def awsedit(request):
+    """retruns created workshop details 
+
+    Args:
+        selectedworkshop: host college name
+
+    Returns:
+        JsonResponse returning of created workshop details
+    """
     var = JSONParser().parse(request)
     sw = var.get('selectedworkshop')
     wrkshp = create_workshop.objects.filter(hcn = sw)
@@ -1759,6 +1980,14 @@ def awsedit(request):
 
 @api_view(['POST'])
 def awssave(request):
+    """saves the edited workshop details 
+
+    Args:
+        wid: workshop id
+
+    Returns:
+        JsonResponse returning of updated workshop details
+    """
     var = JSONParser().parse(request)
     data = create_workshop.objects.filter(id = var.get('wid'))
     print(data.values())
@@ -1774,8 +2003,11 @@ def awssave(request):
 ######################
 # workshop team algo
 catlist = ['eYRC','eYIC','eYRDC','eLSI','web','course_or_other_eyantra_work','personal_or_any_other']
+
 @api_view(['POST'])
 def kavi_sir_mail(request):
+    """
+    """
     var = JSONParser().parse(request)
     user = var.get('user')
     selectedworkshop = var.get('selectedworkshop')
@@ -1824,17 +2056,22 @@ def kavi_sir_mail(request):
         serializer = SsnSerializer(data = {'ssn_id':'ssn1','user' : user,
                     'timestamp' : ts,'mail_label' : label,'rcptmailid' : to,
                     'delegated_access':'1','dcprovider':'None','messageid':'None'})
-        if serializer.is_valid():
-            serializer.save()
-        else:
-            print(serializer.errors)
-        print(serializer)
+    if serializer.is_valid():
+        serializer.save()
+    else:
+        print(serializer.errors)
+    print(serializer)
     d['success'] = sucs
     d['failure'] = flr
     return JsonResponse(d)
 
 @api_view(['POST'])
 def getalgodetail(request):
+    """returns algorithm details
+
+    Returns:
+        JsonResponse returning algo details
+    """
     obj = algo_detail.objects.all()
     algodetail = {}
     algodetail['demo'] = obj[0].demo_module_cnt
@@ -1847,6 +2084,19 @@ def getalgodetail(request):
 
 @api_view(['POST'])
 def savealgo(request):
+    """saves edited algorithm details
+
+    Args:
+        willcriteria: conflict solving order for willing members
+        availcriteria: conflict solving order for available members
+        lang: language preference
+        tcnt: total workshop count for willing members
+        tcntt: total workshop count for available members
+        demo: count of demo module cleared by the team members
+    
+    Returns:
+        JsonResponse returning status
+    """
     var = JSONParser().parse(request)
     willcriteria = ','.join(var.get('willcriteria'))
     availcriteria = ','.join(var.get('availcriteria'))
@@ -1876,6 +2126,11 @@ def savealgo(request):
 
 @api_view(['POST'])
 def getlang(request):
+    """returns language preferences within database
+
+    Returns:
+        JsonResponse returning list of languages prefered by the team members
+    """
     try:
         obj = memberdetail.objects.all()
         lang = {}
@@ -1894,6 +2149,19 @@ def getlang(request):
         return JsonResponse({'status':'failed','info':e.args[0]})
 
 def algo_for_available_mem(spl_mem_available,workshop_lead,ranked_data,availcriteria,lang,tcntt):
+    """algorithm for team selection from available members
+
+    Args:
+        spl_mem_available: list of all available members
+        workshop_lead: workshop lead list choosen from willing members
+        ranked_data: ranked list choosen from willing members
+        availcriteria: order in which conflicts will be removed while ranking members
+        lang: language prefered
+        tcntt: total count of workshops
+
+    Returns:
+        returns updated ranked list, workshop leads and a message
+    """
     print('here are available members')
     msg = 'These people are special cases'
     availctr = []
@@ -1962,6 +2230,20 @@ def algo_for_available_mem(spl_mem_available,workshop_lead,ranked_data,availcrit
 
 @api_view(['POST'])
 def algo_for_willing_mem(request):
+    """algorithm of team selection for workshop conduction
+
+    Args:
+        selectedworkshop: host college name
+        willcriteria: conflict solving order for willing members
+        availcriteria: conflict solving order for available members
+        lang: language preference
+        tcnt: total workshop count for willing members
+        tcntt: total workshop count for available members
+        demo: count of demo module cleared by the team members
+
+    Returns:
+        JsonResponse returning team of selected members on the basis of few criterias
+    """
     var = JSONParser().parse(request)
     lang = var.get('lang')
     selectedworkshop = var.get('selectedworkshop')
@@ -2069,7 +2351,6 @@ def algo_for_willing_mem(request):
     # if len(will_mem_available) < 5:
         return JsonResponse({'workshop_team':workshop_team})
 
-
 '''
 @api_view(['POST'])
 def mailids(request):
@@ -2081,10 +2362,23 @@ def mailids(request):
     #print(l)
     return JsonResponse({'data':l})
 '''
+
 def form(request,uid,wid):
+    """renders to form.html for filling the forms by the team for asking there willingness or 
+    unavailability for workshop
+
+    Returns:
+        renders to html page i.e., form.html with context, member unique id(uuid) and workshop id(wid) 
+    """
     return render(request,'form.html',context={'uuid':uid,'wid':wid})
 
 def headapproval(request,uid,wid):
+    """renders to headapproval.html for approval from the team leads upon unavailability of team members
+
+    Returns:
+        renders to html page i.e., headapproval.html with context, member unique id(uuid) workshop 
+        id(wid) and  list of members whom approval is looked upon(datas)
+    """
     headdet = memberdetail.objects.filter(id = uid)
     wrkshp = create_workshop.objects.filter(id = wid)
     data = WorkshopTeamStatus.objects.filter(workshop_venue = wrkshp[0].hcn,approved_or_rejected_by=headdet[0].name)
@@ -2092,6 +2386,17 @@ def headapproval(request,uid,wid):
 
 @api_view(['POST'])
 def headresults(request):
+    """stores the decisions of team leads upon unavailability into database
+
+    Args:
+        uuid: unique id of team members
+        wid: workshop id
+        values: decision list respectively for each member
+        names: team member names
+
+    Returns:
+        success response of saving the updates
+    """
     var = JSONParser().parse(request)
     print(var.get('uuid'),var.get('wid'),var.get('values'),var.get('names'))
     values = var.get('values')
@@ -2106,6 +2411,19 @@ def headresults(request):
 
 @api_view(['POST'])
 def formdata(request):
+    """stores the team members responses of willingness or unavailability along with reason and 
+    category of reason
+
+    Args:
+        uuid: unique id of team members
+        wid: workshop id
+        option: willing or unavailable
+        category: category of reason
+        reason: reason explained in brief
+
+    Returns:
+        success response of saving the updates
+    """
     now = datetime.now()
     ts = now.strftime("%Y-%m-%d %H:%M:%S")
     var = JSONParser().parse(request)
@@ -2119,6 +2437,16 @@ def formdata(request):
 
 @api_view(['POST'])
 def sendmail(request):
+    """send mail to team for selection in workshop conduction
+
+    Args:
+        user: user who is logged in this session
+        selectedworkshop: host college name
+        label: label attached with email
+        url: django server url
+    Returns:
+        JsonResponse returning success or failure while sending email to team
+    """
     var = JSONParser().parse(request)
     user = var.get('user')
     selectedworkshop = var.get('selectedworkshop')
@@ -2160,7 +2488,7 @@ def sendmail(request):
             body = render_to_string(os.path.join(STATIC_DIR,'link.html'),
                 {'uid':uuid,'wid':wrkshp[0].id,'workshop_name':wrkshp[0].hcn,
                 'venue_address':wrkshp[0].venueadd,'start_date':start_date,
-                'end_date':end_date,'district': district,'state' : state,'last_date':last_date})
+                'end_date':end_date,'district': district,'state' : state,'last_date':last_date,'url':var.get('url')})
             sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
             now = datetime.now()
             ts = now.strftime("%Y-%m-%d %H:%M:%S")
@@ -2186,6 +2514,16 @@ def sendmail(request):
 
 @api_view(['POST'])
 def headmail(request):
+    """send mail to team leads for approval of unavailable members
+
+    Args:
+        user: user who is logged in this session
+        selectedworkshop: host college name
+        label: label attached with email
+        url: django server url
+    Returns:
+        JsonResponse returning success or failure while sending email to team leads
+    """
     var = JSONParser().parse(request)
     user = var.get('user')
     selectedworkshop = var.get('selectedworkshop')
@@ -2227,7 +2565,8 @@ def headmail(request):
         for i in range(len(rsnd)):
             if objs[idx].head in list(rsnd[i].keys())[0] and len(list(rsnd[i].values())[0]):
                 #print('1')
-                if objs[idx].name in list(rsnd[i].values())[0]:
+                tmp = objs[idx].name in list(rsnd[i].values())[0]
+                if tmp:
                     #print('2')
                     cohead = memberdetail.objects.filter(iscohead = '1',cohead = list(rsnd[i].keys())[0])
                     to = cohead[0].emailid
@@ -2241,7 +2580,7 @@ def headmail(request):
                     body = render_to_string(os.path.join(STATIC_DIR,'headlink.html'),
                         {'uid':uuid,'wid':wrkshp[0].id,'workshop_name':wrkshp[0].hcn,
                         'venue_address':wrkshp[0].venueadd,'start_date':start_date,
-                        'end_date':end_date,'responder_list':cohead[0].name})
+                        'end_date':end_date,'responder_list':objs[idx].name,'url':var.get('url')})
                     sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
                     now = datetime.now()
                     ts = now.strftime("%Y-%m-%d %H:%M:%S")
@@ -2261,7 +2600,7 @@ def headmail(request):
                     else:
                         print(serializer.errors)
                     print(serializer)
-                if  objs[idx].name in list(rsnd[i].values())[0] or len(list(rsnd[i].values())[0]) >= 1:
+                if  (tmp and len(list(rsnd[i].values())[0]) >= 1) or not tmp:
                     #print('3')
                     to = objs[idx].emailid
                     uuid = objs[idx].id
@@ -2278,7 +2617,7 @@ def headmail(request):
                     body = render_to_string(os.path.join(STATIC_DIR,'headlink.html'),
                         {'uid':uuid,'wid':wrkshp[0].id,'workshop_name':wrkshp[0].hcn,
                         'venue_address':wrkshp[0].venueadd,'start_date':start_date,
-                        'end_date':end_date,'responder_list':responder_list})
+                        'end_date':end_date,'responder_list':responder_list,'url':var.get('url')})
                     sent  = SendMessage(EMAIL_HOST_USER,to,cc,bcc,subject,body,label)
                     now = datetime.now()
                     ts = now.strftime("%Y-%m-%d %H:%M:%S")
@@ -2305,6 +2644,14 @@ def headmail(request):
 ######################
 @api_view(['POST'])
 def gethcn(request):
+    """returns college names present within requested state 
+
+    Args:
+        state: state of which college names is required
+
+    Returns:
+        JsonResponse returning list of college names
+    """
     var = JSONParser().parse(request)
     state=var.get('state')
     if '(' in state:
