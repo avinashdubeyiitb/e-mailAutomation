@@ -410,7 +410,7 @@ def stats(request):
         return JsonResponse(dct)
     except errors.HttpError as error:
         print('An error occurred: %s' % error)
-        return JsonResponse({'status':error})    
+        return JsonResponse({'status':error})
 
 def ListMessagesWithLabels(service, user_id, label_ids=[]):
   """List all Messages of the user's mailbox with label_ids applied.
@@ -2024,7 +2024,7 @@ def kavi_sir_mail(request):
     district = d[0].district
     state = d[0].state
     stat = WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop)
-    app = memberdetail.objects.all()
+    app = memberdetail.objects.filter(ishead = '1')
     dte = wrkshp[0].startdate + ' & ' + wrkshp[0].enddate
     d = {'sent':[],'success':'','failure':''}
     sucs = flr = 0
@@ -2034,7 +2034,7 @@ def kavi_sir_mail(request):
     end_date = wrkshp[0].enddate
     end_date = datetime.strptime(end_date, '%Y-%m-%d')
     end_date = datetime.strftime(end_date,'%B %d, %Y')
-    to = '98dikshitajain@gmail.com'
+    to = 'aakashkhandelwal56@gmail.com'
     cc = ''
     bcc = ''
     subject = 'Workshop team for workshop at ' +  wrkshp[0].hcn + ' ,' + district + ' ,'+ state + ' on ' + start_date + ' - ' + end_date + '.'

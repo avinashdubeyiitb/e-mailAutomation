@@ -15,71 +15,39 @@
   <p>Dear Sir,</p>
   <p>For the upcoming workshop at {{workshop_name}}, {{district}}, {{state}} on {{start_date}} - {{end_date}},
     we have got the following responses for Willingness and Unavailability .</p>
-    <table>
-      <tbody>
-        <tr>
-          <td>
-            <table>
-              <thead>
-                <th>Workshop Venue</th>
-                <th>Date</th>
-                <th>District</th>
-              </thead>
-              <tbody>
-                {% for data in stat%}
-                <tr>
-                  <td >{{workshop_name}}</td>
-                  <td >{{dte}}</td>
-                  <td >{{district}}</td>
-                </tr>
-                {%endfor%}
-              </tbody>
-            </table>
-          </td>
-          <td>
-            <table>
-            <thead>
-              <th>Responder</th>
-              <th>Willingness/Unavailability</th>
-              <th>Reason</th>
-            </thead>
-            <tbody>
-                {% for data in stat%}
-                <tr>
-                  <td>
-                    {{data.responder}}
-                  </td>
-                  <td>
-                    {{data.willingness_or_unavailability}}
-                  </td>
-                  <td>
-                    {{data.reason}}
-                  </td>
-                </tr>
-                {%endfor%}
-            </tbody>
-            </table>
-          </td>
-          <td>
-            <table>
-              <thead>
-                <th>Approved/Rejected</th>
-                <th>Approved/Rejected by</th>
-              </thead>
-              <tbody>
-                {% for data in stat%}
-            <tr>
-              <td>{{data.approval_status}}</td>
-              <td>{{data.approved_or_rejected_by}}</td>
-            </tr>
-            {%endfor%}
-              </tbody>
-            </table>
-          </td>
-        </tr>
-      </tbody>
-    </table>
 
+<table>
+  <thead>
+    <th>Workshop Venue</th>
+    <th>Date</th>
+    <th>District</th>
+    <th>Responder</th>
+    <th>Willingness/Unavailability</th>
+    <th>Reason</th>
+    <th>Approved/Rejected</th>
+    <th>Approved/Rejected by</th>
+  </thead>
+  <tbody>
+    {% for data in stat%}
+    <tr>
+      <td >{{workshop_name}}</td>
+      <td >{{dte}}</td>
+      <td >{{district}}</td>
+      <td>
+        {{data.responder}}
+      </td>
+      <td>
+        {{data.willingness_or_unavailability}}
+      </td>
+      <td>
+        {{data.reason}}
+      </td>
+      <td>{{data.approval_status}}</td>
+      <td>{{data.approved_or_rejected_by}}</td>
+    </tr>
+    {%endfor%}
+  </tbody>
+</table>
 <p>
 Please suggest a team for the workshop from the list below
 </p>
