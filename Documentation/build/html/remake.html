@@ -161,6 +161,7 @@
                <ol>
                  <li>For changing the database settings go to settings.py file in django_backend/app/app
                    folder there you will find <br>
+                   <div id="bghighlgt">
                     &emsp;&emsp;&emsp;&emsp;&emsp; DATABASES = { <br>
                     &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;    'default': { <br>
                     &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;        'ENGINE': 'django.db.backends.postgresql', <br>
@@ -170,6 +171,7 @@
                     &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;        'HOST':'localhost' <br>
                     &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;    } <br>
                     &emsp;&emsp;&emsp;&emsp;&emsp;} <br>
+                  </div>
                 Here ENGINE depicts the database used ,NAME is the database name, USER and PASSWORD are
                 postgres pgAdmin username and password, HOST denotes server.
                  </li>
@@ -182,14 +184,14 @@
                     visit this <a target="_blank" href="https://developers.google.com/gmail/api/quickstart/python?authuser=1">link</a> )
                      .</li>
                      <li>To truncate the tables and import your own data, type one among these commands in psql shell.<br>
-                     <ol>
+                     <ul>
                      <li>If user wants a simple truncate to happen<br>
-                       TRUNCATE table_name1,table_name2,....;
+                      <span id="bghighlgt"> TRUNCATE table_name1,table_name2,....;</span>
                      </li>
                      <li>If user wants not only to truncate but also reset associated sequence generator(auto-incrementing field of the table)<br>
-                       TRUNCATE TABLE table_name RESTART IDENTITY;
+                      <span id="bghighlgt">TRUNCATE TABLE table_name RESTART IDENTITY;</span>
                      </li>
-                     </ol>
+                   </ul>
                     </li>
                </ol>
              </div>
@@ -263,3 +265,10 @@
 
 </body>
 </html>
+<style media="screen">
+  #bghighlgt{
+    background-color: #e8e8e8;
+    box-shadow: inset 0px 0px 4px rgba(0,0,0,0.5);
+    padding: 4px;
+  }
+</style>

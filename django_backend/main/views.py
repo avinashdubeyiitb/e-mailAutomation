@@ -60,14 +60,6 @@ from pathlib import Path
     #client_class = OAuth2Client
 
 def get_user_info(credentials):
-  """Send a request to the UserInfo API to retrieve the user's information.
-
-  Args:
-    credentials: oauth2client.client.OAuth2Credentials instance to authorize the
-                 request.
-  Returns:
-    User information as a dict.
-  """
   access_token = credentials['access_token']
   # url = 'https://www.googleapis.com/oauth2/v3/tokeninfo?access_token={0}'.format(access_token)
   # r = requests.get(url)
