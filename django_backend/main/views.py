@@ -237,9 +237,6 @@ def download(request):
         downloads_path = str(Path.home() / "Downloads")
         print(downloads_path)
         attachments = []
-        for idx in range(len(tmp)):
-            if tmp[idx]['name'] == 'Subject' or  tmp[idx]['name'] == 'subject':
-                subject = tmp[idx]['value']
         for part in msg['payload'].get('parts'):
             if part['filename']:
                 file_name = part['filename']
@@ -359,12 +356,12 @@ def stats(request):
                     else :
                         lbl.append(lst[1])
                         dct['Sent'][i]['Data'].append({'label':lst[1],'count':1,'failed':0,'clist':[(obj[idx].rcptmailid,obj[idx].messageid)],'flist':[]})
-        print(dct)
+        #print(dct)
         lbl = list(set(lbl))
-        print(lbl)
+        #print(lbl)
         ids = []
         credentials = get_credentials()
-        print(credentials,'credentials')
+        #print(credentials,'credentials')
         service = build('gmail', 'v1', credentials=credentials)
         labels = ListLabels(service,'me')
         for val in labels:
