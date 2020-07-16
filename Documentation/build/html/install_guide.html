@@ -146,15 +146,15 @@
 
 <h1 id="index">Installation Guide</h1>
 <div class="section">
-  <h6 id="id2">QuickStart: For testing the app</h6>
+  <h3 id="id2" >QuickStart: For testing the app</h3>
   <p>Here is a quickstart guide it is highly recommanded that you first follow this guide and then make changes according to
-  your needs this guide will help you to start the app and then test with dummy data.Few steps will be different for Linux 
+  your needs this guide will help you to start the app and then test with dummy data.Few steps will be different for Linux
   and Windows, so they are accordingly provided.</p>
   <ol>
-    <li>Clone the git repo. by downloading the zip or by git command <a target="_blank" href="https://github.com/SabanwarVivek/5_Email_Automation_and_Spatial_Analysis_A.git">link</a>.<br>
+    <li>Clone the git repo. by downloading the zip or by git command.<br>
       By zip:
       <ul>
-        <li>Just download the zip from repo. and extract it in a folder.</li>
+        <li>Just download the zip from repo. and extract it in a folder (<a target="_blank" href="https://github.com/SabanwarVivek/5_Email_Automation_and_Spatial_Analysis_A.git">download link</a>).</li>
       </ul>
       By git commands:
       <ul>
@@ -163,53 +163,60 @@
         <li>Create a Folder, name it whatever you like.</li>
         <li>Open the terminal within that folder.</li>
         <li>Type <br>
-          git config --global user.name "John Doe" <br>
-            git config --global user.email john@example.com <br>
+        <span id="bghighlgt">git config --global user.name "John Doe" </span>  <br>
+          <span id="bghighlgt">git config --global user.email john@example.com </span>  <br>
             Replace name and email with yours</li>
         <li>Then do,
           <ul>
-            <li>git init</li>
-            <li>git remote add origin https://github.com/SabanwarVivek/5_Email_Automation_and_Spatial_Analysis_A.git </li>
-            <li>git pull origin master</li>
+            <li> <span id="bghighlgt">git init</span> </li>
+            <li><span id="bghighlgt">git remote add origin https://github.com/SabanwarVivek/5_Email_Automation_and_Spatial_Analysis_A.git </span> </li>
+            <li><span id="bghighlgt">git pull origin master</span> </li>
           </ul>
             </li>
       </ul>
-      <li><b>For Windows --></b></li>
-      <li>To install python, refer this <a target="_blank" href="https://www.python.org/downloads/">Download Python</a></li>
-     <li>Run command pip install virtualenv in base project directory.<br>
-      Setup your virtual environment named 'venv' by writing this command <br>
-     virtualenv venv</li>
-    <li>Switch to your virtual environment by:<br>
-    change current directory of cmd to cd venv/Scripts <br>
-    and then type activate <br>
-    Your virtualenv will get activated.
-    </li>
-    <li><b>For Linux --></b></li>
-    <li>To install python, refer this<a target="_blank" href="https://docs.python-guide.org/starting/install3/linux/">Download Python</a></li>
-    <li>Run the command sudo pip install virtualenv in base project directory.<br>
-      Setup your virtual environment named 'venv' by writing this command <br>
-     virtualenv venv
-    </li>
-    <li>Switch to your virtual environment by:<br>
-      type the following command in base project directory <br>
-      source venv/bin/activate<br>
+      <li>To install python <br>
+      <b>For Windows --></b>
+      <ul>
+        <li><a target="_blank" href="https://www.python.org/downloads/">Download Python</a></li>
+       <li>Run command <span id="bghighlgt">pip install virtualenv</span>  in base project directory.<br>
+        Setup your virtual environment named 'venv' by writing this command <br>
+      <span id="bghighlgt">virtualenv venv</span> </li>
+      <li>Switch to your virtual environment by:<br>
+      change current directory of cmd to cd venv/Scripts <br>
+      and then type <span id="bghighlgt">activate</span>  <br>
       Your virtualenv will get activated.
+      </li>
+      </ul>
+
+    <b>For Linux --></b>
+    <ul>
+      <li><a target="_blank" href="https://docs.python-guide.org/starting/install3/linux/">Download Python</a></li>
+      <li>Run the command <span id="bghighlgt">sudo pip install virtualenv</span> in base project directory.<br>
+        Setup your virtual environment named 'venv' by writing this command <br>
+      <span id="bghighlgt">virtualenv venv</span>
+      </li>
+      <li>Switch to your virtual environment by:<br>
+        type the following command in base project directory <br>
+      <span id="bghighlgt">source venv/bin/activate</span>  <br>
+        Your virtualenv will get activated.
+        </li>
+    </ul>
       </li>
     <li><p>You need to install the postgres and pgAdmin <a target="_blank" href="https://www.pgadmin.org/">(https://www.pgadmin.org/ ) </a>for using postgres sql. For full guide on how to
       install please refer this <a target="_blank" href="https://www.youtube.com/watch?v=d--mEqEUybA&feature=youtu.be"> link</a>. <br></p></li>
       <li> After installing , open the pgAdmin by searching in search bar for pgadmin, click on it and a new window will open in browser
       . Click on servers then right click on PostgreSQL select create and then database. Name the database whatever you like.</li>
       <li>Now in test_database folder we have a dump file of pgsql.</li>
-      <li><b>For Windows --> </b>
-        To import its data into pgAdmin open command prompt with administrator rights,
+      <li>To import its data into pgAdmin <br>
+        <b>For Windows --> </b> <br>
+        Open command prompt with administrator rights,
         also make sure that your environment variables path are set for that particular location if not, then set the environment
         variables path. Type the following command <br>
-        psql –U username dbname < dbexport.pgsql  <br>
+      <span id="bghighlgt">psql –U username dbname < dbexport.pgsql</span>    <br>
         where username is the username of pgadmin and dbname is the database name that you want to import data into . <br>
         Example: <br>
-        psql –U postgres elsi < C:\example\data.pgsql  <br>
+      <span id="bghighlgt">psql –U postgres elsi < C:\example\data.pgsql</span>    <br>
         For setting the environment variables if not set already :<br>
-        for windows 10 <br>
         <ul>
           <li>In Search, search for and then select: System (Control Panel)</li>
           <li>Click the <strong>Advanced system settings</strong> link.</li>
@@ -221,65 +228,69 @@
              you have installed the PostreSQL in system).
         </li>
         <li>Reopen Command prompt window, and then run the respective command.</li>
-      </ul></li>
-      <li><b>For Linux --> </b>Type the command :<br>
-        psql -U username -h host dbname < dbexport.pgsql <br>
+      </ul>
+      <b>For Linux --> </b> <br>
+      Type the command :<br>
+      <span id="bghighlgt">psql -U username -h host dbname < dbexport.pgsql </span>  <br>
         Example: <br>
-        psql -U posgtres -h localhost elsi < data.pgsql
+      <span id="bghighlgt">psql -U posgtres -h localhost elsi < data.pgsql</span>
       </li>
       <li>Now database is ready.</li>
       <li>Now run command `pip install -r requirements.txt` in directory django_backend .</li>
       <li>In django_backend/app you will see the settings.py file open it. <br>
             There you will find <br>
-             &emsp;&emsp;&emsp;&emsp;&emsp; DATABASES = { <br>
-             &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;    'default': { <br>
-             &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;        'ENGINE': 'django.db.backends.postgresql', <br>
-             &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;        'NAME': 'elsi', <br>
-             &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;        'USER':'postgres', <br>
-             &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;        'PASSWORD':'1234', <br>
-             &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;        'HOST':'localhost' <br>
-             &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;    } <br>
-             &emsp;&emsp;&emsp;&emsp;&emsp;} <br>
+            <div id="bghighlgt">
+              &emsp;&emsp;&emsp;&emsp;&emsp; DATABASES = { <br>
+              &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;    'default': { <br>
+              &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;        'ENGINE': 'django.db.backends.postgresql', <br>
+              &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;        'NAME': 'elsi', <br>
+              &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;        'USER':'postgres', <br>
+              &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;        'PASSWORD':'1234', <br>
+              &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;        'HOST':'localhost' <br>
+              &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;    } <br>
+              &emsp;&emsp;&emsp;&emsp;&emsp;} <br>
+            </div>
          Here ENGINE depicts the database used ,NAME is the database name, USER and PASSWORD are
          postgres pgAdmin username and password, HOST denotes server. <br>
          Change the NAME according to database name you created and all other fileds respectively.
        </li>
       <li>Now in django_backend folder open cmd and follow with these commands<br>
-        <ol>
+        <ul>
           <li>python manage.py makemigrations 	&#60;appname&#62; <br>
-          -->python manage.py makemigrations main </li>
-          <li>python manage.py migrate main</li>
-          <li>for creating superuser for django admin: python manage.py createsuperuser</li>
+        <span id="bghighlgt"> -->python manage.py makemigrations main </span> </li>
+          <li> <span id="bghighlgt">python manage.py migrate main</span> </li>
+          <li>for creating superuser for django admin: <span id="bghighlgt"> python manage.py createsuperuser</span></li>
           <li>then finally python manage.py runserver &#60;port&#62; <br>
-          -->python manage.py runserver 8081 </li>
-        </ol>
+          <span id="bghighlgt">-->python manage.py runserver 8081</span> </li>
+        </ul>
         The backend sever will start at localhost:8081. <br>
     To visit the django admin panel type in browser http://127.0.0.1:8081/admin and enter the superuser credentials. <br>
     <strong>Note: </strong>If you want to change localhost server on different port just change 8081 with your preferred port
     and provide the same port in settings tab present in GUI of app .
         </li>
-      <li>Now open cmd in vue_frontend.(install nodejs and npm first, for Windows -> <a target="_blank" href="https://nodejs.org/en/download/">link</a> and for Linux -> 
+      <li>Now open cmd in vue_frontend.(install nodejs and npm first, for Windows -> <a target="_blank" href="https://nodejs.org/en/download/">link</a> and for Linux ->
         <a target="_blank" href="https://websiteforstudents.com/how-to-install-node-js-and-npm-on-ubuntu-16-04-18-04-via-apt-and-snap/">link</a>)</li>
       <li>Type: npm install ,this will install all the dependencies</li>
       <li>And then type: npm run electron:serve. <br>
         <strong>Note: </strong> If you want to run the app in production environment : <br>
         Open the command prompt in vue_frontend folder and follow these steps: <br>
-        <ol>
-          <li>npm run electron: build</li>
-        </ol>
+        <ul>
+          <li> <span id="bghighlgt">npm run electron: build </span> </li>
+        </ul>
     We will get an setup file and executable file with some other files in dist_electron and dist_electron/win-unpacked folder.</li>
       <li>Test the app with login credentials sun as username and password both or use superuser credentials if you made one.</li>
       <li>Test all the functionality of the app.</li>
   </ol>
 <ol>
-  <li id="id1"> <h6>Database</h6>
+  <p></p>
+   <h3 id="id1">Database</h3>
   <p>Some important points:
 <ul>
   <li>If you have a database in sql and want to change it to psql use this git <a target="_blank" href="https://github.com/AnatolyUss/nmig/blob/master/README.md">link </a>.</li>
 <li>If you have a csv and want to import data to pgAdmin database use psql shell with this command <br>
-\copy Public.”table _name” FROM ‘csv_file_location’ DELIMITER ‘,’ CSV HEADER null ‘null’; <br>
+ <span id="bghighlgt">\copy Public.”table _name” FROM ‘csv_file_location’ DELIMITER ‘,’ CSV HEADER null ‘null’; </span> <br>
 Example: <br>
- \copy Public.”elsi_college_dtls” FROM ‘C:\example\data.csv’ DELIMITER ‘,’ CSV HEADER null ‘null’;
+<span id="bghighlgt"> \copy Public.”elsi_college_dtls” FROM ‘C:\example\data.csv’ DELIMITER ‘,’ CSV HEADER null ‘null’;</span>
  <img src=".\_static\img3.png" alt="Not found:(">
  <p>Sometimes you need to provide encoding details also of the csv file, so just provide extra parameter
    encoding ‘UTF8’ where encoding may have any other format other
@@ -289,40 +300,25 @@ Example: <br>
 If you have .pgsql file and want to import its data into pgAdmin then open command prompt with administrator rights,
 also make sure that your environment variables path are set for that particular location if not, then set the environment
 variables path. Type the following command <br>
-psql –U username dbname < dbexport.pgsql  <br>
+ <span id="bghighlgt"> psql –U username dbname < dbexport.pgsql  </span><br>
 where username is the username of pgadmin and dbname is the database name that you want to import data into . <br>
 Example: <br>
-psql –U postgres elsi < C:\example\data.pgsql  <br>
+<span id="bghighlgt">psql –U postgres elsi < C:\example\data.pgsql </span> <br>
 </li>
 </ul>
 <p> <strong>Note:</strong> Make a database named elsi in pgadmin. A folder named test_database is provided which contains
-  data.pgsql file this is the testing file which can be used for testing the app (for importing this file follow step c),
+  data.pgsql file this is the testing file which can be used for testing the app (for importing this file follow step 3),
   later on if you want to truncate the tables and import your own data, type one among these commands in psql shell.<br>
   <ol>
   <li>If user wants a simple truncate to happen<br>
-    TRUNCATE table_name1,table_name2,....;
+  <span id="bghighlgt">TRUNCATE table_name1,table_name2,....;</span>
   </li>
   <li>If user wants not only to truncate but also reset associated sequence generator(auto-incrementing field of the table)<br>
-    TRUNCATE TABLE table_name RESTART IDENTITY;
+  <span id="bghighlgt">TRUNCATE TABLE table_name RESTART IDENTITY;</span>
   </li>
   </ol>
-For setting the environment variables if not set already :<br>
-for windows 10 <br>
-<ol>
-  <li>In Search, search for and then select: System (Control Panel)</li>
-  <li>Click the <strong>Advanced system settings</strong> link.</li>
-  <li>Click <strong>Environment Variables</strong>. In the section <strong>System Variables</strong>, find the PATH environment variable
-     and select it. Click <strong>Edit</strong>. If the PATH environment variable does not exist, click New.</li>
-  <li>4.	In the <strong>Edit System Variable </strong>(or <strong>New System Variable</strong>) window, specify the value of the PATH environment variable.
-    Click <strong>OK</strong>. Close all remaining windows by clicking <strong>OK</strong>.( the path value which you need to write here will be
-     C:\Program Files\PostgreSQL\12\lib and C:\Program Files\PostgreSQL\12\bin  these locations may change depending on where
-     you have installed the PostreSQL in system).
-</li>
-<li>Reopen Command prompt window, and then run the respective command.</li>
-</ol>
  </p>
 </p>
-</li>
 </ol>
 </div>
 <div class="genindex-jumpbox">
@@ -377,3 +373,10 @@ for windows 10 <br>
 
 </body>
 </html>
+<style media="screen">
+  #bghighlgt{
+    background-color: #e8e8e8;
+    box-shadow: inset 0px 0px 4px rgba(0,0,0,0.5);
+    padding: 4px;
+  }
+</style>
