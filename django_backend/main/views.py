@@ -356,13 +356,14 @@ def stats(request):
                     else :
                         lbl.append(lst[1])
                         dct['Sent'][i]['Data'].append({'label':lst[1],'count':1,'failed':0,'clist':[(obj[idx].rcptmailid,obj[idx].messageid)],'flist':[]})
-        #print(dct)
+        print(dct)
         lbl = list(set(lbl))
-        #print(lbl)
+        print(lbl)
         ids = []
         credentials = get_credentials()
-        #print(credentials,'credentials')
+        print(credentials,'credentials')
         service = build('gmail', 'v1', credentials=credentials)
+        print(service)
         labels = ListLabels(service,'me')
         for val in labels:
             if val['name'] in lbl:
@@ -621,7 +622,7 @@ def getbody(clg,obj,sta,dis):
             else :
                 print('A')
                 subdiv = 'A'
-                body = render_to_string(os.path.join(STATIC_DIR,'no_record.html'),{'count':count})
+                body = render_to_string(os.path.join(STATIC_DIR,'not_registered.html'),{'count':count})
         return {'subject':subject,'body':body,'subdiv':subdiv,'tchdtl':tchdtl}
     except ValueError as e:
         return {'status':'failed','info':e.args[0]}
@@ -758,18 +759,23 @@ def get_credentials():
             creds = pickle.load(token)
             #print(creds,'1')
         # If there are no (valid) credentials available, let the user log in.
-    if not creds:
+    if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
+            try:
+                creds.refresh(Request())
+            except :
+                flow = InstalledAppFlow.from_client_secrets_file(
+                    credentials_path, SCOPES)
+                creds = flow.run_local_server(host='127.0.0.1',port=8083)
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                credentials_path, SCOPES)
-            creds = flow.run_local_server(host='127.0.0.1',port=8081)
+                    credentials_path, SCOPES)
+            creds = flow.run_local_server(host='127.0.0.1',port=8083)
             # Save the credentials for the next run
         with open(file_path, 'wb') as token:
             pickle.dump(creds, token)
     return creds
-
+#get_credentials()
 def CreateMessageHtml(sender, to, cc, bcc, subject, body, msgHtml=None):
     """Create a message for an email.
 
@@ -900,6 +906,7 @@ def getname(name):
     options.add_argument('--headless')
     options.add_argument("--silent")
     options.add_argument('--ignore-certificate-errors')
+    print(platform.system())
     if platform.system() == 'Windows':
         file_path = os.path.join(ASSETS_DIR,'chromedriver.exe')
     else :
@@ -910,8 +917,9 @@ def getname(name):
         driver.get('https://www.google.com/search?q=' + q1)#add college name to be searched in query
         html= driver.page_source
         soup = BeautifulSoup(html,"html.parser")
-        if soup.find('div', attrs={'data-attrid':'title'}) :
-            name = soup.find('div', attrs={'data-attrid':'title'}).span.contents
+        print(soup.find('h2', attrs={'data-attrid':'title'}))
+        if soup.find('h2', attrs={'data-attrid':'title'}) :
+            name = soup.find('h2', attrs={'data-attrid':'title'}).span.contents
             return name
         else:
             return "no data"
@@ -1472,7 +1480,7 @@ def submit(request):
         #     print(dis)
         #     sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
         #     print(sta)
-        obj = ElsiCollegeDtls.objects.filter(normalised_ins_name = clg)
+        obj = ElsiCollegeDtls.objects.filter(normalised_ins_name = coll)
         res = getbody(coll,obj,state,district)
         var['subject']=res['subject']
         var['body']=res['body']

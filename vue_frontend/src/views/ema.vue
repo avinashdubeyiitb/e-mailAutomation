@@ -143,7 +143,13 @@ Inbox
                   <div v-show="reqdata.attachments === 'loading'">{{reqdata.attachments}}</div>
                 </b-container>
                 <b-button @click="$bvModal.hide('minbox'+idx)">OK</b-button>
-                <b-button @click="download('inbox',id[1])" class="float-right">Download</b-button>
+                <b-button @click="downloaded = true;download('inbox',id[1])" class="float-right">Download</b-button>
+                <div id="loader" v-show="downloaded">
+                <b-button variant="danger" disabled>
+                  <b-spinner small ></b-spinner>
+                  Downloading...
+                </b-button>
+                </div>
                 </b-modal>
               </div>
       </b-dropdown>
@@ -157,6 +163,13 @@ Inbox
   Loading...
 </b-button>
 </div>
+<!--
+<div id="loader" v-show="downloaded">
+<b-button variant="danger" disabled>
+  <b-spinner small ></b-spinner>
+  Downloading...
+</b-button>
+</div>-->
   </div>
   </div>
 </template>
@@ -179,7 +192,8 @@ export default {
       // selected: [],
       // result: '',
       // sent: []
-      loader: true
+      loader: true,
+      downloaded: false
     }
   },
   methods: {
@@ -188,8 +202,9 @@ export default {
         messageid: mid,
         type: label
       })
-        .then(function (response) {
+        .then(response => {
           console.log('Downloaded')
+          this.downloaded = false
         })
         .catch(function (error) {
           console.log(error)

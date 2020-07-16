@@ -194,10 +194,10 @@
   </div>
     <b-button v-b-modal.modal-2 id="srbody">body</b-button>
     <b-modal id="modal-2" size="lg" title="Body" hide-footer >
-    <b-container class="px-2" >
+    <b-container class="px-2" id="container1">
     <span v-html="output.body"></span>
     </b-container>
-    <b-button @click="$bvModal.hide('modal-2')">OK</b-button>
+    <b-button @click="onDivInput1($event);$bvModal.hide('modal-2')">OK</b-button>
     </b-modal><br>
   <label id="srattach"><strong>Attachment:</strong>
       <div v-for="(value,key) in output.attachments" v-bind:key="key">
@@ -294,10 +294,10 @@
      </label><br>
     <b-button v-b-modal.modal-1 id="srbody">body</b-button>
     <b-modal id="modal-1" size="lg" title="Body" hide-footer>
-    <b-container class="px-2" >
+    <b-container class="px-2" id="container2">
     <span v-html="reqdata.body"></span>
     </b-container>
-    <b-button block @click="$bvModal.hide('modal-1')">OK</b-button>
+    <b-button block @click="onDivInput2($event);$bvModal.hide('modal-1')">OK</b-button>
     </b-modal><br>
 
     <label id="srattach"><strong>Attachment:</strong>
@@ -386,6 +386,12 @@ export default {
       Input: value
       Logic: opens the file(value) in an external window
     */
+    onDivInput1 (e) {
+      this.output.body = document.getElementById('container1').innerHTML
+    },
+    onDivInput2 (e) {
+      this.reqdata.body = document.getElementById('container2').innerHTML
+    },
     getfile (value) {
       console.log(value)
       if (value === 'Pamphlet2020.pdf') {
