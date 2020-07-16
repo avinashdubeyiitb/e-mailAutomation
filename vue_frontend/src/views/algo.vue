@@ -160,9 +160,14 @@
   </tbody>
 </table>
 
-<button id="sub1" @click="kavi_sir_mail">Send Mail to Kavi sir</button>
+<button id="sub1" @click="loader = true;kavi_sir_mail()">Send Mail to Kavi sir</button>
 <div id="result">{{result}}</div>
-
+</div>
+<div id="loader" v-show="loader">
+<b-button variant="danger" disabled>
+  <b-spinner small ></b-spinner>
+  Sending...
+</b-button>
 </div>
   </div>
 </template>
@@ -220,7 +225,8 @@ export default {
       out: '',
       algodetail: '',
       result: '',
-      response: ''
+      response: '',
+      loader: false
     }
   },
   watch: {
@@ -252,6 +258,7 @@ export default {
       })
         .then(function (response) {
           this.result = response.data
+          this.loader = false
         })
         .catch(function (error) {
           console.log(error)

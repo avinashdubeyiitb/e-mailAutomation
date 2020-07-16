@@ -26,9 +26,10 @@
   <div id="col1inner" >
     <div v-show="isNight3" >
     <strong><p id="fd">Fill details:</p></strong>
+    <button id="refresh" @click="clear">Clear</button>
     <form @submit="formSubmit">
     <strong id="rid" >Recipient Email ID:</strong>
-    <input id="ridi" type="email" v-model="remail" @change="$store.commit('remail', remail)"><br>
+    <input id="ridi" type="email" v-model="remail" @change="$store.commit('remail', remail)" multiple><br>
     <strong id="cc">CC:</strong>
     <input id="cci" type="email" v-model="cc" @change="$store.commit('cc', cc)" multiple><br>
     <strong id="bcc">BCC:</strong>
@@ -61,14 +62,14 @@
         </div>
     <strong id="cno">Contact No.:</strong>
     <input id="cnoi" type="tel" v-model="cno" @change="$store.commit('cno', cno)" @input="acceptNumber"><br>
-    <button id="msub">Submit</button>
+    <button id="msub" v-on:click="loader = true">Submit</button>
     </form>
     <p id="or">-----------------------or------------------------</p>
     <p id="up">Upload csv file</p>
     <label id="file">File:
     <input type="file" accept=".xlsx,.csv" id="file" ref="file" v-on:change="handleFileUpload()"/>
   </label>
-    <button id="csub" v-on:click="submitFile()">Submit</button>
+    <button id="csub" v-on:click="loader = true;submitFile()">Submit</button>
   </div>
   <div v-show="!isNight2">
     <div id="content">
@@ -115,7 +116,7 @@
         </template>
         <div >
           <b-button id="bcancel" @click="onClose" size="sm" variant="danger">Cancel</b-button>
-          <b-button id="bsure" @click="approveselect" size="sm" variant="primary">Sure</b-button>
+          <b-button id="bsure" @click="sender = true;approveselect()" size="sm" variant="primary">Sure</b-button>
         </div>
       </b-popover>
     <form>
@@ -134,7 +135,7 @@
           Are you want to save it in gmail draft or discard it ?
         </template>
         <div>
-          <b-button id="bstd" @click="gsaveselected" size="sm" variant="primary">Save to draft</b-button>
+          <b-button id="bstd" @click="sender = true;gsaveselected()" size="sm" variant="primary">Save to draft</b-button>
           <b-button id="bdiscard" @click="discardselected" size="sm" variant="danger">Discard</b-button>
         </div>
       </b-popover>
@@ -229,7 +230,7 @@
         </template>
         <div >
           <b-button id="bcancel" @click="onClose" size="sm" variant="danger">Cancel</b-button>
-          <b-button id="bsure" @click="approve" size="sm" variant="primary">Sure</b-button>
+          <b-button id="bsure" @click="sender = true;approve($event)" size="sm" variant="primary">Sure</b-button>
         </div>
       </b-popover>
     <form>
@@ -248,11 +249,11 @@
           Are you want to save it in gmail draft or discard it ?
         </template>
         <div>
-          <b-button id="bstd" @click="gsave" size="sm" variant="primary">Save to draft</b-button>
+          <b-button id="bstd" @click="sender = true;gsave($event)" size="sm" variant="primary">Save to draft</b-button>
           <b-button id="bdiscard" @click="discard" size="sm" variant="danger">Discard</b-button>
         </div>
       </b-popover>
-      <b-button id="save" @click="saveDetail" v-if="output.subdiv !== 'A'">Store Changes</b-button>
+      <b-button id="save" @click="loader = true;saveDetail($event)" v-if="output.subdiv !== 'A'">Store Changes</b-button>
 </div>
 <div v-show="!isNight2">
      <form>
@@ -314,6 +315,18 @@
  </form>
 </div>
 </div>
+<div id="loader" v-show="loader">
+<b-button variant="danger" disabled>
+  <b-spinner small ></b-spinner>
+  Loading...
+</b-button>
+</div>
+<div id="loader" v-show="sender">
+<b-button variant="danger" disabled>
+  <b-spinner small ></b-spinner>
+  Sending...
+</b-button>
+</div>
   </div>
 </template>
 <script>
@@ -326,6 +339,8 @@ export default {
   },
   data () {
     return {
+      loader: false,
+      sender: false,
       url: this.$store.getters.url,
       csvapp: this.$store.getters.csvapp,
       csvgsave: this.$store.getters.csvgsave,
@@ -386,6 +401,55 @@ export default {
       Input: value
       Logic: opens the file(value) in an external window
     */
+    clear () {
+      this.popoverShow1 = false
+      this.popoverShow2 = false
+      this.isNight = true
+      this.$store.commit('simisNight', this.isNight)
+      this.isNight1 = true
+      this.$store.commit('simisNight1', this.isNight1)
+      this.isNight2 = true
+      this.$store.commit('simisNight2', this.isNight2)
+      this.iscsvtrue = false
+      this.$store.commit('iscsvtrue', this.iscsvtrue)
+      this.output.remail = ''
+      this.output.cc = ''
+      this.output.bcc = ''
+      this.output.name = ''
+      this.output.designation = ''
+      this.output.department = ''
+      this.output.cname = ''
+      this.output.cno = ''
+      this.output.body = ''
+      this.output.subject = ''
+      this.output.state = ''
+      this.output.district = ''
+      this.$store.commit('output', this.output)
+      this.upfile1 = ''
+      this.$store.commit('upfile1', this.upfile1)
+      this.upfile2 = ''
+      this.$store.commit('upfile2', this.upfile2)
+      this.detail = ''
+      this.$store.commit('detail', this.detail)
+      this.remail = ''
+      this.$store.commit('remail', this.remail)
+      this.cc = ''
+      this.$store.commit('cc', this.cc)
+      this.bcc = ''
+      this.$store.commit('bcc', this.bcc)
+      this.name = ''
+      this.$store.commit('name', this.name)
+      this.designation = ''
+      this.$store.commit('designation', this.designation)
+      this.department = ''
+      this.$store.commit('department', this.department)
+      this.cname = ''
+      this.$store.commit('cname', this.cname)
+      this.state = 'State'
+      this.$store.commit('state', this.state)
+      this.d = 'District'
+      this.$store.commit('d', this.d)
+    },
     onDivInput1 (e) {
       this.output.body = document.getElementById('container1').innerHTML
     },
@@ -548,6 +612,7 @@ export default {
           this.items = items.data
           this.$store.commit('items', this.items)
           console.log(this.items)
+          this.loader = false
         })
         .catch(function () {
           console.log('FAILURE!!')
@@ -605,6 +670,7 @@ export default {
           currentObj.$store.commit('csvgsave', currentObj.csvgsave)
           currentObj.selected = []
           currentObj.$store.commit('selected', currentObj.selected)
+          currentObj.sender = false
         })
         .catch(function (error) {
           console.log(error)
@@ -700,6 +766,7 @@ export default {
           currentObj.$store.commit('csvapp', currentObj.csvapp)
           currentObj.selected = []
           currentObj.$store.commit('selected', currentObj.selected)
+          currentObj.sender = false
         })
         .catch(function (error) {
           console.log(error)
@@ -722,6 +789,7 @@ export default {
           this.output = output.data
           this.$store.commit('output', this.output)
           console.log(output)
+          this.loader = false
         })
         .catch(function (error) {
           currentObj.output = error
@@ -769,6 +837,7 @@ export default {
         .then(output => {
           this.output = output.data
           this.$store.commit('output', this.output)
+          this.loader = false
         })
         .catch(function (error) {
           currentObj.output = error
@@ -802,6 +871,8 @@ export default {
           currentObj.output = response.data
           currentObj.$store.commit('output', currentObj.output)
           console.log(currentObj.output)
+          currentObj.sender = false
+          currentObj.clear()
         })
         .catch(function (error) {
           currentObj.output = error
@@ -847,6 +918,8 @@ export default {
           currentObj.output = response.data
           currentObj.$store.commit('output', currentObj.output)
           console.log(currentObj.output)
+          currentObj.sender = false
+          currentObj.clear()
         })
         .catch(function (error) {
           currentObj.output = error
@@ -864,6 +937,11 @@ export default {
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+#loader{
+  position: absolute;
+  top:45%;
+  left:45%;
+}
 .first {
   background-color: lightgreen;
 }
@@ -970,6 +1048,11 @@ font-size: 20px;
 line-height: 30px;
 text-align: center;
 color: #000000;
+}
+#refresh{
+position: absolute;
+right:10%;
+top: 1%;
 }
 #rid{
   position: absolute;

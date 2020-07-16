@@ -60,9 +60,9 @@
         </b-dropdown></p>
     </div>
 
-    <button id="msub" v-b-modal.modal-1>Submit</button>
-    <button id="sub1" @click="sendmail">Send Mail to Team</button>
-    <button id="sub2" @click="headmail">Send Approval Mails</button>
+    <button id="msub" @click="loader = true" v-b-modal.modal-1>Submit</button>
+    <button id="sub1" @click="sender = true;sendmail($event)">Send Mail to Team</button>
+    <button id="sub2" @click="sender = true;headmail($event)">Send Approval Mails</button>
         <div id="result">{{result}}</div>
 
     </form>
@@ -191,7 +191,7 @@
         </template>
         <div >
           <b-button id="bcancel" @click="onClose" size="sm" variant="danger">Cancel</b-button>
-          <b-button id="bsure" @click="approve" size="sm" variant="primary">Sure</b-button>
+          <b-button id="bsure" @click="sender=true;approve($event)" size="sm" variant="primary">Sure</b-button>
         </div>
       </b-popover>
     <form>
@@ -210,11 +210,23 @@
           Are you want to save it in gmail draft or discard it ?
         </template>
         <div>
-          <b-button id="bstd" @click="gsave" size="sm" variant="primary">Save to draft</b-button>
+          <b-button id="bstd" @click="sender = true;gsave($event)" size="sm" variant="primary">Save to draft</b-button>
           <b-button id="bdiscard" @click="discard" size="sm" variant="danger">Discard</b-button>
         </div>
       </b-popover>
 </div>
+</div>
+<div id="loader" v-show="loader">
+<b-button variant="danger" disabled>
+  <b-spinner small ></b-spinner>
+  Loading...
+</b-button>
+</div>
+<div id="loader" v-show="sender">
+<b-button variant="danger" disabled>
+  <b-spinner small ></b-spinner>
+  Sending...
+</b-button>
 </div>
   </div>
 </template>
@@ -265,7 +277,9 @@ export default {
       editedTodo: null,
       upfile1: [],
       mulupfile1: [],
-      result: ''
+      result: '',
+      loader: false,
+      sender: false
     }
   },
   watch: {
@@ -326,6 +340,7 @@ export default {
       })
         .then(function (response) {
           currentObj.result = response.data
+          currentObj.sender = false
         })
         .catch(function (error) {
           console.log(error)
@@ -343,6 +358,7 @@ export default {
       })
         .then(function (response) {
           currentObj.result = response.data
+          currentObj.sender = false
         })
         .catch(function (error) {
           console.log(error)
@@ -460,6 +476,7 @@ export default {
       })
         .then(output => {
           this.output = output.data
+          this.loader = false
         })
         .catch(function (error) {
           currentObj.output = error
@@ -486,6 +503,7 @@ export default {
         .then(function (response) {
           currentObj.output = response.data
           console.log(currentObj.output)
+          currentObj.sender = false
         })
         .catch(function (error) {
           currentObj.output = error
@@ -513,6 +531,7 @@ export default {
         .then(function (response) {
           currentObj.output = response.data
           console.log(currentObj.output)
+          currentObj.sender = false
         })
         .catch(function (error) {
           currentObj.output = error
