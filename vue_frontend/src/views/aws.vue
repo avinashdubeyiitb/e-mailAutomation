@@ -562,6 +562,11 @@ a {
 .form-control{
   margin:10px
 }*/
+#loader{
+  position: absolute;
+  top:45%;
+  left:45%;
+}
 img{
   height:200px;
   width:200px;

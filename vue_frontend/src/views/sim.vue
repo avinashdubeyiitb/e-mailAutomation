@@ -34,12 +34,12 @@
     <input id="cci" type="email" v-model="cc" @change="$store.commit('cc', cc)" multiple><br>
     <strong id="bcc">BCC:</strong>
     <input id="bcci" type="email" v-model="bcc" @change="$store.commit('bcc', bcc)" multiple><br>
-    <strong id="name">Name:</strong>
-    <input id="namei" type="text" v-model="name" @change="$store.commit('name', name)"><br>
-    <strong id="desig">Designation:</strong>
-    <input id="desigi" type="text" v-model="designation" @change="$store.commit('designation', designation)"><br>
-    <strong id="depart">Department:</strong>
-    <input id="departi" type="text" v-model="department" @change="$store.commit('department', department)"><br>
+    <strong id="name">Name:*</strong>
+    <input id="namei" type="text" v-model="name" @change="$store.commit('name', name)" required><br>
+    <strong id="desig">Designation:*</strong>
+    <input id="desigi" type="text" v-model="designation" @change="$store.commit('designation', designation)" required><br>
+    <strong id="depart">Department:*</strong>
+    <input id="departi" type="text" v-model="department" @change="$store.commit('department', department)" required><br>
     <strong id="cname">College Name:</strong>
     <input id="cnamei" type="text" v-model="cname" @change="$store.commit('cname', cname)"><br>
     <div id="recipientstatei">
@@ -60,8 +60,8 @@
             </div>
         </b-dropdown>
         </div>
-    <strong id="cno">Contact No.:</strong>
-    <input id="cnoi" type="tel" v-model="cno" @change="$store.commit('cno', cno)" @input="acceptNumber"><br>
+    <strong id="cno">Contact No.:*</strong>
+    <input id="cnoi" type="tel" v-model="cno" @change="$store.commit('cno', cno)" @input="acceptNumber" required><br>
     <button id="msub" v-on:click="loader = true">Submit</button>
     </form>
     <p id="or">-----------------------or------------------------</p>

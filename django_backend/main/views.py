@@ -1781,7 +1781,7 @@ def awssubmit(request):
                 print(clist)
                 dict['bcc'] = clist
                 print(dict)
-                subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): +\
+                subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): \
                     Invitation to Attend the Two Day Workshop at " + hcn +", " + getdet[0].district +", " + getdet[0].state
                 body = render_to_string(os.path.join(STATIC_DIR,'announce_workshop.html'),
                 {'venueadd':venueadd,'cooname': cooname,'cooemail':cooemail, 'coono':coono, 'hcn':hcn ,'hcnstate':getdet[0].state,
@@ -2375,7 +2375,7 @@ def algo_for_willing_mem(request):
     [spl_mem_available.append(x) for x in mem_available if x not in spl_mem_available]
     print(spl_mem_available,'step1')
     #step 2
-    y = WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop,willingness_or_unavailability = 'willingness')
+    y = WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop,willingness_or_unavailability = 'Willingness')
     #print(y)
     will_mem_available = []
     for i in range(y.count()):
@@ -2555,11 +2555,13 @@ def sendmail(request):
     #last_date = datetime.strptime(last_date, '%d-%m-%Y')
     last_date = datetime.strftime(last_date,'%B %d, %Y')
     start_date = wrkshp[0].startdate
-    #start_date = datetime.strptime(start_date, '%Y-%m-%d')
-    start_date = datetime.strftime(start_date,'%B %d, %Y')
+    print(start_date)
+    start_date = datetime.strptime(start_date, '%Y-%m-%d')
+    #start_date = datetime.strftime(start_date,'%B %d, %Y')
     end_date = wrkshp[0].enddate
-    #end_date = datetime.strptime(end_date, '%Y-%m-%d')
-    end_date = datetime.strftime(end_date,'%B %d, %Y')
+    end_date = datetime.strptime(end_date, '%Y-%m-%d')
+    #end_date = datetime.strftime(end_date,'%B %d, %Y')
+    print(end_date)
     #selected = var.get('selected')
     #print(selected)
     objs = memberdetail.objects.filter(team = '1')

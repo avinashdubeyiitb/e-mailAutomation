@@ -401,6 +401,11 @@ a {
 .form-control{
   margin:10px
 }*/
+#loader{
+  position: absolute;
+  top:45%;
+  left:45%;
+}
 h1{
 position: absolute;
 left: 35%;

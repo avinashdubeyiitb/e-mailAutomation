@@ -21,8 +21,7 @@
       </div>
     </div>
     <h1>Create Workshop </h1>
-  <div id="col1inner" >
-    <div>
+    <div id="col2inner" >
       <strong id="hcnactivestatus">Select Workshop:</strong>
       <div class="dropdown" id="hcnactivestatusi" >
       <input v-model="selectedworkshop1" class="dropdown-input" type="text" placeholder="Select"  @click="chngclg1()"/>
@@ -49,10 +48,10 @@
             </div>
             <button id="sub4" @click="savewrkactv">Save</button>
     </div>
-    <div >
+    <div id="col1inner">
     <strong><p id="fd">Fill details:</p></strong>
     <form @submit="formSubmit">
-      <strong id="hcnstatel">Hcn State:</strong>
+      <strong id="hcnstatel">Host State:</strong>
       <div id="hcnstate">
           <b-dropdown  v-bind:text="state" class="dropsize">
             <div v-for="(p,i) in statedisdata" v-bind:key='i' >
@@ -91,9 +90,8 @@
 
     <button id="msub">Submit</button>
     </form>
+    <button id="nsub" @click="discard">Clear</button>
   </div>
-
-<button id="nsub" @click="discard">Clear</button>
 
 <div v-show="success" id="rmsg">
   <p>{{output.status}}</p>
@@ -122,7 +120,6 @@
 </div>
 
 </div>
-  </div>
 </template>
 <script>
 export default {
@@ -304,12 +301,21 @@ color: #FFFFFF;
 
 #col1inner{
 position: absolute;
-width: 90%;
+width: 43%;
 height: 90%;
 left: 7%;
-right:1%;
 top: 10%;
 z-index: -1;
+border: 1px solid #000000;
+box-sizing: border-box;
+border-radius: 10px;
+}
+#col2inner{
+position: absolute;
+width: 48%;
+height: 90%;
+right: 1%;
+top: 10%;
 border: 1px solid #000000;
 box-sizing: border-box;
 border-radius: 10px;
@@ -548,7 +554,7 @@ top: 58%;
 }
 #nsub{
 position: absolute;
-left:52%;
+left:60%;
 top: 58%;
 }
 #rmsg{
@@ -643,7 +649,7 @@ table, th, td {
 position: absolute;
 width: 154px;
 height: 25px;
-left: 59%;
+left: 10%;
 top: 11%;
 
 font-family: Radley;
@@ -658,14 +664,14 @@ color: #000000;
 }
 #hcnactivestatusi{
 position: absolute;
-left: 77%;
+left: 45%;
 top: 10%;
 }
 #isactv{
 position: absolute;
 width: 154px;
 height: 25px;
-left: 59%;
+left: 10%;
 top: 19%;
 
 font-family: Radley;
@@ -680,12 +686,12 @@ color: #000000;
 }
 #isactvi1{
 position: absolute;
-left: 77%;
+left: 45%;
 top: 19%;
 }
 #isactvi2{
 position: absolute;
-left: 77%;
+left: 45%;
 top: 23%;
 }
 

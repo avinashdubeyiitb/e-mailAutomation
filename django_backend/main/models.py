@@ -80,8 +80,8 @@ class WorkshopTeamStatus(models.Model):
     willingness_or_unavailability = models.CharField(max_length=50,blank=True,null=True,default='None')
     reason = models.TextField(max_length=500,blank=True,null=True)
     category_of_reason = models.CharField(max_length=50,blank=False,null=True)
-    approval_status = models.CharField(max_length=50,blank=False,null=True)
-    approved_or_rejected_by = models.CharField(max_length=50,blank=False,null=True)
+    approval_status = models.CharField(max_length=50,blank=False,null=False,default="None")
+    approved_or_rejected_by = models.CharField(max_length=50,blank=False,null=False,default="None")
 
     def __str__(self):
         return self.workshop_venue
