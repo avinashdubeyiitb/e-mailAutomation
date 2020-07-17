@@ -359,25 +359,27 @@ def stats(request):
         labels = ListLabels(service,'me')
         for val in labels:
             if val['name'] in lbl:
-                ids.append(val['id'])
+                ids.append((val['id'],val['name']))
+                print(val['name'],val['id'])
         msg = ListMessagesWithLabels(service,'me',['INBOX'])
+        print(ids,'here')
         #print(msg)
         for idx in range(len(ids)):
-            m = ListMessagesWithLabels(service,'me',[ids[idx]])
+            m = ListMessagesWithLabels(service,'me',[ids[idx][0]])
             for i in range(len(m)):
                 for j in range(len(msg)):
                     if m[i]['threadId'] == msg[j]['threadId']:
                         tmp = service.users().messages().get(userId='me', id=msg[j]['id']).execute()
-                        #print(tmp)
+                        print(m[i])
                         f = None;t = None
                         for l in range(len(tmp['payload']['headers'])):
                             if tmp['payload']['headers'][l]['name'] == 'From':
-                                print(lbl[idx],tmp['payload']['headers'][l]['value'])
+                                print(ids[idx][1],tmp['payload']['headers'][l]['value'])
                                 f = tmp['payload']['headers'][l]['value']
                                 if f.find('<') != -1:
                                     f = f[f.index('<')+1:f.index('>')]
                             if tmp['payload']['headers'][l]['name'] == 'To':
-                                print(lbl[idx],tmp['payload']['headers'][l]['value'])
+                                print(ids[idx][1],tmp['payload']['headers'][l]['value'])
                                 t = tmp['payload']['headers'][l]['value']
                                 if t.find('<') != -1:
                                     t = t[t.index('<')+1:t.index('>')]
@@ -390,13 +392,14 @@ def stats(request):
                                 a = len(dct['Inbox'])
                                 dct['Inbox'].append({'user':t,'Data':[]})
                             for b in range(len(dct['Inbox'][a]['Data'])):
-                                if dct['Inbox'][a]['Data'][b]['label'] == lbl[idx]:
+                                if dct['Inbox'][a]['Data'][b]['label'] == ids[idx][1]:
                                     dct['Inbox'][a]['Data'][b]['count'] +=1
                                     dct['Inbox'][a]['Data'][b]['clist'].append((f,tmp['id']))
                                     break
                             else:
-                                dct['Inbox'][a]['Data'].append({'label':lbl[idx],'count':1,'clist':[(f,tmp['id'])]})
-        print(dct)
+                                dct['Inbox'][a]['Data'].append({'label':ids[idx][1],'count':1,'clist':[(f,tmp['id'])]})
+                                #print(dct)
+        #print(dct)
         return JsonResponse(dct)
     except errors.HttpError as error:
         print('An error occurred: %s' % error)
@@ -2026,6 +2029,23 @@ def getmeminfo(request):
     return JsonResponse(data)
 
 @api_view(['POST'])
+def getallinfo(request):
+    var = JSONParser().parse(request)
+    selectedworkshop = var.get('selectedworkshop')
+    data = {}
+    WrkshopsTakenCount = WorkshopsTakenCount.objects.all()
+    WrkshopTeamStatus = WorkshopTeamStatus.objects.filter(workshop_venue = selectedworkshop)
+    Demo_Dtls = DemoDtls.objects.all()
+    data['head_wtc'] = [field.name for field in WorkshopsTakenCount._meta.get_fields()]
+    data['head_wts'] = [field.name for field in WorkshopTeamStatus._meta.get_fields()]
+    data['head_dd'] = [field.name for field in DemoDtls._meta.get_fields()]
+    data['WorkshopsTakenCount'] = list(WrkshopsTakenCount.values())
+    data['WorkshopTeamStatus'] = list(WrkshopTeamStatus.values())
+    data['DemoDtls'] = list(Demo_Dtls.values())
+    #print(data)
+    return JsonResponse(data)
+
+@api_view(['POST'])
 def save_finalteam(request):
     var = JSONParser().parse(request)
     team = var.get('team')
@@ -2369,7 +2389,7 @@ def algo_for_willing_mem(request):
     #print(x)
     mem_available = []
     for i in range(x.count()):
-        if x[i].approval_status == 'None' or x[i].approval_status == 'no':
+        if (x[i].approval_status == None or x[i].approval_status == 'no') and x[i].willingness_or_unavailability != 'Willingness':
             mem_available.append(x[i].responder)
     spl_mem_available = []
     [spl_mem_available.append(x) for x in mem_available if x not in spl_mem_available]

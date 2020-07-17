@@ -43,6 +43,7 @@ urlpatterns = [
     # url(r'^auth/google/',views.GoogleLogin.as_view(), name ='google_login' ),
     url(r'^api/main/algo',views.algo_for_willing_mem),
     url(r'^api/main/meminfo',views.getmeminfo),
+    url(r'^api/main/getallinfo',views.getallinfo),
     url(r'^api/main/savealgo',views.savealgo),
     url(r'^api/main/getalgodetail',views.getalgodetail),
     url(r'^api/main/save_finalteam',views.save_finalteam)

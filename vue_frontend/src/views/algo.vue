@@ -20,6 +20,54 @@
         <router-link style="text-decoration: none; color: inherit;" to="/ema">Email Analytics</router-link>
       </div>
     </div>
+    <b-button v-b-modal.stats size="sm" id="stats" @click="getallinfo">Members Stats</b-button>
+            <b-modal size="xl" id="stats" title="Stats" hide-footer scrollable>
+              <table>
+                <thead>
+                  <th><button @click="show1 = !show1;show2 = false;show3 = false">Count of Workshop taken</button></th>
+                  <th><button @click="show2 = !show2;show1 = false;show3 = false">Willingness/Unavailability</button></th>
+                  <th><button @click="show3 = !show3;show2 = false;show1 = false">Demo details</button></th>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+            <b-container class="px-2" v-show="show1">
+              <table>
+                <thead >
+                  <th v-for="(x,y) in response1.head_wtc " :key="y">{{x}}</th>
+                </thead>
+                <tbody>
+              <tr v-for="(x2,j2) in response1.WorkshopsTakenCount" :key="j2">
+                <td v-for="(value2,key2) in x2" :key="key2">{{value2}}</td>
+              </tr>
+                </tbody>
+              </table>
+            </b-container>
+            <b-container class="px-2" v-show="show2">
+              <table>
+                <thead >
+                  <th v-for="(x,y) in response1.head_wts " :key="y">{{x}}</th>
+                </thead>
+                <tbody>
+              <tr v-for="(x4,j4) in response1.WorkshopTeamStatus" :key="j4">
+                <td v-for="(value4,key4) in x4" :key="key4">{{value4}}</td>
+              </tr>
+                </tbody>
+              </table>
+            </b-container>
+            <b-container class="px-2" v-show="show3">
+              <table>
+                <thead >
+                  <th v-for="(x,y) in response1.head_dd " :key="y">{{x}}</th>
+                </thead>
+                <tbody>
+              <tr v-for="(x6,j6) in response1.DemoDtls" :key="j6">
+                <td v-for="(value6,key6) in x6" :key="key6">{{value6}}</td>
+              </tr>
+                </tbody>
+              </table>
+            </b-container>
+            </b-modal>
     <h1>Algorithm for Team Selection </h1>
   <div id="col1inner" >
     <strong id="wrk" >Select Workshop:</strong>
@@ -226,7 +274,8 @@ export default {
       algodetail: '',
       result: '',
       response: '',
-      loader: false
+      loader: false,
+      response1: ''
     }
   },
   watch: {
@@ -247,6 +296,18 @@ export default {
           console.log(error)
         })
     },
+    getallinfo () {
+      this.axios.post(this.url + '/api/main/getallinfo', {
+        selectedworkshop: this.selectedworkshop
+      })
+        .then(response1 => {
+          this.response1 = response1.data
+          console.log(response1)
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    },
     kavi_sir_mail () {
       this.result = 'sending mails'
       this.axios.post(this.url + '/api/main/kavi_sir_mail', {
@@ -256,7 +317,7 @@ export default {
         team: this.output.workshop_team,
         url: this.$store.getters.url
       })
-        .then(function (response) {
+        .then(response => {
           this.result = response.data
           this.loader = false
         })
@@ -401,6 +462,11 @@ a {
 .form-control{
   margin:10px
 }*/
+#stats{
+  position: absolute;
+  top:15%;
+  left:70%;
+}
 #loader{
   position: absolute;
   top:45%;

@@ -50,8 +50,8 @@
     </div>
     <strong id="recipientdis">Recipient District:</strong>
     <div id="recipientdisi">
-      <p>{{district}}
-        <b-dropdown  v-bind:text="d" class="dropsize">
+      <p><b-button v-for='(name,key) in district' v-bind:key='key' >{{name}}<b-button @click="disc2(name,key)" class="close" aria-label="Close"><span class="d-inline-block" aria-hidden="true">&times;</span></b-button></b-button>
+        <b-dropdown  text="District" class="dropsize">
           <div v-for="(dis,i) in districts" v-bind:key='i'>
             <div v-for="(diss,i) in dis" v-bind:key='i' >
               <b-dropdown-item  @click='selecteddistrict(diss)'>{{diss}}</b-dropdown-item>
@@ -441,6 +441,10 @@ export default {
       console.log(value, key)
       this.$delete(this.output.attachments, key)
       console.log(Object.values(this.output.attachments))
+    },
+    disc2 (name, key) {
+      console.log(name)
+      this.$delete(this.district, key)
     },
     selecteddistrict (diss) {
       this.district.push(diss)

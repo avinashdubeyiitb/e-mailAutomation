@@ -21,6 +21,7 @@
       </div>
     </div>
     <h1>Email Analytics</h1>
+    <button id="refresh" @click="stats()">Refresh</button>
   <div id="col1inner" >
     Sent
 <table class="table">
@@ -229,6 +230,7 @@ export default {
         })
     },
     stats () {
+      this.loader = true
       this.axios.post(this.url + '/api/main/stats', {
       })
         .then(output => {
@@ -245,6 +247,11 @@ export default {
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+#refresh{
+position: absolute;
+top: 5%;
+right: 10%;
+}
 h1{
 position: absolute;
 left: 40%;

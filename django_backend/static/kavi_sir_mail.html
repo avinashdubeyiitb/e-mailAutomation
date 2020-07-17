@@ -29,6 +29,7 @@
   </thead>
   <tbody>
     {% for data in stat%}
+    {% if data.willingness_or_unavailability != 'None'%}
     <tr>
       <td >{{workshop_name}}</td>
       <td >{{dte}}</td>
@@ -45,6 +46,7 @@
       <td>{{data.approval_status}}</td>
       <td>{{data.approved_or_rejected_by}}</td>
     </tr>
+    {%endif%}
     {%endfor%}
   </tbody>
 </table>
@@ -55,18 +57,18 @@ Please suggest a team for the workshop from the list below
       <thead>
         <th>Responder</th>
         <th>Count of workshops taken in past 1 year</th>
-        <th>Willingness/Unavailability</th>
         <th>Reason</th>
-        <th>Total count of workshops taken</th>
       </thead>
       <tbody>
         {% for data in team%}
     <tr>
       <td>{{data.name}}</td>
       <td>{{data.past_count}}</td>
-      <td>{{data.status}}</td>
-      <td>{{data.reason}}</td>
-      <td>{{data.total_count}}</td>
+      {%if data.status == 'Willingness'%}
+      <td>Willingness</td>
+      {%else %}
+      <td>{{data.status}} : total count {{data.total_count}}</td>
+      {%endif%}
     </tr>
     {%endfor%}
       </tbody>
