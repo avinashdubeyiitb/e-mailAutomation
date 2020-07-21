@@ -44,13 +44,38 @@
               </table>
             </b-container>
             <b-container class="px-2" v-show="show2">
-              <table>
+              <div id="content">
+                <div class="text-uppercase text-bold">id selected: {{selected}}</div>
+          <table class="table table-hover">
+          <thead>
+          <tr>
+          <th>
+          <label class="form-checkbox">
+          <input type="checkbox" v-model="selectAll" @click="select">
+          </label>
+          </th>
+          <th>College Name</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-bind:key="name" v-for="name in response1.WorkshopTeamStatus">
+          <td>
+          <label class="form-checkbox">
+          <input type="checkbox" :value="name" v-model="selected" @change="$store.commit('selected', selected);clginfo()">
+          </label>
+          </td>
+          <td>{{name}}</td>
+          </tr>
+          </tbody>
+          </table>
+            </div>
+              <table v-show="avail">
                 <thead >
-                  <th v-for="(x,y) in response1.head_wts " :key="y">{{x}}</th>
+                  <th v-for="(x,y) in response2.head_wts " :key="y">{{x}}</th>
                 </thead>
-                <tbody>
-              <tr v-for="(x4,j4) in response1.WorkshopTeamStatus" :key="j4">
-                <td v-for="(value4,key4) in x4" :key="key4">{{value4}}</td>
+                <tbody v-for="(x,y) in response2.dtl" :key="y">
+              <tr v-for="(value4,key4) in x" :key="key4">
+                <td v-for="(val,key) in value4" :key="key">{{val}}</td>
               </tr>
                 </tbody>
               </table>
@@ -275,12 +300,56 @@ export default {
       result: '',
       response: '',
       loader: false,
-      response1: ''
+      response1: '',
+      response2: '',
+      selected: [],
+      avail: false,
+      selectAll: false
     }
   },
   watch: {
   },
   methods: {
+    clginfo () {
+      this.avail = false
+      if (this.selected.length) {
+        this.axios.post(this.url + '/api/main/clginfo', {
+          selectedlist: this.selected
+        })
+          .then(response2 => {
+            this.response2 = response2.data
+            // console.log(response2)
+            this.avail = true
+          })
+          .catch(function (error) {
+            console.log(error)
+          })
+      }
+    },
+    select () {
+      this.selected = []
+      if (!this.selectAll) {
+        for (const pk in this.response1.WorkshopTeamStatus) {
+          console.log(pk)
+          this.selected.push(this.response1.WorkshopTeamStatus[pk])
+        }
+        this.avail = false
+        this.axios.post(this.url + '/api/main/clginfo', {
+          selectedlist: this.selected
+        })
+          .then(response2 => {
+            this.response2 = response2.data
+            // console.log(response2)
+            this.avail = true
+          })
+          .catch(function (error) {
+            console.log(error)
+          })
+      } else {
+        this.selected = []
+        this.avail = false
+      }
+    },
     getinfo (name) {
       console.log(name)
       this.axios.post(this.url + '/api/main/meminfo', {
@@ -290,7 +359,7 @@ export default {
       })
         .then(response => {
           this.response = response.data
-          console.log(response)
+          // console.log(response)
         })
         .catch(function (error) {
           console.log(error)
@@ -302,7 +371,7 @@ export default {
       })
         .then(response1 => {
           this.response1 = response1.data
-          console.log(response1)
+          // console.log(response1)
         })
         .catch(function (error) {
           console.log(error)

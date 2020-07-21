@@ -23,6 +23,14 @@
     <h1>Create Workshop </h1>
     <div id="col2inner" >
       <strong id="hcnactivestatus">Select Workshop:</strong>
+      <div id="hcnactivestatusi" >
+      <b-dropdown  v-bind:text="selectedworkshop1" class="dropsize">
+        <b-dropdown-item v-for="host in wrklist.list" v-bind:key='host[0]' @click="selectedworkshop1 = host[0];savestt(host[1])">
+          {{host[0]}}
+        </b-dropdown-item>
+      </b-dropdown>
+      </div>
+      <!--
       <div class="dropdown" id="hcnactivestatusi" >
       <input v-model="selectedworkshop1" class="dropdown-input" type="text" placeholder="Select"  @click="chngclg1()"/>
         <div  v-show="selectedworkshop1" class="dropdown-list" style="z-index:100; position: fixed;background: #FFFFFF">
@@ -32,7 +40,7 @@
             </div>
           </div>
           </div>
-          </div>
+          </div>-->
           <strong id="isactv">Is Active:</strong>
             <div class="form-check" id="isactvi1">
                 <label class="form-check-label">
@@ -149,7 +157,8 @@ export default {
       success: false,
       showing: true,
       wrklist: [],
-      selectedworkshop1: '',
+      selectedworkshop1: 'Host College Name',
+      selectedworkshop: '',
       isactive: ''
     }
   },
@@ -167,6 +176,7 @@ export default {
     },
     savewrkactv () {
       const currentObj = this
+      this.selectedworkshop = this.$store.getters.awsselectedworkshop
       this.axios.post(this.url + '/api/main/savewrkactv', {
         isactive: this.isactive,
         workshop: this.selectedworkshop1
@@ -176,8 +186,10 @@ export default {
           currentObj.workshoplist()
           if (currentObj.selectedworkshop === currentObj.selectedworkshop1 && currentObj.isactive === 'False') {
             currentObj.selectedworkshop = ''
-            this.$store.commit('awsselectedworkshop', '')
+            currentObj.$store.commit('awsselectedworkshop', '')
           }
+          currentObj.isactive = ''
+          currentObj.selectedworkshop1 = 'Host College Name'
         })
         .catch(function (error) {
           console.log(error)
@@ -664,7 +676,7 @@ color: #000000;
 }
 #hcnactivestatusi{
 position: absolute;
-left: 45%;
+left: 40%;
 top: 10%;
 }
 #isactv{

@@ -102,11 +102,32 @@ CORS_ORIGIN_WHITELIST = (
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'elsi',
+        'NAME': 'emauto',
         'USER':'postgres',
         'PASSWORD':'1234',
         'HOST':'localhost'
-    }
+    },
+    'elsi': {
+        'NAME': 'elsi',
+        'ENGINE': 'django.db.backends.postgresql',
+        'USER':'postgres',
+        'PASSWORD':'1234',
+        'HOST':'localhost'
+    },
+    'tbt': {
+        'NAME': 'tbt',
+        'ENGINE': 'django.db.backends.postgresql',
+        'USER':'postgres',
+        'PASSWORD':'1234',
+        'HOST':'localhost'
+    },
+    'tmp': {
+        'NAME': 'tmp',
+        'ENGINE': 'django.db.backends.postgresql',
+        'USER':'postgres',
+        'PASSWORD':'1234',
+        'HOST':'localhost'
+    },
 }
 
 

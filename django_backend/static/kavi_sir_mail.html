@@ -18,9 +18,6 @@
 
 <table>
   <thead>
-    <th>Workshop Venue</th>
-    <th>Date</th>
-    <th>District</th>
     <th>Responder</th>
     <th>Willingness/Unavailability</th>
     <th>Reason</th>
@@ -31,9 +28,6 @@
     {% for data in stat%}
     {% if data.willingness_or_unavailability != 'None'%}
     <tr>
-      <td >{{workshop_name}}</td>
-      <td >{{dte}}</td>
-      <td >{{district}}</td>
       <td>
         {{data.responder}}
       </td>
@@ -66,6 +60,8 @@ Please suggest a team for the workshop from the list below
       <td>{{data.past_count}}</td>
       {%if data.status == 'Willingness'%}
       <td>Willingness</td>
+      {%elif data.status == 'None'%}
+      <td>total count {{data.total_count}}</td>
       {%else %}
       <td>{{data.status}} : total count {{data.total_count}}</td>
       {%endif%}

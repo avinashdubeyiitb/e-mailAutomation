@@ -60,8 +60,8 @@
             </div>
         </b-dropdown>
         </div>
-    <strong id="cno">Contact No.:*</strong>
-    <input id="cnoi" type="tel" v-model="cno" @change="$store.commit('cno', cno)" @input="acceptNumber" required><br>
+    <strong id="cno">Contact No.:</strong>
+    <input id="cnoi" type="tel" v-model="cno" @change="$store.commit('cno', cno)" @input="acceptNumber"><br>
     <button id="msub" v-on:click="loader = true">Submit</button>
     </form>
     <p id="or">-----------------------or------------------------</p>
