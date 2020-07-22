@@ -473,9 +473,9 @@ def getbody(clg,obj,sta,dis):
     try:
         district = dis
         state = sta
-        c = AppElsiCollegeDtls.objects.all()
         count=0
         tchdtl = ['default']
+        c = ElsiCollegeDtls.objects.using('elsi').all() 
         for c in c.values('lab_inaugurated'):
             if c.get('lab_inaugurated') == 1:
                 count=count+1
@@ -487,13 +487,13 @@ def getbody(clg,obj,sta,dis):
                     clg + " , " + district + " , " + state
             body = render_to_string(os.path.join(STATIC_DIR,'no_record.html'),{'count':count})
         else :
-            college_name = obj[0].normalised_ins_name
+            college_name = app_normalised_name.objects.filter(college_id = obj[0].id)[0].normalised_ins_name
             district = obj[0].district
             state = obj[0].state
             wo_attend = obj[0].wo_attend
             tbt_allowed = obj[0].tbt_allowed
             lab_inaugurated = obj[0].lab_inaugurated
-            workshop = AppWorkshopParticipants.objects.filter(clg_id = obj[0].id)
+            workshop = WorkshopParticipants.objects.using('elsi').filter(clg_id = obj[0].id)
             print(workshop.values())
             subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): " +\
                     "Information for e-Yantra Lab Setup Initiative (eLSI): " +\
@@ -520,7 +520,7 @@ def getbody(clg,obj,sta,dis):
                 {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
                 'count':count,"datas":d,'lst':l})
             elif obj[0].wo_attend and obj[0].tbt_allowed:
-                tb = AppTbtCollegeDtls.objects.filter(elsi_clg_id = obj[0].id )
+                tb = TbtCollegeDtls.objects.using('tbt').filter(elsi_clg_id = obj[0].id )
                 if tb[0].completed:
                     print('D')
                     subdiv = 'D'
@@ -530,9 +530,9 @@ def getbody(clg,obj,sta,dis):
                         tchdtl.append(fields.name)
                         if fields.name in tchdtl2:
                             l.append(fields.name)
-                    det = AppWorkshopDtls.objects.filter(id = workshop[0].workshop_id )
+                    det = WorkshopDtls.objects.using('elsi').filter(id = workshop[0].workshop_id )
                     workshop_id = workshop[0].workshop_id
-                    temp = AppElsiCollegeDtls.objects.filter(id = det[0].clg_id)
+                    temp = ElsiCollegeDtls.objects.using('elsi').filter(id = det[0].clg_id)
                     details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
                     print(details)
                     d= {'data':[]}
@@ -561,10 +561,10 @@ def getbody(clg,obj,sta,dis):
                         tchdtl.append(fields.name)
                         if fields.name in tchdtl2:
                             l.append(fields.name)
-                    det = AppWorkshopDtls.objects.filter(id = workshop[0].workshop_id )
+                    det = WorkshopDtls.objects.using('elsi').filter(id = workshop[0].workshop_id )
                     print(det.values())
                     workshop_id = workshop[0].workshop_id
-                    temp = AppElsiCollegeDtls.objects.filter(id = det[0].clg_id)
+                    temp = ElsiCollegeDtls.objects.using('elsi').filter(id = det[0].clg_id)
                     details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
                     print(details)
                     d= {'data':[]}
@@ -596,7 +596,7 @@ def getbody(clg,obj,sta,dis):
                 print(tchdtl)
                 print(workshop.values())
                 workshop_id = workshop[0].workshop_id
-                workshop_dtl = AppWorkshopDtls.objects.filter(id = workshop_id)
+                workshop_dtl = WorkshopDtls.objects.using('elsi').filter(id = workshop_id)
                 print(workshop_dtl.values())
                 datas = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
                 print(datas.values())
@@ -608,7 +608,7 @@ def getbody(clg,obj,sta,dis):
                             d['data'][idx]['value'].append(datas.values()[idx][field.name])
                 print(d)
                 clg_id = workshop_dtl[0].clg_id
-                temp = AppElsiCollegeDtls.objects.filter(id = clg_id)
+                temp = ElsiCollegeDtls.objects.using('elsi').filter(id = clg_id)
                 print(temp.values())
                 body = render_to_string(os.path.join(STATIC_DIR,'workshop_done.html'),
                 {'CollegeName':college_name,'State': state,'District':district,
@@ -986,8 +986,8 @@ def store(request):
         #     print(dis)
         #     sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
         #     print(sta)
-        obj = AppElsiCollegeDtls.objects.filter(normalised_ins_name = coll)
-        c = AppElsiCollegeDtls.objects.all()
+        obj = ElsiCollegeDtls.objects.using('elsi').filter(id = app_normalised_name.objects.filter(normalised_ins_name = coll)[0].id)
+        c = ElsiCollegeDtls.objects.using('elsi').all()
         count=0
         for c in c.values('lab_inaugurated'):
             if c.get('lab_inaugurated') == 1:
@@ -995,13 +995,13 @@ def store(request):
         if obj.count() < 1:
             pass
         else :
-            college_name = obj[0].normalised_ins_name
+            college_name = app_normalised_name.objects.filter(id = obj[0].id)[0].normalised_ins_name
             district = obj[0].district
             state = obj[0].state
             wo_attend = obj[0].wo_attend
             tbt_allowed = obj[0].tbt_allowed
             lab_inaugurated = obj[0].lab_inaugurated
-            workshop = AppWorkshopParticipants.objects.filter(clg_id = obj[0].id)
+            workshop = WorkshopParticipants.objects.using('elsi').filter(clg_id = obj[0].id)
             print(workshop.values())
             subject = "IIT Bombay, e-Yantra Lab Setup Initiative (eLSI): " +\
                     "Information for e-Yantra Lab Setup Initiative (eLSI): " +\
@@ -1026,7 +1026,7 @@ def store(request):
                 {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
                 'count':count,"datas":d,'lst':l})
             elif obj[0].wo_attend and obj[0].tbt_allowed:
-                tb = AppTbtCollegeDtls.objects.filter(elsi_clg_id = obj[0].id )
+                tb = TbtCollegeDtls.objects.using('tbt').filter(elsi_clg_id = obj[0].id )
                 if tb[0].completed:
                     print('D')
                     l = ['sno.']
@@ -1034,9 +1034,9 @@ def store(request):
                         tchdtl.append(fields.name)
                         if fields.name in tchdtl2:
                             l.append(fields.name)
-                    det = AppWorkshopDtls.objects.filter(id = workshop[0].workshop_id )
+                    det = WorkshopDtls.objects.using('elsi').filter(id = workshop[0].workshop_id )
                     workshop_id = workshop[0].workshop_id
-                    temp = AppElsiCollegeDtls.objects.filter(id = det[0].clg_id)
+                    temp = ElsiCollegeDtls.objects.using('elsi').filter(id = det[0].clg_id)
                     details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
                     print(details)
                     d= {'data':[]}
@@ -1063,9 +1063,9 @@ def store(request):
                         tchdtl.append(fields.name)
                         if fields.name in tchdtl2:
                             l.append(fields.name)
-                    det = AppWorkshopDtls.objects.filter(id = workshop[0].workshop_id )
+                    det = WorkshopDtls.objects.using('elsi').filter(id = workshop[0].workshop_id )
                     workshop_id = workshop[0].workshop_id
-                    temp = AppElsiCollegeDtls.objects.filter(id = det[0].clg_id)
+                    temp = ElsiCollegeDtls.objects.using('elsi').filter(id = det[0].clg_id)
                     details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
                     print(details)
                     d= {'data':[]}
@@ -1094,7 +1094,7 @@ def store(request):
                             l.append(fields.name)
                 print(workshop.values())
                 workshop_id = workshop[0].workshop_id
-                workshop_dtl = AppWorkshopDtls.objects.filter(id = workshop_id)
+                workshop_dtl = WorkshopDtls.objects.using('elsi').filter(id = workshop_id)
                 print(workshop_dtl.values())
                 datas = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
                 print(datas)
@@ -1106,7 +1106,7 @@ def store(request):
                             d['data'][idx]['value'].append(datas.values()[idx][field.name])
                 print(d)
                 clg_id = workshop_dtl[0].clg_id
-                temp = AppElsiCollegeDtls.objects.filter(id = clg_id)
+                temp = ElsiCollegeDtls.objects.using('elsi').filter(id = clg_id)
                 print(temp.values())
                 body = render_to_string(os.path.join(STATIC_DIR,'workshop_done.html'),
                 {'CollegeName':college_name,'State': state,'District':district,
@@ -1157,7 +1157,11 @@ def csvapprove(request):
                 attachmentFile = None
                 clg = row[6]
                 coll = getname(clg)
-                obj = AppElsiCollegeDtls.objects.filter(normalised_ins_name = coll)
+                nme = app_normalised_name.objects.filter(normalised_ins_name = coll)
+                if nme.count()>0:
+                    obj = ElsiCollegeDtls.objects.using('elsi').filter(id = app_normalised_name.objects.filter(normalised_ins_name = coll)[0].id)
+                else :
+                    obj = ElsiCollegeDtls.objects.using('elsi').filter(id = 0)
                 print(coll)
                 fn = []
                 # if len(district) >0 and len(state)>0:
@@ -1273,8 +1277,11 @@ def csvdraft(request):
                 state = (row[7])
                 attachmentFile = None
                 clg = row[6]
-                coll = getname(clg)
-                obj = AppElsiCollegeDtls.objects.filter(normalised_ins_name = coll)
+                nme = app_normalised_name.objects.filter(normalised_ins_name = coll)
+                if nme.count()>0:
+                    obj = ElsiCollegeDtls.objects.using('elsi').filter(id = app_normalised_name.objects.filter(normalised_ins_name = coll)[0].id)
+                else :
+                    obj = ElsiCollegeDtls.objects.using('elsi').filter(id = 0)
                 print(coll)
                 # if len(district) >0 and len(state)>0:
                 #     dis=getname(district)
@@ -1376,7 +1383,7 @@ def idrequest(request):
     var = JSONParser().parse(request)
     clg = var.get('cname')
     rema = var.get('remail')
-    obj = AppElsiCollegeDtls.objects.filter(college_name = clg)
+    obj = ElsiCollegeDtls.objects.using('elsi').filter(college_name = clg)
     with open('assets/info.json','r') as read:
         rd = json.load(read)
     #file_path = os.path.join(BASE_DIR,rd['file_name'])
@@ -1475,7 +1482,11 @@ def submit(request):
         #     print(dis)
         #     sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
         #     print(sta)
-        obj = AppElsiCollegeDtls.objects.filter(normalised_ins_name = coll)
+        nme = app_normalised_name.objects.filter(normalised_ins_name = coll)
+        if nme.count()>0:
+            obj = ElsiCollegeDtls.objects.using('elsi').filter(id = app_normalised_name.objects.filter(normalised_ins_name = coll)[0].id)
+        else :
+            obj = ElsiCollegeDtls.objects.using('elsi').filter(id = 0)
         res = getbody(coll,obj,state,district)
         var['subject']=res['subject']
         var['body']=res['body']
@@ -1666,7 +1677,7 @@ def cwssubmit(request):
         var = JSONParser().parse(request)
         x = var.get('coono')
         print(x)
-        clgid = AppElsiCollegeDtls.objects.filter(college_name = var.get('hcn'))[0].id
+        clgid = ElsiCollegeDtls.objects.using('elsi').filter(college_name = var.get('hcn'))[0].id
         serializer = CreateWorkshop(data={'clgid':clgid,'hcn':var.get('hcn'),'startdate':var.get('startdate'),
             'enddate':var.get('enddate'),'venueadd':var.get('venueadd'),'cooname':var.get('cooname'),
             'cooemail':var.get('cooemail'),'coono':var.get('coono')})
@@ -1740,7 +1751,7 @@ def awssubmit(request):
         dict={}
         clist=[]
         hcn = wrkdet[0].hcn
-        getdet = AppElsiCollegeDtls.objects.filter(college_name = hcn)
+        getdet = ElsiCollegeDtls.objects.using('elsi').filter(college_name = hcn)
         startdate = wrkdet[0].startdate
         enddate = wrkdet[0].enddate
         filldate = var.get('filldate')
@@ -1761,7 +1772,7 @@ def awssubmit(request):
             state = re.sub(r'\([^)]*\)', '', state)[0:-1]
         print(state)
         districts = var.get('district')
-        c = AppElsiCollegeDtls.objects.all()
+        c = ElsiCollegeDtls.objects.using('elsi').all()
         count=0
         for c in c.values('lab_inaugurated'):
             if c.get('lab_inaugurated') == 1:
@@ -2072,7 +2083,7 @@ def save_finalteam(request):
         eyantra_mem7 =final_team[6],eyantra_mem8 = final_team[7])
     try:
         objs = create_workshop.objects.filter(id = wid)
-        objs2 = AppElsiCollegeDtls.objects.filter(college_name = objs[0].hcn)
+        objs2 = ElsiCollegeDtls.objects.using('elsi').filter(college_name = objs[0].hcn)
         to = []
         for i in range(len(team)):
             obj = memberdetail.objects.filter(name__contains = team[i])[0].emailid
@@ -2130,7 +2141,7 @@ def kavi_sir_mail(request):
     user = var.get('user')
     selectedworkshop = var.get('selectedworkshop')
     wrkshp = create_workshop.objects.filter(hcn = selectedworkshop)
-    d = AppElsiCollegeDtls.objects.filter(college_name = selectedworkshop)
+    d = ElsiCollegeDtls.objects.using('elsi').filter(college_name = selectedworkshop)
     label = var.get('label')
     tm = var.get('team')
     print(tm)
@@ -2579,7 +2590,7 @@ def sendmail(request):
     user = var.get('user')
     selectedworkshop = var.get('selectedworkshop')
     wrkshp = create_workshop.objects.filter(hcn = selectedworkshop)
-    d = AppElsiCollegeDtls.objects.filter(college_name = selectedworkshop)
+    d = ElsiCollegeDtls.objects.using('elsi').filter(college_name = selectedworkshop)
     label = var.get('label')
     district = d[0].district
     state = d[0].state
@@ -2658,7 +2669,7 @@ def headmail(request):
     user = var.get('user')
     selectedworkshop = var.get('selectedworkshop')
     wrkshp = create_workshop.objects.filter(hcn = selectedworkshop)
-    x = AppElsiCollegeDtls.objects.filter(college_name = selectedworkshop)
+    x = ElsiCollegeDtls.objects.using('elsi').filter(college_name = selectedworkshop)
     objs = memberdetail.objects.filter(ishead = '1')
     print(objs)
     label = var.get('label')
@@ -2800,7 +2811,7 @@ def gethcn(request):
     if '(' in state:
         state = re.sub(r'\([^)]*\)', '', state)[0:-1]
     print(state)
-    getdet = AppElsiCollegeDtls.objects.filter(state__iexact = state).order_by('college_name')
+    getdet = ElsiCollegeDtls.objects.using('elsi').filter(state__iexact = state).order_by('college_name')
     hcn = {}
     for i in range(getdet.count()):
         if "host" in hcn:

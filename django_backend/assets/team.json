@@ -1,12 +1,5 @@
 [
     {
-        "name": "Suprabha Jadhav",
-        "total_count": 4,
-        "status": "Willingness",
-        "past_count": 1,
-        "reason": ""
-    },
-    {
         "name": "Avinash Dubey",
         "total_count": 4,
         "status": "None",
@@ -36,6 +29,13 @@
     },
     {
         "name": "Rutuja Ekatpure",
+        "total_count": 4,
+        "status": "None",
+        "past_count": 2,
+        "reason": null
+    },
+    {
+        "name": "Vikrant Fernandes",
         "total_count": 4,
         "status": "None",
         "past_count": 2,

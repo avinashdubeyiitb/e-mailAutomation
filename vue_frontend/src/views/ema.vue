@@ -27,9 +27,9 @@
 <table class="table">
 <thead>
 <tr>
-<th>User</th>
-<th>Label</th>
-<th>Count</th>
+<th style="width: 17%">User</th>
+<th style="width: 50%">Label</th>
+<th style="width: 19%">Count</th>
 <th>Failed</th>
 </tr>
 </thead>
@@ -73,8 +73,8 @@ Draft
 <table class="table">
   <thead>
 <tr>
-<th>User</th>
-<th>Count</th>
+<th style="width: 67%">User</th>
+<th style="width: 19%">Count</th>
 <th>Failed</th>
 </tr>
 </thead>
@@ -118,8 +118,8 @@ Inbox
 <table class="table">
   <thead>
 <tr>
-<th>User</th>
-<th>Label</th>
+<th style="width: 17%">User</th>
+<th style="width: 50%">Label</th>
 <th>Count</th>
 </tr>
 </thead>
