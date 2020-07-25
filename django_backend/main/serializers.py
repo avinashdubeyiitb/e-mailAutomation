@@ -1,5 +1,13 @@
 from rest_framework import serializers
-from main.models import create_workshop,WorkshopTeamStatus,User,ssn_detail,algo_detail
+from main.models import create_workshop,WorkshopTeamStatus,User,ssn_detail,algo_detail,app_normalised_name
+
+class NormalizedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = app_normalised_name
+        fields = (
+            'college_name',
+            'normalised_ins_name',
+        )
 
 class AlgoDetailSerializer(serializers.ModelSerializer):
 

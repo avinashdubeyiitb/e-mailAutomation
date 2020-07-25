@@ -209,6 +209,17 @@ SCOPES = [
 ###############################
 # common functions
 
+def chkdatabase(name,norname):
+    nme = app_normalised_name.objects.filter(college_name = name)
+    if nme.count()<1 and norname !='n':
+        serializer = NormalizedSerializer(data = {'college_name':clg,
+                    'normalised_ins_name':norname})
+        if serializer.is_valid():
+            serializer.save()
+        else:
+            print(serializer.errors)
+        print(app_normalised_name.objects.filter(college_name = obj[i].college_name))
+
 @api_view(['POST'])
 def download(request):
     """Searches for message within gmail and downloads the attachments accordingly.
@@ -487,7 +498,7 @@ def getbody(clg,obj,sta,dis):
                     clg + " , " + district + " , " + state
             body = render_to_string(os.path.join(STATIC_DIR,'no_record.html'),{'count':count})
         else :
-            college_name = app_normalised_name.objects.filter(college_id = obj[0].id)[0].normalised_ins_name
+            college_name = app_normalised_name.objects.filter(college_name = obj[0].college_name)[0].normalised_ins_name
             district = obj[0].district
             state = obj[0].state
             wo_attend = obj[0].wo_attend
@@ -901,7 +912,7 @@ def getname(name):
     options.add_argument('--headless')
     options.add_argument("--silent")
     options.add_argument('--ignore-certificate-errors')
-    print(platform.system())
+    #print(platform.system())
     if platform.system() == 'Windows':
         file_path = os.path.join(ASSETS_DIR,'chromedriver.exe')
     else :
@@ -912,7 +923,7 @@ def getname(name):
         driver.get('https://www.google.com/search?q=' + q1)#add college name to be searched in query
         html= driver.page_source
         soup = BeautifulSoup(html,"html.parser")
-        print(soup.find('h2', attrs={'data-attrid':'title'}))
+        #print(soup.find('h2', attrs={'data-attrid':'title'}))
         if soup.find('h2', attrs={'data-attrid':'title'}) :
             name = soup.find('h2', attrs={'data-attrid':'title'}).span.contents
             return name
@@ -986,7 +997,7 @@ def store(request):
         #     print(dis)
         #     sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
         #     print(sta)
-        obj = ElsiCollegeDtls.objects.using('elsi').filter(id = app_normalised_name.objects.filter(normalised_ins_name = coll)[0].id)
+        obj = ElsiCollegeDtls.objects.using('elsi').filter(college_name = app_normalised_name.objects.filter(normalised_ins_name = coll)[0].college_name)
         c = ElsiCollegeDtls.objects.using('elsi').all()
         count=0
         for c in c.values('lab_inaugurated'):
@@ -995,7 +1006,7 @@ def store(request):
         if obj.count() < 1:
             pass
         else :
-            college_name = app_normalised_name.objects.filter(id = obj[0].id)[0].normalised_ins_name
+            college_name = app_normalised_name.objects.filter(college_name = obj[0].college_name)[0].normalised_ins_name
             district = obj[0].district
             state = obj[0].state
             wo_attend = obj[0].wo_attend
@@ -1157,9 +1168,10 @@ def csvapprove(request):
                 attachmentFile = None
                 clg = row[6]
                 coll = getname(clg)
+                chkdatabase(clg,coll)
                 nme = app_normalised_name.objects.filter(normalised_ins_name = coll)
                 if nme.count()>0:
-                    obj = ElsiCollegeDtls.objects.using('elsi').filter(id = app_normalised_name.objects.filter(normalised_ins_name = coll)[0].id)
+                    obj = ElsiCollegeDtls.objects.using('elsi').filter(college_name = app_normalised_name.objects.filter(normalised_ins_name = coll)[0].college_name)
                 else :
                     obj = ElsiCollegeDtls.objects.using('elsi').filter(id = 0)
                 print(coll)
@@ -1277,9 +1289,10 @@ def csvdraft(request):
                 state = (row[7])
                 attachmentFile = None
                 clg = row[6]
+                chkdatabase(clg,coll)
                 nme = app_normalised_name.objects.filter(normalised_ins_name = coll)
                 if nme.count()>0:
-                    obj = ElsiCollegeDtls.objects.using('elsi').filter(id = app_normalised_name.objects.filter(normalised_ins_name = coll)[0].id)
+                    obj = ElsiCollegeDtls.objects.using('elsi').filter(college_name = app_normalised_name.objects.filter(normalised_ins_name = coll)[0].college_name)
                 else :
                     obj = ElsiCollegeDtls.objects.using('elsi').filter(id = 0)
                 print(coll)
@@ -1482,9 +1495,10 @@ def submit(request):
         #     print(dis)
         #     sta = "".join(filter(lambda x: not x.isdigit(), data[-2]))
         #     print(sta)
+        chkdatabase(clg,coll)
         nme = app_normalised_name.objects.filter(normalised_ins_name = coll)
         if nme.count()>0:
-            obj = ElsiCollegeDtls.objects.using('elsi').filter(id = app_normalised_name.objects.filter(normalised_ins_name = coll)[0].id)
+            obj = ElsiCollegeDtls.objects.using('elsi').filter(college_name = app_normalised_name.objects.filter(normalised_ins_name = coll)[0].college_name)
         else :
             obj = ElsiCollegeDtls.objects.using('elsi').filter(id = 0)
         res = getbody(coll,obj,state,district)

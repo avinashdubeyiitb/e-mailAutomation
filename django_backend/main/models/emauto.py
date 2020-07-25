@@ -155,7 +155,7 @@ class AppElsiCollegeDtls(models.Model):
         db_table = 'elsi_college_dtls'
 from .elsi import ElsiCollegeDtls
 class app_normalised_name(models.Model):
-    college = models.ForeignKey(ElsiCollegeDtls,on_delete=models.CASCADE)
+    college_name = models.TextField(blank=True, null=True)
     normalised_ins_name = models.TextField(blank=True,null=True)
     def __str__(self):
         return self.college_name
