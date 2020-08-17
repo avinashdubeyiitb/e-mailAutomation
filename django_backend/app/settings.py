@@ -120,14 +120,7 @@ DATABASES = {
         'USER':'postgres',
         'PASSWORD':'1234',
         'HOST':'localhost'
-    },
-    'tmp': {
-        'NAME': 'tmp',
-        'ENGINE': 'django.db.backends.postgresql',
-        'USER':'postgres',
-        'PASSWORD':'1234',
-        'HOST':'localhost'
-    },
+    }
 }
 
 

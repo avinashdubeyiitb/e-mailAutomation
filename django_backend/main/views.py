@@ -212,13 +212,13 @@ SCOPES = [
 def chkdatabase(name,norname):
     nme = app_normalised_name.objects.filter(college_name = name)
     if nme.count()<1 and norname !='n':
-        serializer = NormalizedSerializer(data = {'college_name':clg,
+        serializer = NormalizedSerializer(data = {'college_name':name,
                     'normalised_ins_name':norname})
         if serializer.is_valid():
             serializer.save()
         else:
             print(serializer.errors)
-        print(app_normalised_name.objects.filter(college_name = obj[i].college_name))
+        print(app_normalised_name.objects.filter(college_name = name))
 
 @api_view(['POST'])
 def download(request):
@@ -514,16 +514,16 @@ def getbody(clg,obj,sta,dis):
                 subdiv = 'E'
                 l = ['sno.']
                 tchdtl2 = ['name','department','designation']
-                for fields in ElsiTeacherDtls._meta.fields:
+                for fields in ElsiTeachersDtls._meta.using('elsi').fields:
                         tchdtl.append(fields.name)
                         if fields.name in tchdtl2:
                             l.append(fields.name)
-                det = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id)
+                det = ElsiTeachersDtls.objects.using('elsi').filter(clg_id = obj[0].id)
                 print(det)
                 d= {'data':[]}
                 for idx in range(det.count()):
                     d['data'].append({'id':det[idx].id,'value':[idx+1]})
-                    for field in ElsiTeacherDtls._meta.fields:
+                    for field in ElsiTeachersDtls._meta.using('elsi').fields:
                         if field.name in tchdtl2:
                             d['data'][idx]['value'].append(det.values()[idx][field.name])
                 print(d)
@@ -537,27 +537,27 @@ def getbody(clg,obj,sta,dis):
                     subdiv = 'D'
                     l = ['sno.']
                     tchdtl2 = ['name','department','designation']
-                    for fields in ElsiTeacherDtls._meta.fields:
+                    for fields in ElsiTeachersDtls._meta.using('elsi').fields:
                         tchdtl.append(fields.name)
                         if fields.name in tchdtl2:
                             l.append(fields.name)
                     det = WorkshopDtls.objects.using('elsi').filter(id = workshop[0].workshop_id )
                     workshop_id = workshop[0].workshop_id
                     temp = ElsiCollegeDtls.objects.using('elsi').filter(id = det[0].clg_id)
-                    details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
+                    details = ElsiTeachersDtls.objects.using('elsi').filter(clg_id = obj[0].id,workshop_id = workshop_id)
                     print(details)
                     d= {'data':[]}
                     for idx in range(details.count()):
                         d['data'].append({'id':details[idx].id,'value':[idx+1]})
-                        for field in ElsiTeacherDtls._meta.fields:
+                        for field in ElsiTeachersDtls._meta.using('elsi').fields:
                             if field.name in tchdtl2:
                                 d['data'][idx]['value'].append(details.values()[idx][field.name])
                     print(d)
                     start_date = det[0].start_date
-                    start_date = datetime.strptime(start_date, '%d-%m-%Y')
+                    #start_date = datetime.strptime(start_date, '%d-%m-%Y')
                     start_date = datetime.strftime(start_date,'%B %d, %Y')
                     end_date = det[0].end_date
-                    end_date = datetime.strptime(end_date, '%d-%m-%Y')
+                    #end_date = datetime.strptime(end_date, '%d-%m-%Y')
                     end_date = datetime.strftime(end_date,'%B %d, %Y')
                     body = render_to_string(os.path.join(STATIC_DIR,'tbt_complete.html'),
                     {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
@@ -568,7 +568,7 @@ def getbody(clg,obj,sta,dis):
                     subdiv = 'C'
                     l = ['sno.']
                     tchdtl2 = ['name','department','designation']
-                    for fields in ElsiTeacherDtls._meta.fields:
+                    for fields in ElsiTeachersDtls._meta.using('elsi').fields:
                         tchdtl.append(fields.name)
                         if fields.name in tchdtl2:
                             l.append(fields.name)
@@ -576,20 +576,20 @@ def getbody(clg,obj,sta,dis):
                     print(det.values())
                     workshop_id = workshop[0].workshop_id
                     temp = ElsiCollegeDtls.objects.using('elsi').filter(id = det[0].clg_id)
-                    details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
+                    details = ElsiTeachersDtls.objects.using('elsi').filter(clg_id = obj[0].id,workshop_id = workshop_id)
                     print(details)
                     d= {'data':[]}
                     for idx in range(details.count()):
                         d['data'].append({'id':details[idx].id,'value':[idx+1]})
-                        for field in ElsiTeacherDtls._meta.fields:
+                        for field in ElsiTeachersDtls._meta.using('elsi').fields:
                             if field.name in tchdtl2:
                                 d['data'][idx]['value'].append(details.values()[idx][field.name])
                     print(d)
                     start_date = det[0].start_date
-                    start_date = datetime.strptime(start_date, '%d-%m-%Y')
+                    #start_date = datetime.strptime(start_date, '%d-%m-%Y')
                     start_date = datetime.strftime(start_date,'%B %d, %Y')
                     end_date = det[0].end_date
-                    end_date = datetime.strptime(end_date, '%d-%m-%Y')
+                    #end_date = datetime.strptime(end_date, '%d-%m-%Y')
                     end_date = datetime.strftime(end_date,'%B %d, %Y')
                     body = render_to_string(os.path.join(STATIC_DIR,'tbt_notcomplete.html'),
                     {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
@@ -600,7 +600,7 @@ def getbody(clg,obj,sta,dis):
                 subdiv = 'B'
                 l = ['sno.']
                 tchdtl2 = ['name','department']
-                for fields in ElsiTeacherDtls._meta.fields:
+                for fields in ElsiTeachersDtls._meta.using('elsi').fields:
                     tchdtl.append(fields.name)
                     if fields.name in tchdtl2:
                         l.append(fields.name)
@@ -609,12 +609,12 @@ def getbody(clg,obj,sta,dis):
                 workshop_id = workshop[0].workshop_id
                 workshop_dtl = WorkshopDtls.objects.using('elsi').filter(id = workshop_id)
                 print(workshop_dtl.values())
-                datas = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
+                datas = ElsiTeachersDtls.objects.using('elsi').filter(clg_id = obj[0].id,workshop_id = workshop_id)
                 print(datas.values())
                 d= {'data':[]}
                 for idx in range(datas.count()):
                     d['data'].append({'id':datas[idx].id,'value':[idx+1]})
-                    for field in ElsiTeacherDtls._meta.fields:
+                    for field in ElsiTeachersDtls._meta.using('elsi').fields:
                         if field.name in tchdtl2:
                             d['data'][idx]['value'].append(datas.values()[idx][field.name])
                 print(d)
@@ -1020,16 +1020,16 @@ def store(request):
             if  obj[0].lab_inaugurated:
                 print('E')
                 l = ['sno.']
-                for fields in ElsiTeacherDtls._meta.fields:
+                for fields in ElsiTeachersDtls._meta.using('elsi').fields:
                         tchdtl.append(fields.name)
                         if fields.name in tchdtl2:
                             l.append(fields.name)
-                det = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id )
+                det = ElsiTeachersDtls.objects.using('elsi').filter(clg_id = obj[0].id )
                 print(det)
                 d= {'data':[]}
                 for idx in range(det.count()):
                     d['data'].append({'id':det[idx].id,'value':[idx+1]})
-                    for field in ElsiTeacherDtls._meta.fields:
+                    for field in ElsiTeachersDtls._meta.using('elsi').fields:
                         if field.name in tchdtl2:
                             d['data'][idx]['value'].append(det.values()[idx][field.name])
                 print(d)
@@ -1041,27 +1041,27 @@ def store(request):
                 if tb[0].completed:
                     print('D')
                     l = ['sno.']
-                    for fields in ElsiTeacherDtls._meta.fields:
+                    for fields in ElsiTeachersDtls._meta.using('elsi').fields:
                         tchdtl.append(fields.name)
                         if fields.name in tchdtl2:
                             l.append(fields.name)
                     det = WorkshopDtls.objects.using('elsi').filter(id = workshop[0].workshop_id )
                     workshop_id = workshop[0].workshop_id
                     temp = ElsiCollegeDtls.objects.using('elsi').filter(id = det[0].clg_id)
-                    details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
+                    details = ElsiTeachersDtls.objects.using('elsi').filter(clg_id = obj[0].id,workshop_id = workshop_id)
                     print(details)
                     d= {'data':[]}
                     for idx in range(details.count()):
                         d['data'].append({'id':details[idx].id,'value':[idx+1]})
-                        for field in ElsiTeacherDtls._meta.fields:
+                        for field in ElsiTeachersDtls._meta.using('elsi').fields:
                             if field.name in tchdtl2:
                                 d['data'][idx]['value'].append(details.values()[idx][field.name])
                     print(d)
                     start_date = det[0].start_date
-                    start_date = datetime.strptime(start_date, '%d-%m-%Y')
+                    #start_date = datetime.strptime(start_date, '%d-%m-%Y')
                     start_date = datetime.strftime(start_date,'%b %d, %Y')
                     end_date = det[0].end_date
-                    end_date = datetime.strptime(end_date, '%d-%m-%Y')
+                    #end_date = datetime.strptime(end_date, '%d-%m-%Y')
                     end_date = datetime.strftime(end_date,'%b %d, %Y')
                     body = render_to_string(os.path.join(STATIC_DIR,'tbt_complete.html'),
                     {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
@@ -1070,27 +1070,27 @@ def store(request):
                 else:
                     print('C')
                     l = ['sno.']
-                    for fields in ElsiTeacherDtls._meta.fields:
+                    for fields in ElsiTeachersDtls._meta.using('elsi').fields:
                         tchdtl.append(fields.name)
                         if fields.name in tchdtl2:
                             l.append(fields.name)
                     det = WorkshopDtls.objects.using('elsi').filter(id = workshop[0].workshop_id )
                     workshop_id = workshop[0].workshop_id
                     temp = ElsiCollegeDtls.objects.using('elsi').filter(id = det[0].clg_id)
-                    details = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
+                    details = ElsiTeachersDtls.objects.using('elsi').filter(clg_id = obj[0].id,workshop_id = workshop_id)
                     print(details)
                     d= {'data':[]}
                     for idx in range(details.count()):
                         d['data'].append({'id':details[idx].id,'value':[idx+1]})
-                        for field in ElsiTeacherDtls._meta.fields:
+                        for field in ElsiTeachersDtls._meta.using('elsi').fields:
                             if field.name in tchdtl2:
                                 d['data'][idx]['value'].append(details.values()[idx][field.name])
                     print(d)
                     start_date = det[0].start_date
-                    start_date = datetime.strptime(start_date, '%d-%m-%Y')
+                    #start_date = datetime.strptime(start_date, '%d-%m-%Y')
                     start_date = datetime.strftime(start_date,'%b %d, %Y')
                     end_date = det[0].end_date
-                    end_date = datetime.strptime(end_date, '%d-%m-%Y')
+                    #end_date = datetime.strptime(end_date, '%d-%m-%Y')
                     end_date = datetime.strftime(end_date,'%b %d, %Y')
                     body = render_to_string(os.path.join(STATIC_DIR,'tbt_notcomplete.html'),
                     {'CollegeName':obj[0].college_name,'State': obj[0].state,'District':obj[0].district,
@@ -1099,7 +1099,7 @@ def store(request):
             elif obj[0].wo_attend :
                 print('B')
                 l = ['sno.']
-                for fields in ElsiTeacherDtls._meta.fields:
+                for fields in ElsiTeachersDtls._meta.using('elsi').fields:
                         tchdtl.append(fields.name)
                         if fields.name in tchdtl2:
                             l.append(fields.name)
@@ -1107,12 +1107,12 @@ def store(request):
                 workshop_id = workshop[0].workshop_id
                 workshop_dtl = WorkshopDtls.objects.using('elsi').filter(id = workshop_id)
                 print(workshop_dtl.values())
-                datas = ElsiTeacherDtls.objects.filter(clg_id = obj[0].id,workshop_id = workshop_id)
+                datas = ElsiTeachersDtls.objects.using('elsi').filter(clg_id = obj[0].id,workshop_id = workshop_id)
                 print(datas)
                 d= {'data':[]}
                 for idx in range(datas.count()):
                     d['data'].append({'id':datas[idx].id,'value':[idx+1]})
-                    for field in ElsiTeacherDtls._meta.fields:
+                    for field in ElsiTeachersDtls._meta.using('elsi').fields:
                         if field.name in tchdtl2:
                             d['data'][idx]['value'].append(datas.values()[idx][field.name])
                 print(d)
@@ -1769,13 +1769,13 @@ def awssubmit(request):
         startdate = wrkdet[0].startdate
         enddate = wrkdet[0].enddate
         filldate = var.get('filldate')
-        startdate = datetime.strptime(startdate, '%Y-%m-%d')
+        #startdate = datetime.strptime(startdate, '%Y-%m-%d')
         day1 = startdate.strftime("%A")
         startdate = datetime.strftime(startdate,'%B %d, %Y')
-        enddate = datetime.strptime(enddate, '%Y-%m-%d')
+        #enddate = datetime.strptime(enddate, '%Y-%m-%d')
         day2 = enddate.strftime("%A")
         enddate = datetime.strftime(enddate,'%B %d, %Y')
-        filldate = datetime.strptime(filldate, '%Y-%m-%d')
+        #filldate = datetime.strptime(filldate, '%Y-%m-%d')
         filldate = datetime.strftime(filldate,'%B %d, %Y')
         venueadd = wrkdet[0].venueadd
         cooname = wrkdet[0].cooname
@@ -2104,10 +2104,10 @@ def save_finalteam(request):
             to.append(obj)
         str_team = ','.join(map(str,team))
         start_date = objs[0].startdate
-        start_date = datetime.strptime(start_date, '%Y-%m-%d')
+        #start_date = datetime.strptime(start_date, '%Y-%m-%d')
         start_date = datetime.strftime(start_date,'%B %d, %Y')
         end_date = objs[0].enddate
-        end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        #end_date = datetime.strptime(end_date, '%Y-%m-%d')
         end_date = datetime.strftime(end_date,'%B %d, %Y')
         to = ','.join(map(str,to))
         label = 'willingness-unavailability'
